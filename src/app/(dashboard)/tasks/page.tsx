@@ -1,0 +1,407 @@
+'use client'
+
+import { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  BookOpen,
+  Calendar,
+  Clock,
+  FileText,
+  Plus,
+  Edit2,
+  Trash2,
+  Users,
+  CheckCircle,
+  AlertCircle,
+} from 'lucide-react'
+import { apiClient } from '@/data/api/client'
+import { toast } from 'sonner'
+import { formatDate } from '@/lib/utils'
+
+interface Task {
+  id: string
+  title: string
+  description: string
+  type: string
+  category?: string
+  points?: number
+  dueDate?: string
+  isPublished: boolean
+  groups: any[]
+  _count: {
+    assessments: number
+    attachments: number
+  }
+}
+
+export default function TasksPage() {
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    instructions: '',
+    type: 'ASSIGNMENT',
+    category: '',
+    points: 100,
+    dueDate: '',
+    groupIds: [] as string[],
+    isPublished: false,
+  })
+
+  const queryClient = useQueryClient()
+
+  const { data: tasksData, isLoading } = useQuery({
+    queryKey: ['tasks'],
+    queryFn: async () => {
+      return apiClient.get<{ data: Task[]; total: number }>('/tasks')
+    },
+  })
+
+  const createMutation = useMutation({
+    mutationFn: async (data: typeof formData) => {
+      return apiClient.post('/tasks', data)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      toast.success('Task created successfully')
+      setShowAddForm(false)
+      resetForm()
+    },
+    onError: () => {
+      toast.error('Failed to create task')
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiClient.delete(`/tasks/${id}`)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      toast.success('Task deleted successfully')
+    },
+    onError: () => {
+      toast.error('Failed to delete task')
+    },
+  })
+
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      description: '',
+      instructions: '',
+      type: 'ASSIGNMENT',
+      category: '',
+      points: 100,
+      dueDate: '',
+      groupIds: [],
+      isPublished: false,
+    })
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    await createMutation.mutateAsync(formData)
+  }
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this task?')) {
+      await deleteMutation.mutateAsync(id)
+    }
+  }
+
+  const tasks = tasksData?.data || []
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-gray-500">Loading tasks...</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Tasks</h1>
+          <p className="text-gray-600 mt-1">Create and manage assignments, quizzes, and exams</p>
+        </div>
+        <Button 
+          onClick={() => setShowAddForm(true)}
+          className="flex items-center gap-2"
+        >
+          <Plus className="h-4 w-4" />
+          Create Task
+        </Button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Total Tasks</p>
+                <p className="text-2xl font-bold">{tasks.length}</p>
+              </div>
+              <BookOpen className="h-8 w-8 text-blue-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Published</p>
+                <p className="text-2xl font-bold">
+                  {tasks.filter(t => t.isPublished).length}
+                </p>
+              </div>
+              <CheckCircle className="h-8 w-8 text-green-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Drafts</p>
+                <p className="text-2xl font-bold">
+                  {tasks.filter(t => !t.isPublished).length}
+                </p>
+              </div>
+              <FileText className="h-8 w-8 text-gray-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Due This Week</p>
+                <p className="text-2xl font-bold">
+                  {tasks.filter(t => {
+                    if (!t.dueDate) return false
+                    const due = new Date(t.dueDate)
+                    const now = new Date()
+                    const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+                    return due >= now && due <= weekFromNow
+                  }).length}
+                </p>
+              </div>
+              <AlertCircle className="h-8 w-8 text-yellow-600" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Add Form */}
+      {showAddForm && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Create New Task</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="title">Title</Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="Task title"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="type">Type</Label>
+                  <select
+                    id="type"
+                    value={formData.type}
+                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                    className="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="ASSIGNMENT">Assignment</option>
+                    <option value="QUIZ">Quiz</option>
+                    <option value="EXAM">Exam</option>
+                    <option value="PROJECT">Project</option>
+                    <option value="HOMEWORK">Homework</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="category">Category</Label>
+                  <Input
+                    id="category"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    placeholder="e.g., Mathematics, Science"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="points">Points</Label>
+                  <Input
+                    id="points"
+                    type="number"
+                    value={formData.points}
+                    onChange={(e) => setFormData({ ...formData, points: parseInt(e.target.value) })}
+                    placeholder="100"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="dueDate">Due Date</Label>
+                  <Input
+                    id="dueDate"
+                    type="datetime-local"
+                    value={formData.dueDate}
+                    onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>Publish Status</Label>
+                  <div className="flex items-center gap-2 mt-2">
+                    <input
+                      type="checkbox"
+                      id="isPublished"
+                      checked={formData.isPublished}
+                      onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <Label htmlFor="isPublished" className="font-normal">
+                      Publish immediately
+                    </Label>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="description">Description</Label>
+                <textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="w-full h-24 px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Task description"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="instructions">Instructions</Label>
+                <textarea
+                  id="instructions"
+                  value={formData.instructions}
+                  onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
+                  className="w-full h-24 px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Detailed instructions for students"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button type="submit">Create Task</Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => {
+                    setShowAddForm(false)
+                    resetForm()
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Tasks List */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {tasks.map((task) => (
+          <Card key={task.id} className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <CardTitle className="text-lg">{task.title}</CardTitle>
+                  <div className="flex items-center gap-3 mt-2">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                      task.type === 'EXAM' ? 'bg-red-100 text-red-700' :
+                      task.type === 'QUIZ' ? 'bg-yellow-100 text-yellow-700' :
+                      task.type === 'PROJECT' ? 'bg-purple-100 text-purple-700' :
+                      'bg-blue-100 text-blue-700'
+                    }`}>
+                      {task.type}
+                    </span>
+                    {task.category && (
+                      <span className="text-sm text-gray-500">{task.category}</span>
+                    )}
+                    {task.isPublished ? (
+                      <span className="text-xs text-green-600 flex items-center gap-1">
+                        <CheckCircle className="h-3 w-3" />
+                        Published
+                      </span>
+                    ) : (
+                      <span className="text-xs text-gray-500">Draft</span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex gap-1">
+                  <Button size="sm" variant="ghost">
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleDelete(task.id)}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                {task.description}
+              </p>
+              <div className="space-y-2 text-sm">
+                {task.points && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <span className="font-medium">Points:</span>
+                    <span>{task.points}</span>
+                  </div>
+                )}
+                {task.dueDate && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Calendar className="h-4 w-4" />
+                    <span>Due: {formatDate(task.dueDate)}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Users className="h-4 w-4" />
+                  <span>{task.groups.length} Groups Assigned</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <FileText className="h-4 w-4" />
+                  <span>{task._count.assessments} Submissions</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {tasks.length === 0 && (
+        <Card>
+          <CardContent className="text-center py-12">
+            <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500">No tasks found. Create your first task to get started.</p>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  )
+}

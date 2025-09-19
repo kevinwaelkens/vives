@@ -1,0 +1,409 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  password      String
+  role          Role      @default(TUTOR)
+  refreshToken  String?   @db.Text
+  
+  // Relations
+  groups        Group[]   @relation("GroupTutors")
+  comments      Comment[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
+  
+  // Metadata
+  lastLoginAt   DateTime?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@index([email])
+  @@index([role])
+}
+
+model Group {
+  id           String    @id @default(cuid())
+  name         String
+  code         String    @unique
+  academicYear String
+  grade        String
+  
+  // Relations
+  tutors       User[]    @relation("GroupTutors")
+  students     Student[]
+  tasks        Task[]    @relation("GroupTasks")
+  attendance   Attendance[]
+  
+  // Settings
+  settings     Json?     @default("{}")
+  isActive     Boolean   @default(true)
+  
+  // Metadata
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  @@index([academicYear, grade])
+  @@index([code])
+}
+
+model Student {
+  id           String    @id @default(cuid())
+  studentId    String    @unique
+  name         String
+  email        String    @unique
+  dateOfBirth  DateTime?
+  
+  // Relations
+  groupId      String
+  group        Group     @relation(fields: [groupId], references: [id])
+  assessments  Assessment[]
+  tasks        Task[]    @relation("StudentTasks")
+  attendance   Attendance[]
+  parentContacts ParentContact[]
+  
+  // Additional Info
+  notes        String?   @db.Text
+  status       StudentStatus @default(ACTIVE)
+  customFields Json?     @default("{}")
+  
+  // Metadata
+  enrolledAt   DateTime  @default(now())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  @@index([groupId])
+  @@index([email])
+  @@index([studentId])
+  @@index([status])
+}
+
+model ParentContact {
+  id          String   @id @default(cuid())
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  name        String
+  email       String
+  phone       String?
+  relationship String  // mother, father, guardian, etc.
+  isPrimary   Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([studentId])
+  @@index([email])
+}
+
+model Task {
+  id           String    @id @default(cuid())
+  title        String
+  description  String    @db.Text
+  instructions String?   @db.Text
+  
+  // Task Details
+  type         TaskType  @default(ASSIGNMENT)
+  category     String?
+  points       Float?    @default(100)
+  weight       Float?    @default(1.0)
+  
+  // Scheduling
+  assignedAt   DateTime  @default(now())
+  dueDate      DateTime?
+  
+  // Relations
+  groups       Group[]   @relation("GroupTasks")
+  students     Student[] @relation("StudentTasks")
+  assessments  Assessment[]
+  attachments  Attachment[]
+  
+  // Settings
+  allowLateSubmission Boolean @default(true)
+  rubric       Json?     @default("{}")
+  
+  // Metadata
+  createdById  String
+  isPublished  Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  @@index([dueDate])
+  @@index([type])
+  @@index([isPublished])
+}
+
+model Assessment {
+  id          String    @id @default(cuid())
+  
+  // Relations
+  taskId      String
+  task        Task      @relation(fields: [taskId], references: [id])
+  studentId   String
+  student     Student   @relation(fields: [studentId], references: [id])
+  
+  // Assessment Data
+  score       Float?
+  grade       String?
+  feedback    String?   @db.Text
+  rubricData  Json?     @default("{}")
+  
+  // Status
+  status      AssessmentStatus @default(NOT_SUBMITTED)
+  submittedAt DateTime?
+  gradedAt    DateTime?
+  gradedById  String?
+  
+  // Versioning
+  version     Int       @default(1)
+  isLatest    Boolean   @default(true)
+  
+  // Relations
+  comments    Comment[]
+  attachments Attachment[]
+  
+  // Metadata
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@unique([taskId, studentId, version])
+  @@index([studentId])
+  @@index([taskId])
+  @@index([status])
+}
+
+model Attendance {
+  id          String           @id @default(cuid())
+  
+  // Relations
+  studentId   String
+  student     Student          @relation(fields: [studentId], references: [id])
+  groupId     String
+  group       Group            @relation(fields: [groupId], references: [id])
+  
+  // Attendance Data
+  date        DateTime         @db.Date
+  status      AttendanceStatus
+  period      String?          // morning, afternoon, full-day
+  notes       String?
+  
+  // Metadata
+  markedById  String
+  markedAt    DateTime         @default(now())
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  
+  @@unique([studentId, date, period])
+  @@index([studentId])
+  @@index([groupId])
+  @@index([date])
+  @@index([status])
+}
+
+model Comment {
+  id           String     @id @default(cuid())
+  content      String     @db.Text
+  
+  // Relations
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  authorId     String
+  author       User       @relation(fields: [authorId], references: [id])
+  
+  // Threading
+  parentId     String?
+  parent       Comment?   @relation("CommentReplies", fields: [parentId], references: [id])
+  replies      Comment[]  @relation("CommentReplies")
+  
+  // Metadata
+  isEdited     Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  
+  @@index([assessmentId])
+  @@index([authorId])
+  @@index([parentId])
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  
+  // Relations
+  userId      String
+  user        User             @relation(fields: [userId], references: [id])
+  
+  // Notification Data
+  type        NotificationType
+  title       String
+  message     String           @db.Text
+  data        Json?            @default("{}")
+  
+  // Status
+  isRead      Boolean          @default(false)
+  readAt      DateTime?
+  
+  // Metadata
+  createdAt   DateTime         @default(now())
+  
+  @@index([userId, isRead])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model Attachment {
+  id          String      @id @default(cuid())
+  
+  // File Info
+  filename    String
+  url         String
+  mimeType    String
+  size        Int
+  
+  // Relations
+  taskId      String?
+  task        Task?       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  assessmentId String?
+  assessment  Assessment? @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  
+  // Metadata
+  uploadedById String
+  createdAt   DateTime    @default(now())
+  
+  @@index([taskId])
+  @@index([assessmentId])
+}
+
+model EmailTemplate {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  subject     String
+  content     String   @db.Text
+  variables   Json     @default("[]")
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([name])
+}
+
+model BulkOperation {
+  id          String            @id @default(cuid())
+  type        BulkOperationType
+  status      BulkOperationStatus @default(PENDING)
+  
+  // Operation Data
+  totalItems  Int
+  processed   Int               @default(0)
+  failed      Int               @default(0)
+  errors      Json?             @default("[]")
+  results     Json?             @default("{}")
+  
+  // Metadata
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdById String
+  createdAt   DateTime          @default(now())
+  
+  @@index([type, status])
+  @@index([createdById])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  
+  // Action Details
+  action      String
+  entity      String
+  entityId    String?
+  
+  // Change Data
+  oldValues   Json?
+  newValues   Json?
+  
+  // Relations
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  
+  // Metadata
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+  
+  @@index([entity, entityId])
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// ENUMS
+enum Role {
+  ADMIN
+  TUTOR
+  VIEWER
+  PARENT
+}
+
+enum StudentStatus {
+  ACTIVE
+  INACTIVE
+  GRADUATED
+  TRANSFERRED
+}
+
+enum TaskType {
+  ASSIGNMENT
+  QUIZ
+  EXAM
+  PROJECT
+  HOMEWORK
+}
+
+enum AssessmentStatus {
+  NOT_SUBMITTED
+  SUBMITTED
+  LATE_SUBMITTED
+  GRADED
+  RETURNED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+enum NotificationType {
+  TASK_ASSIGNED
+  ASSESSMENT_SUBMITTED
+  GRADE_RELEASED
+  COMMENT_ADDED
+  ATTENDANCE_MARKED
+  SYSTEM_ALERT
+}
+
+enum BulkOperationType {
+  STUDENT_IMPORT
+  GRADE_IMPORT
+  ATTENDANCE_IMPORT
+  TASK_ASSIGNMENT
+  NOTIFICATION_SEND
+}
+
+enum BulkOperationStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
