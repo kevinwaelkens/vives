@@ -41,12 +41,12 @@ export function UserManagement() {
   const users = useMemo(() => data?.data || [], [data?.data]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
+          <p className="text-gray-600 mt-0.5">
             Manage system users and their roles
           </p>
         </div>

@@ -57,29 +57,25 @@ export const UserCard = memo(function UserCard({
 
   return (
     <Card>
-      <CardContent className="p-6">
+      <CardContent className="p-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-              <RoleIcon className="h-6 w-6 text-gray-600" />
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+              <RoleIcon className="h-5 w-5 text-gray-600" />
             </div>
             <div>
-              <div className="flex items-center space-x-2">
-                <h3 className="text-lg font-medium text-gray-900">
+              <div className="flex items-center space-x-1.5">
+                <h3 className="text-base font-medium text-gray-900">
                   {user.name}
                 </h3>
-                <Badge className={roleColors[user.role]}>
-                  {user.role}
-                </Badge>
-                {!user.isActive && (
-                  <Badge variant="secondary">Inactive</Badge>
-                )}
+                <Badge className={roleColors[user.role]}>{user.role}</Badge>
+                {!user.isActive && <Badge variant="secondary">Inactive</Badge>}
               </div>
-              <div className="flex items-center text-sm text-gray-500 mt-1">
+              <div className="flex items-center text-sm text-gray-500 mt-0.5">
                 <Mail className="h-4 w-4 mr-1" />
                 {user.email}
               </div>
-              <div className="flex items-center text-sm text-gray-500 mt-1">
+              <div className="flex items-center text-sm text-gray-500 mt-0.5">
                 <Calendar className="h-4 w-4 mr-1" />
                 Created {formatDate(user.createdAt)}
                 {user.lastLoginAt && (
@@ -90,7 +86,7 @@ export const UserCard = memo(function UserCard({
               </div>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1.5">
             <Button
               variant="outline"
               size="sm"
@@ -101,8 +97,8 @@ export const UserCard = memo(function UserCard({
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   data-testid={`delete-user-${user.id}`}
                 >
@@ -113,16 +109,14 @@ export const UserCard = memo(function UserCard({
                 <AlertDialogHeader>
                   <AlertDialogTitle>Delete User</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Are you sure you want to delete {user.name}? This
-                    action cannot be undone. If the user has
-                    associated data, they will be deactivated instead.
+                    Are you sure you want to delete {user.name}? This action
+                    cannot be undone. If the user has associated data, they will
+                    be deactivated instead.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={() => onDelete(user)}
-                  >
+                  <AlertDialogAction onClick={() => onDelete(user)}>
                     Delete
                   </AlertDialogAction>
                 </AlertDialogFooter>

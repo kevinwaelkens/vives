@@ -85,7 +85,10 @@ export default function DashboardLayout({
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-1 px-2 py-4" data-testid="navigation">
+          <nav
+            className="flex-1 space-y-0.5 px-2 py-3"
+            data-testid="navigation"
+          >
             {navigation.map((item) => {
               const isActive = pathname === item.href;
               const Icon = item.icon;
@@ -103,12 +106,12 @@ export default function DashboardLayout({
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
+                    "flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200",
                     isActive
                       ? "bg-blue-50 text-blue-700 border-l-4 border-blue-700"
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:translate-x-1",
                   )}
-                  data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
+                  data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
                 >
                   <Icon
                     className={cn("h-5 w-5", isActive && "text-blue-700")}
@@ -120,7 +123,7 @@ export default function DashboardLayout({
           </nav>
 
           {/* User info */}
-          <div className="border-t border-gray-200 p-4 bg-gray-50">
+          <div className="border-t border-gray-200 p-3 bg-gray-50">
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
@@ -168,7 +171,7 @@ export default function DashboardLayout({
         </div>
 
         {/* Page content */}
-        <main className="flex-1 p-4 lg:p-6 overflow-auto">{children}</main>
+        <main className="flex-1 p-3 lg:p-4 overflow-auto">{children}</main>
       </div>
     </div>
   );

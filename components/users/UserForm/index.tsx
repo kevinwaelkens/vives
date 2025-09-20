@@ -55,7 +55,7 @@ export const UserForm = memo(function UserForm({
             {editingUser ? "Edit User" : "Add New User"}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={onSubmit} className="space-y-4">
+        <form onSubmit={onSubmit} className="space-y-3">
           <div>
             <Label htmlFor="name">Name</Label>
             <Input
@@ -92,10 +92,7 @@ export const UserForm = memo(function UserForm({
           </div>
           <div>
             <Label htmlFor="role">Role</Label>
-            <Select
-              value={formData.role}
-              onValueChange={handleRoleChange}
-            >
+            <Select value={formData.role} onValueChange={handleRoleChange}>
               <SelectTrigger data-testid="user-form-role">
                 <SelectValue />
               </SelectTrigger>
@@ -107,7 +104,7 @@ export const UserForm = memo(function UserForm({
               </SelectContent>
             </Select>
           </div>
-          <div className="flex justify-end space-x-2">
+          <div className="flex justify-end space-x-1.5">
             <Button
               type="button"
               variant="outline"
@@ -116,17 +113,16 @@ export const UserForm = memo(function UserForm({
             >
               Cancel
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={isSubmitting}
               data-testid="user-form-submit"
             >
-              {isSubmitting 
-                ? "Saving..." 
-                : editingUser 
-                  ? "Update User" 
-                  : "Create User"
-              }
+              {isSubmitting
+                ? "Saving..."
+                : editingUser
+                  ? "Update User"
+                  : "Create User"}
             </Button>
           </div>
         </form>

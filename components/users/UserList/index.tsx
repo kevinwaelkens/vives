@@ -32,9 +32,9 @@ export const UserList = memo(function UserList({
   if (users.length === 0) {
     return (
       <Card>
-        <CardContent className="p-12 text-center">
-          <UserX className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <CardContent className="p-8 text-center">
+          <UserX className="h-10 w-10 text-gray-400 mx-auto mb-3" />
+          <h3 className="text-base font-medium text-gray-900 mb-1.5">
             No users found
           </h3>
           <p className="text-gray-500">
@@ -48,7 +48,7 @@ export const UserList = memo(function UserList({
   }
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-3">
       {users.map((user) => (
         <UserCard
           key={user.id}
