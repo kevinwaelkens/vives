@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useT } from "@/lib/translations";
+import { LanguageSelector } from "@/components/translations";
 import {
   Users,
   BookOpen,
@@ -21,15 +23,16 @@ import {
   Shield,
 } from "lucide-react";
 
-const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Students", href: "/students", icon: Users },
-  { name: "Groups", href: "/groups", icon: UserCheck },
-  { name: "Tasks", href: "/tasks", icon: BookOpen },
-  { name: "Assessments", href: "/assessments", icon: ClipboardList },
-  { name: "Attendance", href: "/attendance", icon: Calendar },
-  { name: "Analytics", href: "/analytics", icon: BarChart3 },
-  { name: "Settings", href: "/settings", icon: Settings },
+// Navigation items with translation keys
+const navigationItems = [
+  { key: "navigation.dashboard", href: "/dashboard", icon: Home },
+  { key: "navigation.students", href: "/students", icon: Users },
+  { key: "navigation.groups", href: "/groups", icon: UserCheck },
+  { key: "navigation.tasks", href: "/tasks", icon: BookOpen },
+  { key: "navigation.assessments", href: "/assessments", icon: ClipboardList },
+  { key: "navigation.attendance", href: "/attendance", icon: Calendar },
+  { key: "navigation.analytics", href: "/analytics", icon: BarChart3 },
+  { key: "navigation.settings", href: "/settings", icon: Settings },
 ];
 
 export default function DashboardLayout({
@@ -40,6 +43,7 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const { data: session } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const t = useT();
 
   const handleSignOut = () => {
     signOut({ callbackUrl: "/login" });
@@ -88,13 +92,14 @@ export default function DashboardLayout({
             className="flex-1 space-y-0.5 px-2 py-3"
             data-testid="navigation"
           >
-            {navigation.map((item) => {
+            {navigationItems.map((item) => {
               const isActive = pathname === item.href;
               const Icon = item.icon;
+              const itemName = t(item.key, item.key.split(".").pop());
 
               // Check if user has permission to view this route
               if (
-                item.name === "Settings" &&
+                item.key === "navigation.settings" &&
                 session?.user?.role !== "ADMIN"
               ) {
                 return null;
@@ -102,7 +107,7 @@ export default function DashboardLayout({
 
               return (
                 <Link
-                  key={item.name}
+                  key={item.key}
                   href={item.href}
                   className={cn(
                     "flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200",
@@ -110,12 +115,12 @@ export default function DashboardLayout({
                       ? "bg-blue-50 text-blue-700 border-l-4 border-blue-700"
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:translate-x-1",
                   )}
-                  data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
+                  data-testid={`nav-${item.key.split(".").pop()}`}
                 >
                   <Icon
                     className={cn("h-5 w-5", isActive && "text-blue-700")}
                   />
-                  {item.name}
+                  {itemName}
                 </Link>
               );
             })}
@@ -135,6 +140,11 @@ export default function DashboardLayout({
             )}
           </nav>
 
+          {/* Language Selector */}
+          <div className="border-t border-gray-200 p-3">
+            <LanguageSelector variant="select" showLabel={false} />
+          </div>
+
           {/* User info */}
           <div className="border-t border-gray-200 p-3 bg-gray-50">
             <div className="flex items-center justify-between">
@@ -153,7 +163,7 @@ export default function DashboardLayout({
                 variant="ghost"
                 size="icon"
                 onClick={handleSignOut}
-                title="Sign out"
+                title={t("auth.logout", "Logout")}
                 className="hover:bg-red-100 hover:text-red-600 transition-colors"
               >
                 <LogOut className="h-4 w-4" />
@@ -177,8 +187,14 @@ export default function DashboardLayout({
           </Button>
           <div className="flex-1">
             <h2 className="text-lg font-semibold text-gray-900">
-              {navigation.find((item) => item.href === pathname)?.name ||
-                "Dashboard"}
+              {(() => {
+                const currentItem = navigationItems.find(
+                  (item) => item.href === pathname,
+                );
+                return currentItem
+                  ? t(currentItem.key, currentItem.key.split(".").pop())
+                  : t("navigation.dashboard", "Dashboard");
+              })()}
             </h2>
           </div>
         </div>

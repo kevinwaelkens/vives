@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useT } from "@/lib/translations";
+import { LanguageSelector } from "@/components/translations";
 import {
   Users,
   Settings,
@@ -17,24 +19,23 @@ import {
   Database,
   FileText,
   ArrowLeft,
+  Languages,
 } from "lucide-react";
 
-const cmsNavigation = [
-  { name: "User Management", href: "/cms/users", icon: Users },
-  { name: "System Settings", href: "/cms/system-settings", icon: Settings },
-  { name: "Analytics", href: "/cms/analytics", icon: BarChart3 },
-  { name: "Database", href: "/cms/database", icon: Database },
-  { name: "Audit Logs", href: "/cms/logs", icon: FileText },
+const cmsNavigationItems = [
+  { key: "cms.user_management", href: "/cms/users", icon: Users },
+  { key: "cms.system_settings", href: "/cms/system-settings", icon: Settings },
+  { key: "cms.translations", href: "/cms/translations", icon: Languages },
+  { key: "navigation.analytics", href: "/cms/analytics", icon: BarChart3 },
+  { key: "Database", href: "/cms/database", icon: Database }, // Keep as fallback
+  { key: "Audit Logs", href: "/cms/logs", icon: FileText }, // Keep as fallback
 ];
 
-export default function CMSLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function CMSLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const t = useT();
 
   const handleSignOut = () => {
     signOut({ callbackUrl: "/login" });
@@ -58,8 +59,12 @@ export default function CMSLayout({
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
           <Shield className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
-          <p className="text-gray-600 mb-4">You need admin privileges to access the CMS.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Access Denied
+          </h1>
+          <p className="text-gray-600 mb-4">
+            You need admin privileges to access the CMS.
+          </p>
           <Link href="/dashboard">
             <Button>
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -127,14 +132,22 @@ export default function CMSLayout({
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-0.5 px-2 py-3" data-testid="cms-navigation">
-            {cmsNavigation.map((item) => {
+          <nav
+            className="flex-1 space-y-0.5 px-2 py-3"
+            data-testid="cms-navigation"
+          >
+            {cmsNavigationItems.map((item) => {
               const isActive = pathname === item.href;
               const Icon = item.icon;
+              const itemName =
+                item.key.startsWith("cms.") ||
+                item.key.startsWith("navigation.")
+                  ? t(item.key, item.key.split(".").pop())
+                  : item.key; // Fallback for items without translation keys
 
               return (
                 <Link
-                  key={item.name}
+                  key={item.key}
                   href={item.href}
                   className={cn(
                     "flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200",
@@ -142,16 +155,23 @@ export default function CMSLayout({
                       ? "bg-emerald-600 text-white border-l-4 border-emerald-400"
                       : "text-slate-300 hover:bg-slate-800 hover:text-white hover:translate-x-1",
                   )}
-                  data-testid={`cms-nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
+                  data-testid={`cms-nav-${item.key.toLowerCase().replace(/\s+/g, "-")}`}
                 >
-                  <Icon
-                    className={cn("h-5 w-5", isActive && "text-white")}
-                  />
-                  {item.name}
+                  <Icon className={cn("h-5 w-5", isActive && "text-white")} />
+                  {itemName}
                 </Link>
               );
             })}
           </nav>
+
+          {/* Language Selector */}
+          <div className="border-t border-slate-700 p-3">
+            <LanguageSelector
+              variant="select"
+              showLabel={false}
+              className="text-white"
+            />
+          </div>
 
           {/* Admin User info */}
           <div className="border-t border-slate-700 p-3 bg-slate-800">
@@ -172,7 +192,7 @@ export default function CMSLayout({
                 variant="ghost"
                 size="icon"
                 onClick={handleSignOut}
-                title="Sign out"
+                title={t("auth.logout", "Logout")}
                 className="hover:bg-red-600 hover:text-white transition-colors text-slate-400"
               >
                 <LogOut className="h-4 w-4" />
@@ -196,8 +216,18 @@ export default function CMSLayout({
           </Button>
           <div className="flex-1 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">
-              {cmsNavigation.find((item) => item.href === pathname)?.name ||
-                "CMS Dashboard"}
+              {(() => {
+                const currentItem = cmsNavigationItems.find(
+                  (item) => item.href === pathname,
+                );
+                if (currentItem) {
+                  return currentItem.key.startsWith("cms.") ||
+                    currentItem.key.startsWith("navigation.")
+                    ? t(currentItem.key, currentItem.key.split(".").pop())
+                    : currentItem.key;
+                }
+                return t("cms.title", "CMS Dashboard");
+              })()}
             </h2>
             <div className="flex items-center space-x-2">
               <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
@@ -209,7 +239,9 @@ export default function CMSLayout({
         </div>
 
         {/* Page content */}
-        <main className="flex-1 p-3 lg:p-4 overflow-auto bg-slate-50">{children}</main>
+        <main className="flex-1 p-3 lg:p-4 overflow-auto bg-slate-50">
+          {children}
+        </main>
       </div>
     </div>
   );

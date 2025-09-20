@@ -407,3 +407,64 @@ enum BulkOperationStatus {
   FAILED
   CANCELLED
 }
+
+// TRANSLATION SYSTEM MODELS
+model Language {
+  id          String   @id @default(cuid())
+  code        String   @unique // ISO 639-1 codes: en, fr, de, it, nl, es
+  name        String   // English, French, German, Italian, Dutch, Spanish
+  nativeName  String   // English, Français, Deutsch, Italiano, Nederlands, Español
+  flag        String?  // Flag emoji or icon
+  isActive    Boolean  @default(true)
+  isDefault   Boolean  @default(false)
+  
+  // Relations
+  translations Translation[]
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([code])
+  @@index([isActive])
+}
+
+model TranslationKey {
+  id            String   @id @default(cuid())
+  key           String   @unique // Dot notation: auth.login.title, dashboard.welcome
+  englishText   String   @db.Text // Reference English text
+  description   String?  @db.Text // Context for translators
+  category      String?  // Group keys: auth, dashboard, forms, etc.
+  
+  // Relations
+  translations  Translation[]
+  
+  // Metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([key])
+  @@index([category])
+}
+
+model Translation {
+  id              String         @id @default(cuid())
+  
+  // Relations
+  translationKeyId String
+  translationKey   TranslationKey @relation(fields: [translationKeyId], references: [id], onDelete: Cascade)
+  languageId      String
+  language        Language       @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  
+  // Translation Data
+  text            String         @db.Text
+  isApproved      Boolean        @default(false)
+  
+  // Metadata
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  
+  @@unique([translationKeyId, languageId])
+  @@index([translationKeyId])
+  @@index([languageId])
+}
