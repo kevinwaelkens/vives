@@ -29,7 +29,6 @@ const navigation = [
   { name: "Assessments", href: "/assessments", icon: ClipboardList },
   { name: "Attendance", href: "/attendance", icon: Calendar },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
-  { name: "User Management", href: "/admin/users", icon: Shield },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
@@ -95,7 +94,7 @@ export default function DashboardLayout({
 
               // Check if user has permission to view this route
               if (
-                ["Settings", "User Management"].includes(item.name) &&
+                item.name === "Settings" &&
                 session?.user?.role !== "ADMIN"
               ) {
                 return null;
@@ -120,6 +119,20 @@ export default function DashboardLayout({
                 </Link>
               );
             })}
+
+            {/* CMS Access for Admins */}
+            {session?.user?.role === "ADMIN" && (
+              <div className="pt-2 mt-2 border-t border-gray-200">
+                <Link
+                  href="/cms"
+                  className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 hover:translate-x-1"
+                  data-testid="nav-cms"
+                >
+                  <Shield className="h-5 w-5" />
+                  CMS
+                </Link>
+              </div>
+            )}
           </nav>
 
           {/* User info */}
