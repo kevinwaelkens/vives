@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Calendar,
   CheckCircle,
@@ -15,112 +15,119 @@ import {
   Users,
   TrendingUp,
   Download,
-} from 'lucide-react'
-import { apiClient } from '@/data/api/client'
-import { toast } from 'sonner'
+} from "lucide-react";
+import { apiClient } from "@/data/api/client";
+import { toast } from "sonner";
 
 interface AttendanceRecord {
-  id: string
-  studentId: string
+  id: string;
+  studentId: string;
   student: {
-    name: string
-    studentId: string
-  }
-  status: string
-  date: string
-  notes?: string
+    name: string;
+    studentId: string;
+  };
+  status: string;
+  date: string;
+  notes?: string;
 }
 
 export default function AttendancePage() {
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
-  const [selectedGroup, setSelectedGroup] = useState('')
-  const [attendanceRecords, setAttendanceRecords] = useState<Record<string, string>>({})
-  
-  const queryClient = useQueryClient()
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
+  const [selectedGroup, setSelectedGroup] = useState("");
+  const [attendanceRecords, setAttendanceRecords] = useState<
+    Record<string, string>
+  >({});
+
+  const queryClient = useQueryClient();
 
   // Fetch groups
   const { data: groups } = useQuery({
-    queryKey: ['groups'],
+    queryKey: ["groups"],
     queryFn: async () => {
-      const response = await apiClient.get<{ data: any[] }>('/groups')
-      return response.data
+      const response = await apiClient.get<any[]>("/groups");
+      return Array.isArray(response) ? response : (response as any)?.data || [];
     },
-  })
+  });
 
   // Fetch students for selected group
   const { data: students, isLoading: studentsLoading } = useQuery({
-    queryKey: ['students', selectedGroup],
+    queryKey: ["students", selectedGroup],
     queryFn: async () => {
-      if (!selectedGroup) return []
-      const response = await apiClient.get<{ data: any[] }>(`/students?groupId=${selectedGroup}`)
-      return response.data
+      if (!selectedGroup) return [];
+      const response = await apiClient.get<any>(
+        `/students?groupId=${selectedGroup}`,
+      );
+      // Handle both direct array and paginated response
+      return Array.isArray(response) ? response : (response as any)?.data || [];
     },
     enabled: !!selectedGroup,
-  })
+  });
 
   // Fetch attendance for selected date and group
   const { data: attendance, refetch: refetchAttendance } = useQuery({
-    queryKey: ['attendance', selectedDate, selectedGroup],
+    queryKey: ["attendance", selectedDate, selectedGroup],
     queryFn: async () => {
-      if (!selectedGroup) return []
+      if (!selectedGroup) return [];
       const response = await apiClient.get<AttendanceRecord[]>(
-        `/attendance?date=${selectedDate}&groupId=${selectedGroup}`
-      )
+        `/attendance?date=${selectedDate}&groupId=${selectedGroup}`,
+      );
       // Initialize attendance records
-      const records: Record<string, string> = {}
+      const records: Record<string, string> = {};
       response.forEach((record: AttendanceRecord) => {
-        records[record.studentId] = record.status
-      })
-      setAttendanceRecords(records)
-      return response
+        records[record.studentId] = record.status;
+      });
+      setAttendanceRecords(records);
+      return response;
     },
     enabled: !!selectedGroup && !!selectedDate,
-  })
+  });
 
   // Mark attendance mutation
   const markAttendanceMutation = useMutation({
     mutationFn: async (data: {
-      studentId: string
-      groupId: string
-      date: string
-      status: string
+      studentId: string;
+      groupId: string;
+      date: string;
+      status: string;
     }) => {
-      return apiClient.post('/attendance', data)
+      return apiClient.post("/attendance", data);
     },
     onSuccess: () => {
-      toast.success('Attendance marked')
-      refetchAttendance()
+      toast.success("Attendance marked");
+      refetchAttendance();
     },
     onError: () => {
-      toast.error('Failed to mark attendance')
+      toast.error("Failed to mark attendance");
     },
-  })
+  });
 
   const handleMarkAttendance = async (studentId: string, status: string) => {
-    setAttendanceRecords(prev => ({ ...prev, [studentId]: status }))
+    setAttendanceRecords((prev) => ({ ...prev, [studentId]: status }));
     await markAttendanceMutation.mutateAsync({
       studentId,
       groupId: selectedGroup,
       date: selectedDate,
       status,
-    })
-  }
+    });
+  };
 
   const handleBulkMark = async (status: string) => {
-    if (!students) return
-    
+    if (!students) return;
+
     const promises = students.map((student: any) =>
       markAttendanceMutation.mutateAsync({
         studentId: student.id,
         groupId: selectedGroup,
         date: selectedDate,
         status,
-      })
-    )
-    
-    await Promise.all(promises)
-    toast.success(`All students marked as ${status.toLowerCase()}`)
-  }
+      }),
+    );
+
+    await Promise.all(promises);
+    toast.success(`All students marked as ${status.toLowerCase()}`);
+  };
 
   const getAttendanceStats = () => {
     const stats = {
@@ -128,30 +135,30 @@ export default function AttendancePage() {
       absent: 0,
       late: 0,
       excused: 0,
-    }
-    
-    Object.values(attendanceRecords).forEach(status => {
-      switch (status) {
-        case 'PRESENT':
-          stats.present++
-          break
-        case 'ABSENT':
-          stats.absent++
-          break
-        case 'LATE':
-          stats.late++
-          break
-        case 'EXCUSED':
-          stats.excused++
-          break
-      }
-    })
-    
-    return stats
-  }
+    };
 
-  const stats = getAttendanceStats()
-  const totalStudents = students?.length || 0
+    Object.values(attendanceRecords).forEach((status) => {
+      switch (status) {
+        case "PRESENT":
+          stats.present++;
+          break;
+        case "ABSENT":
+          stats.absent++;
+          break;
+        case "LATE":
+          stats.late++;
+          break;
+        case "EXCUSED":
+          stats.excused++;
+          break;
+      }
+    });
+
+    return stats;
+  };
+
+  const stats = getAttendanceStats();
+  const totalStudents = students?.length || 0;
 
   return (
     <div className="space-y-6">
@@ -172,7 +179,7 @@ export default function AttendancePage() {
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                max={new Date().toISOString().split('T')[0]}
+                max={new Date().toISOString().split("T")[0]}
               />
             </div>
             <div>
@@ -192,8 +199,8 @@ export default function AttendancePage() {
               </select>
             </div>
             <div className="flex items-end">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full"
                 disabled={!selectedGroup}
               >
@@ -225,7 +232,9 @@ export default function AttendancePage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">Present</p>
-                    <p className="text-2xl font-bold text-green-600">{stats.present}</p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {stats.present}
+                    </p>
                   </div>
                   <CheckCircle className="h-8 w-8 text-green-600" />
                 </div>
@@ -236,7 +245,9 @@ export default function AttendancePage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">Absent</p>
-                    <p className="text-2xl font-bold text-red-600">{stats.absent}</p>
+                    <p className="text-2xl font-bold text-red-600">
+                      {stats.absent}
+                    </p>
                   </div>
                   <XCircle className="h-8 w-8 text-red-600" />
                 </div>
@@ -247,7 +258,9 @@ export default function AttendancePage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">Late</p>
-                    <p className="text-2xl font-bold text-yellow-600">{stats.late}</p>
+                    <p className="text-2xl font-bold text-yellow-600">
+                      {stats.late}
+                    </p>
                   </div>
                   <Clock className="h-8 w-8 text-yellow-600" />
                 </div>
@@ -258,7 +271,9 @@ export default function AttendancePage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">Excused</p>
-                    <p className="text-2xl font-bold text-blue-600">{stats.excused}</p>
+                    <p className="text-2xl font-bold text-blue-600">
+                      {stats.excused}
+                    </p>
                   </div>
                   <AlertCircle className="h-8 w-8 text-blue-600" />
                 </div>
@@ -270,15 +285,15 @@ export default function AttendancePage() {
           <Card>
             <CardContent className="p-4">
               <div className="flex gap-2">
-                <Button 
-                  onClick={() => handleBulkMark('PRESENT')}
+                <Button
+                  onClick={() => handleBulkMark("PRESENT")}
                   variant="outline"
                   className="flex-1"
                 >
                   Mark All Present
                 </Button>
-                <Button 
-                  onClick={() => handleBulkMark('ABSENT')}
+                <Button
+                  onClick={() => handleBulkMark("ABSENT")}
                   variant="outline"
                   className="flex-1"
                 >
@@ -295,43 +310,82 @@ export default function AttendancePage() {
             </CardHeader>
             <CardContent>
               {studentsLoading ? (
-                <div className="text-center py-8 text-gray-500">Loading students...</div>
+                <div className="text-center py-8 text-gray-500">
+                  Loading students...
+                </div>
               ) : students && students.length > 0 ? (
                 <div className="space-y-2">
                   {students.map((student: any) => (
-                    <div key={student.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                    <div
+                      key={student.id}
+                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                    >
                       <div>
                         <p className="font-medium">{student.name}</p>
-                        <p className="text-sm text-gray-500">{student.studentId}</p>
+                        <p className="text-sm text-gray-500">
+                          {student.studentId}
+                        </p>
                       </div>
                       <div className="flex gap-2">
                         <Button
                           size="sm"
-                          variant={attendanceRecords[student.id] === 'PRESENT' ? 'default' : 'outline'}
-                          onClick={() => handleMarkAttendance(student.id, 'PRESENT')}
-                          className={attendanceRecords[student.id] === 'PRESENT' ? 'bg-green-600 hover:bg-green-700' : ''}
+                          variant={
+                            attendanceRecords[student.id] === "PRESENT"
+                              ? "default"
+                              : "outline"
+                          }
+                          onClick={() =>
+                            handleMarkAttendance(student.id, "PRESENT")
+                          }
+                          className={
+                            attendanceRecords[student.id] === "PRESENT"
+                              ? "bg-green-600 hover:bg-green-700"
+                              : ""
+                          }
                         >
                           P
                         </Button>
                         <Button
                           size="sm"
-                          variant={attendanceRecords[student.id] === 'ABSENT' ? 'destructive' : 'outline'}
-                          onClick={() => handleMarkAttendance(student.id, 'ABSENT')}
+                          variant={
+                            attendanceRecords[student.id] === "ABSENT"
+                              ? "destructive"
+                              : "outline"
+                          }
+                          onClick={() =>
+                            handleMarkAttendance(student.id, "ABSENT")
+                          }
                         >
                           A
                         </Button>
                         <Button
                           size="sm"
-                          variant={attendanceRecords[student.id] === 'LATE' ? 'default' : 'outline'}
-                          onClick={() => handleMarkAttendance(student.id, 'LATE')}
-                          className={attendanceRecords[student.id] === 'LATE' ? 'bg-yellow-600 hover:bg-yellow-700' : ''}
+                          variant={
+                            attendanceRecords[student.id] === "LATE"
+                              ? "default"
+                              : "outline"
+                          }
+                          onClick={() =>
+                            handleMarkAttendance(student.id, "LATE")
+                          }
+                          className={
+                            attendanceRecords[student.id] === "LATE"
+                              ? "bg-yellow-600 hover:bg-yellow-700"
+                              : ""
+                          }
                         >
                           L
                         </Button>
                         <Button
                           size="sm"
-                          variant={attendanceRecords[student.id] === 'EXCUSED' ? 'secondary' : 'outline'}
-                          onClick={() => handleMarkAttendance(student.id, 'EXCUSED')}
+                          variant={
+                            attendanceRecords[student.id] === "EXCUSED"
+                              ? "secondary"
+                              : "outline"
+                          }
+                          onClick={() =>
+                            handleMarkAttendance(student.id, "EXCUSED")
+                          }
                         >
                           E
                         </Button>
@@ -353,10 +407,12 @@ export default function AttendancePage() {
         <Card>
           <CardContent className="text-center py-12">
             <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">Please select a group to mark attendance</p>
+            <p className="text-gray-500">
+              Please select a group to mark attendance
+            </p>
           </CardContent>
         </Card>
       )}
     </div>
-  )
+  );
 }

@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   BarChart,
   Bar,
@@ -15,49 +15,53 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from 'recharts'
-import { TrendingUp, TrendingDown, Users, BookOpen, Award, Calendar } from 'lucide-react'
+} from "recharts";
+import {
+  TrendingUp,
+  TrendingDown,
+  Users,
+  BookOpen,
+  Award,
+  Calendar,
+} from "lucide-react";
+import { useAnalytics } from "@/data/hooks/use-analytics";
 
 export default function AnalyticsPage() {
-  // Sample data for charts
-  const attendanceData = [
-    { day: 'Mon', present: 142, absent: 8, late: 4 },
-    { day: 'Tue', present: 138, absent: 12, late: 6 },
-    { day: 'Wed', present: 145, absent: 5, late: 6 },
-    { day: 'Thu', present: 140, absent: 10, late: 6 },
-    { day: 'Fri', present: 135, absent: 15, late: 6 },
-  ]
+  const { data: analytics, isLoading, error } = useAnalytics();
 
-  const gradeDistribution = [
-    { grade: 'A', students: 45, percentage: 28.8 },
-    { grade: 'B', students: 52, percentage: 33.3 },
-    { grade: 'C', students: 38, percentage: 24.4 },
-    { grade: 'D', students: 15, percentage: 9.6 },
-    { grade: 'F', students: 6, percentage: 3.8 },
-  ]
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-gray-500">Loading analytics...</div>
+      </div>
+    );
+  }
 
-  const taskCompletion = [
-    { name: 'Completed', value: 78, color: '#10b981' },
-    { name: 'Pending', value: 15, color: '#f59e0b' },
-    { name: 'Overdue', value: 7, color: '#ef4444' },
-  ]
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-red-500">Error loading analytics data</div>
+      </div>
+    );
+  }
 
-  const performanceTrend = [
-    { month: 'Jan', average: 72 },
-    { month: 'Feb', average: 75 },
-    { month: 'Mar', average: 78 },
-    { month: 'Apr', average: 74 },
-    { month: 'May', average: 80 },
-    { month: 'Jun', average: 82 },
-  ]
+  if (!analytics) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-gray-500">No analytics data available</div>
+      </div>
+    );
+  }
 
-  const topPerformers = [
-    { name: 'Alice Johnson', score: 95, trend: 'up' },
-    { name: 'Bob Smith', score: 92, trend: 'up' },
-    { name: 'Charlie Brown', score: 90, trend: 'down' },
-    { name: 'Diana Prince', score: 88, trend: 'up' },
-    { name: 'Ethan Hunt', score: 87, trend: 'up' },
-  ]
+  const {
+    keyMetrics,
+    attendanceData,
+    gradeDistribution,
+    taskCompletion,
+    performanceTrend,
+    topPerformers,
+    additionalStats,
+  } = analytics;
 
   return (
     <div className="space-y-6">
@@ -74,10 +78,10 @@ export default function AnalyticsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Average Score</p>
-                <p className="text-2xl font-bold">82.5%</p>
+                <p className="text-2xl font-bold">{keyMetrics.averageScore}%</p>
                 <p className="text-xs text-green-600 flex items-center mt-1">
                   <TrendingUp className="h-3 w-3 mr-1" />
-                  +5.2% from last month
+                  Based on graded assessments
                 </p>
               </div>
               <Award className="h-8 w-8 text-yellow-600" />
@@ -89,10 +93,12 @@ export default function AnalyticsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Attendance Rate</p>
-                <p className="text-2xl font-bold">92.3%</p>
-                <p className="text-xs text-red-600 flex items-center mt-1">
-                  <TrendingDown className="h-3 w-3 mr-1" />
-                  -2.1% from last week
+                <p className="text-2xl font-bold">
+                  {keyMetrics.attendanceRate}%
+                </p>
+                <p className="text-xs text-blue-600 flex items-center mt-1">
+                  <Calendar className="h-3 w-3 mr-1" />
+                  Last 7 days
                 </p>
               </div>
               <Users className="h-8 w-8 text-blue-600" />
@@ -104,10 +110,12 @@ export default function AnalyticsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Tasks Completed</p>
-                <p className="text-2xl font-bold">234</p>
+                <p className="text-2xl font-bold">
+                  {keyMetrics.tasksCompleted}
+                </p>
                 <p className="text-xs text-green-600 flex items-center mt-1">
                   <TrendingUp className="h-3 w-3 mr-1" />
-                  +12 this week
+                  Graded assessments
                 </p>
               </div>
               <BookOpen className="h-8 w-8 text-green-600" />
@@ -119,10 +127,12 @@ export default function AnalyticsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Active Students</p>
-                <p className="text-2xl font-bold">156</p>
+                <p className="text-2xl font-bold">
+                  {keyMetrics.activeStudents}
+                </p>
                 <p className="text-xs text-gray-600 flex items-center mt-1">
                   <Calendar className="h-3 w-3 mr-1" />
-                  This semester
+                  Currently enrolled
                 </p>
               </div>
               <Users className="h-8 w-8 text-purple-600" />
@@ -188,13 +198,13 @@ export default function AnalyticsPage() {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percentage }: any) => `${name}: ${percentage}%`}
+                  label={(entry: any) => `${entry.name}: ${entry.value}%`}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
                 >
-                  {taskCompletion.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  {taskCompletion.map((entry) => (
+                    <Cell key={entry.name} fill={entry.color} />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -215,12 +225,12 @@ export default function AnalyticsPage() {
                 <XAxis dataKey="month" />
                 <YAxis />
                 <Tooltip />
-                <Line 
-                  type="monotone" 
-                  dataKey="average" 
-                  stroke="#3b82f6" 
+                <Line
+                  type="monotone"
+                  dataKey="average"
+                  stroke="#3b82f6"
                   strokeWidth={2}
-                  dot={{ fill: '#3b82f6' }}
+                  dot={{ fill: "#3b82f6" }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -235,17 +245,22 @@ export default function AnalyticsPage() {
           <CardContent>
             <div className="space-y-3">
               {topPerformers.map((student, index) => (
-                <div key={index} className="flex items-center justify-between">
+                <div
+                  key={student.name}
+                  className="flex items-center justify-between"
+                >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-sm font-bold text-blue-600">
                       {index + 1}
                     </div>
                     <div>
                       <p className="font-medium">{student.name}</p>
-                      <p className="text-sm text-gray-500">Average: {student.score}%</p>
+                      <p className="text-sm text-gray-500">
+                        Average: {student.score}%
+                      </p>
                     </div>
                   </div>
-                  {student.trend === 'up' ? (
+                  {student.trend === "up" ? (
                     <TrendingUp className="h-4 w-4 text-green-600" />
                   ) : (
                     <TrendingDown className="h-4 w-4 text-red-600" />
@@ -266,23 +281,29 @@ export default function AnalyticsPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div>
               <p className="text-sm text-gray-600">Total Assignments</p>
-              <p className="text-2xl font-bold">45</p>
+              <p className="text-2xl font-bold">
+                {additionalStats.totalAssignments}
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-600">Avg. Submission Rate</p>
-              <p className="text-2xl font-bold">87%</p>
+              <p className="text-2xl font-bold">
+                {additionalStats.avgSubmissionRate}%
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-600">Avg. Class Size</p>
-              <p className="text-2xl font-bold">26</p>
+              <p className="text-2xl font-bold">
+                {additionalStats.avgClassSize}
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-600">Pass Rate</p>
-              <p className="text-2xl font-bold">94%</p>
+              <p className="text-2xl font-bold">{additionalStats.passRate}%</p>
             </div>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

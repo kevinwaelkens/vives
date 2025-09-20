@@ -49,7 +49,7 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" data-testid="login-form">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -60,6 +60,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={isLoading}
+                data-testid="email-input"
               />
             </div>
             <div className="space-y-2">
@@ -71,12 +72,14 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={isLoading}
+                data-testid="password-input"
               />
             </div>
             <Button
               type="submit"
               className="w-full"
               disabled={isLoading}
+              data-testid="login-button"
             >
               {isLoading ? 'Signing in...' : 'Sign In'}
             </Button>

@@ -1,11 +1,17 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useStudents, useCreateStudent, useUpdateStudent, useDeleteStudent } from '@/data/hooks/use-students'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
+import { useState } from "react";
+import {
+  useStudents,
+  useCreateStudent,
+  useUpdateStudent,
+  useDeleteStudent,
+} from "@/data/hooks/use-students";
+import { useGroups } from "@/data/hooks/use-groups";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import {
   Search,
   Plus,
@@ -15,75 +21,78 @@ import {
   Calendar,
   UserCheck,
   X,
-} from 'lucide-react'
-import { formatDate } from '@/lib/utils'
-import type { StudentFormData, StudentWithRelations } from '@/types'
+} from "lucide-react";
+import { formatDate } from "@/lib/utils";
+import type { StudentFormData, StudentWithRelations } from "@/types";
 
 export default function StudentsPage() {
-  const [search, setSearch] = useState('')
-  const [showAddForm, setShowAddForm] = useState(false)
-  const [editingStudent, setEditingStudent] = useState<StudentWithRelations | null>(null)
+  const [search, setSearch] = useState("");
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editingStudent, setEditingStudent] =
+    useState<StudentWithRelations | null>(null);
   const [formData, setFormData] = useState<Partial<StudentFormData>>({
-    name: '',
-    email: '',
-    groupId: '',
-    notes: '',
-  })
+    name: "",
+    email: "",
+    groupId: "",
+    notes: "",
+  });
 
-  const { data, isLoading } = useStudents({ search })
-  const createMutation = useCreateStudent()
-  const updateMutation = useUpdateStudent()
-  const deleteMutation = useDeleteStudent()
+  const { data, isLoading } = useStudents({ search });
+  const { data: groups, isLoading: groupsLoading } = useGroups();
+  const createMutation = useCreateStudent();
+  const updateMutation = useUpdateStudent();
+  const deleteMutation = useDeleteStudent();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     if (editingStudent) {
       await updateMutation.mutateAsync({
         id: editingStudent.id,
         data: formData as StudentFormData,
-      })
-      setEditingStudent(null)
+      });
+      setEditingStudent(null);
     } else {
-      await createMutation.mutateAsync(formData as StudentFormData)
-      setShowAddForm(false)
+      await createMutation.mutateAsync(formData as StudentFormData);
+      setShowAddForm(false);
     }
-    
-    setFormData({ name: '', email: '', groupId: '', notes: '' })
-  }
+
+    setFormData({ name: "", email: "", groupId: "", notes: "" });
+  };
 
   const handleEdit = (student: StudentWithRelations) => {
-    setEditingStudent(student)
+    setEditingStudent(student);
     setFormData({
       name: student.name,
       email: student.email,
       groupId: student.groupId,
-      notes: student.notes || '',
-    })
-    setShowAddForm(true)
-  }
+      notes: student.notes || "",
+    });
+    setShowAddForm(true);
+  };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this student?')) {
-      await deleteMutation.mutateAsync(id)
+    if (window.confirm("Are you sure you want to delete this student?")) {
+      await deleteMutation.mutateAsync(id);
     }
-  }
+  };
 
   const handleCancel = () => {
-    setShowAddForm(false)
-    setEditingStudent(null)
-    setFormData({ name: '', email: '', groupId: '', notes: '' })
-  }
+    setShowAddForm(false);
+    setEditingStudent(null);
+    setFormData({ name: "", email: "", groupId: "", notes: "" });
+  };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-gray-500">Loading students...</div>
       </div>
-    )
+    );
   }
 
-  const students = data?.data || []
+  // Handle both array format and PaginatedResponse format
+  const students = Array.isArray(data) ? data : data?.data || [];
 
   return (
     <div className="space-y-6">
@@ -91,11 +100,14 @@ export default function StudentsPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Students</h1>
-          <p className="text-gray-600 mt-1">Manage student records and information</p>
+          <p className="text-gray-600 mt-1">
+            Manage student records and information
+          </p>
         </div>
-        <Button 
+        <Button
           onClick={() => setShowAddForm(true)}
           className="flex items-center gap-2"
+          data-testid="add-student-button"
         >
           <Plus className="h-4 w-4" />
           Add Student
@@ -113,6 +125,7 @@ export default function StudentsPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10"
+              data-testid="search-students-input"
             />
           </div>
         </CardContent>
@@ -122,18 +135,23 @@ export default function StudentsPage() {
       {showAddForm && (
         <Card>
           <CardHeader>
-            <CardTitle>{editingStudent ? 'Edit Student' : 'Add New Student'}</CardTitle>
+            <CardTitle>
+              {editingStudent ? "Edit Student" : "Add New Student"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" data-testid="student-form">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="name">Name</Label>
                   <Input
                     id="name"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     required
+                    data-testid="student-name-input"
                   />
                 </div>
                 <div>
@@ -142,8 +160,11 @@ export default function StudentsPage() {
                     id="email"
                     type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                     required
+                    data-testid="student-email-input"
                   />
                 </div>
                 <div>
@@ -151,30 +172,42 @@ export default function StudentsPage() {
                   <select
                     id="groupId"
                     value={formData.groupId}
-                    onChange={(e) => setFormData({ ...formData, groupId: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, groupId: e.target.value })
+                    }
                     className="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
+                    disabled={groupsLoading}
                   >
                     <option value="">Select a group</option>
-                    <option value="clxxx1">Class 10A</option>
-                    <option value="clxxx2">Class 10B</option>
-                    <option value="clxxx3">Class 9A</option>
+                    {groups?.map((group) => (
+                      <option key={group.id} value={group.id}>
+                        {group.name} ({group.code})
+                      </option>
+                    ))}
                   </select>
+                  {groupsLoading && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      Loading groups...
+                    </p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="notes">Notes</Label>
                   <Input
                     id="notes"
                     value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, notes: e.target.value })
+                    }
                   />
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button type="submit">
-                  {editingStudent ? 'Update' : 'Create'} Student
+                <Button type="submit" data-testid="submit-student-button">
+                  {editingStudent ? "Update" : "Create"} Student
                 </Button>
-                <Button type="button" variant="outline" onClick={handleCancel}>
+                <Button type="button" variant="outline" onClick={handleCancel} data-testid="cancel-student-button">
                   Cancel
                 </Button>
               </div>
@@ -202,7 +235,7 @@ export default function StudentsPage() {
               <div>
                 <p className="text-sm text-gray-600">Active</p>
                 <p className="text-2xl font-bold">
-                  {students.filter(s => s.status === 'ACTIVE').length}
+                  {students.filter((s) => s.status === "ACTIVE").length}
                 </p>
               </div>
               <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
@@ -217,7 +250,7 @@ export default function StudentsPage() {
               <div>
                 <p className="text-sm text-gray-600">Inactive</p>
                 <p className="text-2xl font-bold">
-                  {students.filter(s => s.status === 'INACTIVE').length}
+                  {students.filter((s) => s.status === "INACTIVE").length}
                 </p>
               </div>
               <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
@@ -256,13 +289,27 @@ export default function StudentsPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left p-4 font-medium text-gray-700">Name</th>
-                    <th className="text-left p-4 font-medium text-gray-700">Student ID</th>
-                    <th className="text-left p-4 font-medium text-gray-700">Email</th>
-                    <th className="text-left p-4 font-medium text-gray-700">Group</th>
-                    <th className="text-left p-4 font-medium text-gray-700">Status</th>
-                    <th className="text-left p-4 font-medium text-gray-700">Enrolled</th>
-                    <th className="text-left p-4 font-medium text-gray-700">Actions</th>
+                    <th className="text-left p-4 font-medium text-gray-700">
+                      Name
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-700">
+                      Student ID
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-700">
+                      Email
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-700">
+                      Group
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-700">
+                      Status
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-700">
+                      Enrolled
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-700">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -280,15 +327,17 @@ export default function StudentsPage() {
                       </td>
                       <td className="p-4">
                         <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm">
-                          {student.group?.name || 'Unassigned'}
+                          {student.group?.name || "Unassigned"}
                         </span>
                       </td>
                       <td className="p-4">
-                        <span className={`px-2 py-1 rounded text-sm ${
-                          student.status === 'ACTIVE' 
-                            ? 'bg-green-100 text-green-700' 
-                            : 'bg-gray-100 text-gray-700'
-                        }`}>
+                        <span
+                          className={`px-2 py-1 rounded text-sm ${
+                            student.status === "ACTIVE"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-gray-100 text-gray-700"
+                          }`}
+                        >
                           {student.status}
                         </span>
                       </td>
@@ -326,5 +375,5 @@ export default function StudentsPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -1,15 +1,13 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   BookOpen,
   Calendar,
-  Clock,
   FileText,
   Plus,
   Edit2,
@@ -17,111 +15,70 @@ import {
   Users,
   CheckCircle,
   AlertCircle,
-} from 'lucide-react'
-import { apiClient } from '@/data/api/client'
-import { toast } from 'sonner'
-import { formatDate } from '@/lib/utils'
-
-interface Task {
-  id: string
-  title: string
-  description: string
-  type: string
-  category?: string
-  points?: number
-  dueDate?: string
-  isPublished: boolean
-  groups: any[]
-  _count: {
-    assessments: number
-    attachments: number
-  }
-}
+} from "lucide-react";
+import { useTasks, useCreateTask, useDeleteTask } from "@/data/hooks/use-tasks";
+import { useGroups } from "@/data/hooks/use-groups";
+import { formatDate } from "@/lib/utils";
 
 export default function TasksPage() {
-  const [showAddForm, setShowAddForm] = useState(false)
+  const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    instructions: '',
-    type: 'ASSIGNMENT',
-    category: '',
+    title: "",
+    description: "",
+    instructions: "",
+    type: "ASSIGNMENT",
+    category: "",
     points: 100,
-    dueDate: '',
+    dueDate: "",
     groupIds: [] as string[],
     isPublished: false,
-  })
+  });
 
-  const queryClient = useQueryClient()
-
-  const { data: tasksData, isLoading } = useQuery({
-    queryKey: ['tasks'],
-    queryFn: async () => {
-      return apiClient.get<{ data: Task[]; total: number }>('/tasks')
-    },
-  })
-
-  const createMutation = useMutation({
-    mutationFn: async (data: typeof formData) => {
-      return apiClient.post('/tasks', data)
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      toast.success('Task created successfully')
-      setShowAddForm(false)
-      resetForm()
-    },
-    onError: () => {
-      toast.error('Failed to create task')
-    },
-  })
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      return apiClient.delete(`/tasks/${id}`)
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      toast.success('Task deleted successfully')
-    },
-    onError: () => {
-      toast.error('Failed to delete task')
-    },
-  })
+  const { data: tasksData, isLoading } = useTasks();
+  const { data: groupsData } = useGroups();
+  const createMutation = useCreateTask();
+  const deleteMutation = useDeleteTask();
 
   const resetForm = () => {
     setFormData({
-      title: '',
-      description: '',
-      instructions: '',
-      type: 'ASSIGNMENT',
-      category: '',
+      title: "",
+      description: "",
+      instructions: "",
+      type: "ASSIGNMENT",
+      category: "",
       points: 100,
-      dueDate: '',
+      dueDate: "",
       groupIds: [],
       isPublished: false,
-    })
-  }
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    await createMutation.mutateAsync(formData)
-  }
+    e.preventDefault();
+    await createMutation.mutateAsync({
+      ...formData,
+      type: formData.type as any, // Cast to TaskType
+      dueDate: new Date(formData.dueDate), // Convert string to Date
+    });
+    setShowAddForm(false);
+    resetForm();
+  };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this task?')) {
-      await deleteMutation.mutateAsync(id)
+    if (window.confirm("Are you sure you want to delete this task?")) {
+      await deleteMutation.mutateAsync(id);
     }
-  }
+  };
 
-  const tasks = tasksData?.data || []
+  const tasks = Array.isArray(tasksData) ? tasksData : tasksData?.data || [];
+  const groups = groupsData || [];
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-gray-500">Loading tasks...</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -130,9 +87,11 @@ export default function TasksPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Tasks</h1>
-          <p className="text-gray-600 mt-1">Create and manage assignments, quizzes, and exams</p>
+          <p className="text-gray-600 mt-1">
+            Create and manage assignments, quizzes, and exams
+          </p>
         </div>
-        <Button 
+        <Button
           onClick={() => setShowAddForm(true)}
           className="flex items-center gap-2"
         >
@@ -160,7 +119,7 @@ export default function TasksPage() {
               <div>
                 <p className="text-sm text-gray-600">Published</p>
                 <p className="text-2xl font-bold">
-                  {tasks.filter(t => t.isPublished).length}
+                  {tasks.filter((t) => t.isPublished).length}
                 </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-600" />
@@ -173,7 +132,7 @@ export default function TasksPage() {
               <div>
                 <p className="text-sm text-gray-600">Drafts</p>
                 <p className="text-2xl font-bold">
-                  {tasks.filter(t => !t.isPublished).length}
+                  {tasks.filter((t) => !t.isPublished).length}
                 </p>
               </div>
               <FileText className="h-8 w-8 text-gray-600" />
@@ -186,13 +145,17 @@ export default function TasksPage() {
               <div>
                 <p className="text-sm text-gray-600">Due This Week</p>
                 <p className="text-2xl font-bold">
-                  {tasks.filter(t => {
-                    if (!t.dueDate) return false
-                    const due = new Date(t.dueDate)
-                    const now = new Date()
-                    const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
-                    return due >= now && due <= weekFromNow
-                  }).length}
+                  {
+                    tasks.filter((t) => {
+                      if (!t.dueDate) return false;
+                      const due = new Date(t.dueDate);
+                      const now = new Date();
+                      const weekFromNow = new Date(
+                        now.getTime() + 7 * 24 * 60 * 60 * 1000,
+                      );
+                      return due >= now && due <= weekFromNow;
+                    }).length
+                  }
                 </p>
               </div>
               <AlertCircle className="h-8 w-8 text-yellow-600" />
@@ -215,7 +178,9 @@ export default function TasksPage() {
                   <Input
                     id="title"
                     value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, title: e.target.value })
+                    }
                     placeholder="Task title"
                     required
                   />
@@ -225,7 +190,9 @@ export default function TasksPage() {
                   <select
                     id="type"
                     value={formData.type}
-                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, type: e.target.value })
+                    }
                     className="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="ASSIGNMENT">Assignment</option>
@@ -240,7 +207,9 @@ export default function TasksPage() {
                   <Input
                     id="category"
                     value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category: e.target.value })
+                    }
                     placeholder="e.g., Mathematics, Science"
                   />
                 </div>
@@ -250,7 +219,12 @@ export default function TasksPage() {
                     id="points"
                     type="number"
                     value={formData.points}
-                    onChange={(e) => setFormData({ ...formData, points: parseInt(e.target.value) })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        points: parseInt(e.target.value),
+                      })
+                    }
                     placeholder="100"
                   />
                 </div>
@@ -260,8 +234,37 @@ export default function TasksPage() {
                     id="dueDate"
                     type="datetime-local"
                     value={formData.dueDate}
-                    onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, dueDate: e.target.value })
+                    }
                   />
+                </div>
+                <div>
+                  <Label htmlFor="groups">Groups</Label>
+                  <select
+                    id="groups"
+                    multiple
+                    value={formData.groupIds}
+                    onChange={(e) => {
+                      const selectedOptions = Array.from(
+                        e.target.selectedOptions,
+                        (option) => option.value,
+                      );
+                      setFormData({ ...formData, groupIds: selectedOptions });
+                    }}
+                    className="w-full h-24 px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    {groups.map((group) => (
+                      <option key={group.id} value={group.id}>
+                        {group.name} ({group.academicYear} - Grade {group.grade}
+                        )
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Hold Ctrl/Cmd to select multiple groups
+                  </p>
                 </div>
                 <div>
                   <Label>Publish Status</Label>
@@ -270,7 +273,12 @@ export default function TasksPage() {
                       type="checkbox"
                       id="isPublished"
                       checked={formData.isPublished}
-                      onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          isPublished: e.target.checked,
+                        })
+                      }
                       className="h-4 w-4 rounded border-gray-300"
                     />
                     <Label htmlFor="isPublished" className="font-normal">
@@ -284,7 +292,9 @@ export default function TasksPage() {
                 <textarea
                   id="description"
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                   className="w-full h-24 px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Task description"
                   required
@@ -295,19 +305,21 @@ export default function TasksPage() {
                 <textarea
                   id="instructions"
                   value={formData.instructions}
-                  onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, instructions: e.target.value })
+                  }
                   className="w-full h-24 px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Detailed instructions for students"
                 />
               </div>
               <div className="flex gap-2">
                 <Button type="submit">Create Task</Button>
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => {
-                    setShowAddForm(false)
-                    resetForm()
+                    setShowAddForm(false);
+                    resetForm();
                   }}
                 >
                   Cancel
@@ -327,16 +339,23 @@ export default function TasksPage() {
                 <div className="flex-1">
                   <CardTitle className="text-lg">{task.title}</CardTitle>
                   <div className="flex items-center gap-3 mt-2">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      task.type === 'EXAM' ? 'bg-red-100 text-red-700' :
-                      task.type === 'QUIZ' ? 'bg-yellow-100 text-yellow-700' :
-                      task.type === 'PROJECT' ? 'bg-purple-100 text-purple-700' :
-                      'bg-blue-100 text-blue-700'
-                    }`}>
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-medium ${
+                        task.type === "EXAM"
+                          ? "bg-red-100 text-red-700"
+                          : task.type === "QUIZ"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : task.type === "PROJECT"
+                              ? "bg-purple-100 text-purple-700"
+                              : "bg-blue-100 text-blue-700"
+                      }`}
+                    >
                       {task.type}
                     </span>
                     {task.category && (
-                      <span className="text-sm text-gray-500">{task.category}</span>
+                      <span className="text-sm text-gray-500">
+                        {task.category}
+                      </span>
                     )}
                     {task.isPublished ? (
                       <span className="text-xs text-green-600 flex items-center gap-1">
@@ -398,10 +417,12 @@ export default function TasksPage() {
         <Card>
           <CardContent className="text-center py-12">
             <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">No tasks found. Create your first task to get started.</p>
+            <p className="text-gray-500">
+              No tasks found. Create your first task to get started.
+            </p>
           </CardContent>
         </Card>
       )}
     </div>
-  )
+  );
 }

@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { signOut, useSession } from 'next-auth/react'
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Users,
   BookOpen,
@@ -18,47 +18,56 @@ import {
   X,
   Home,
   UserCheck,
-} from 'lucide-react'
+  Shield,
+} from "lucide-react";
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: Home },
-  { name: 'Students', href: '/students', icon: Users },
-  { name: 'Groups', href: '/groups', icon: UserCheck },
-  { name: 'Tasks', href: '/tasks', icon: BookOpen },
-  { name: 'Assessments', href: '/assessments', icon: ClipboardList },
-  { name: 'Attendance', href: '/attendance', icon: Calendar },
-  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-  { name: 'Settings', href: '/settings', icon: Settings },
-]
+  { name: "Dashboard", href: "/dashboard", icon: Home },
+  { name: "Students", href: "/students", icon: Users },
+  { name: "Groups", href: "/groups", icon: UserCheck },
+  { name: "Tasks", href: "/tasks", icon: BookOpen },
+  { name: "Assessments", href: "/assessments", icon: ClipboardList },
+  { name: "Attendance", href: "/attendance", icon: Calendar },
+  { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  { name: "User Management", href: "/admin/users", icon: Shield },
+  { name: "Settings", href: "/settings", icon: Settings },
+];
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const pathname = usePathname()
-  const { data: session } = useSession()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const pathname = usePathname();
+  const { data: session } = useSession();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleSignOut = () => {
-    signOut({ callbackUrl: '/login' })
-  }
+    signOut({ callbackUrl: "/login" });
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
-        <div
+        <button
+          type="button"
           className="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden"
           onClick={() => setSidebarOpen(false)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              setSidebarOpen(false);
+            }
+          }}
+          aria-label="Close sidebar"
         />
       )}
 
       {/* Sidebar */}
       <div
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 shadow-xl transform transition-transform lg:relative lg:translate-x-0',
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          "fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 shadow-xl transform transition-transform lg:relative lg:translate-x-0",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
         <div className="flex h-full flex-col">
@@ -76,17 +85,17 @@ export default function DashboardLayout({
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-1 px-2 py-4">
+          <nav className="flex-1 space-y-1 px-2 py-4" data-testid="navigation">
             {navigation.map((item) => {
-              const isActive = pathname === item.href
-              const Icon = item.icon
-              
+              const isActive = pathname === item.href;
+              const Icon = item.icon;
+
               // Check if user has permission to view this route
               if (
-                ['Settings'].includes(item.name) && 
-                session?.user?.role !== 'ADMIN'
+                ["Settings", "User Management"].includes(item.name) &&
+                session?.user?.role !== "ADMIN"
               ) {
-                return null
+                return null;
               }
 
               return (
@@ -94,16 +103,19 @@ export default function DashboardLayout({
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200',
+                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
                     isActive
-                      ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-700'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:translate-x-1'
+                      ? "bg-blue-50 text-blue-700 border-l-4 border-blue-700"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:translate-x-1",
                   )}
+                  data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                 >
-                  <Icon className={cn("h-5 w-5", isActive && "text-blue-700")} />
+                  <Icon
+                    className={cn("h-5 w-5", isActive && "text-blue-700")}
+                  />
                   {item.name}
                 </Link>
-              )
+              );
             })}
           </nav>
 
@@ -149,7 +161,8 @@ export default function DashboardLayout({
           </Button>
           <div className="flex-1">
             <h2 className="text-lg font-semibold text-gray-900">
-              {navigation.find((item) => item.href === pathname)?.name || 'Dashboard'}
+              {navigation.find((item) => item.href === pathname)?.name ||
+                "Dashboard"}
             </h2>
           </div>
         </div>
@@ -158,5 +171,5 @@ export default function DashboardLayout({
         <main className="flex-1 p-4 lg:p-6 overflow-auto">{children}</main>
       </div>
     </div>
-  )
+  );
 }
