@@ -1,0 +1,20 @@
+{
+  "actions": {
+    "mark_all_absent": "Mark All Absent",
+    "mark_all_present": "Mark All Present"
+  },
+  "export_report": "Export Report",
+  "form": {
+    "date_label": "Date",
+    "group_label": "Group",
+    "select_group": "Select a group"
+  },
+  "loading_students": "Loading students...",
+  "no_students": "No students found in this group.",
+  "select_group_message": "Please select a group to mark attendance",
+  "stats": {
+    "total": "Total"
+  },
+  "subtitle": "Track daily student attendance",
+  "title": "Attendance"
+}

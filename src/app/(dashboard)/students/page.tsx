@@ -20,12 +20,14 @@ import {
   Mail,
   Calendar,
   UserCheck,
-  X,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n";
 import type { StudentFormData, StudentWithRelations } from "@/types";
 
 export default function StudentsPage() {
+  const { t } = useTranslation("students");
+  const { t: tCommon } = useTranslation("common");
   const [search, setSearch] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingStudent, setEditingStudent] =
@@ -72,7 +74,7 @@ export default function StudentsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this student?")) {
+    if (window.confirm(t("delete_confirmation"))) {
       await deleteMutation.mutateAsync(id);
     }
   };
@@ -86,7 +88,7 @@ export default function StudentsPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading students...</div>
+        <div className="text-gray-500">{tCommon("loading")}</div>
       </div>
     );
   }
@@ -99,10 +101,8 @@ export default function StudentsPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Students</h1>
-          <p className="text-gray-600 mt-1">
-            Manage student records and information
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
+          <p className="text-gray-600 mt-1">{t("subtitle")}</p>
         </div>
         <Button
           onClick={() => setShowAddForm(true)}
@@ -110,7 +110,7 @@ export default function StudentsPage() {
           data-testid="add-student-button"
         >
           <Plus className="h-4 w-4" />
-          Add Student
+          {t("add_student")}
         </Button>
       </div>
 
@@ -121,7 +121,7 @@ export default function StudentsPage() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               type="text"
-              placeholder="Search students by name, email, or ID..."
+              placeholder={t("search_placeholder")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10"
@@ -136,11 +136,15 @@ export default function StudentsPage() {
         <Card>
           <CardHeader>
             <CardTitle>
-              {editingStudent ? "Edit Student" : "Add New Student"}
+              {editingStudent ? t("edit_student") : t("add_new_student")}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4" data-testid="student-form">
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-4"
+              data-testid="student-form"
+            >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="name">Name</Label>
@@ -207,7 +211,12 @@ export default function StudentsPage() {
                 <Button type="submit" data-testid="submit-student-button">
                   {editingStudent ? "Update" : "Create"} Student
                 </Button>
-                <Button type="button" variant="outline" onClick={handleCancel} data-testid="cancel-student-button">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCancel}
+                  data-testid="cancel-student-button"
+                >
                   Cancel
                 </Button>
               </div>

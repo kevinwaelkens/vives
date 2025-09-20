@@ -1,0 +1,33 @@
+{
+  "create_task": "Aufgabe erstellen",
+  "delete_confirmation": "Sind Sie sicher, dass Sie diese Aufgabe löschen möchten?",
+  "form": {
+    "category_label": "Kategorie",
+    "create_new_task": "Neue Aufgabe erstellen",
+    "description_label": "Beschreibung",
+    "due_date_label": "Fälligkeitsdatum",
+    "groups_label": "Gruppen",
+    "instructions_label": "Anweisungen",
+    "points_label": "Punkte",
+    "publish_immediately": "Sofort veröffentlichen",
+    "title_label": "Titel",
+    "type_label": "Typ"
+  },
+  "loading": "Aufgaben werden geladen...",
+  "no_tasks": "Keine Aufgaben gefunden. Erstellen Sie Ihre erste Aufgabe, um zu beginnen.",
+  "stats": {
+    "drafts": "Entwürfe",
+    "due_this_week": "Fällig diese Woche",
+    "published": "Veröffentlicht",
+    "total_tasks": "Gesamte Aufgaben"
+  },
+  "subtitle": "Aufgaben, Quiz und Prüfungen erstellen und verwalten",
+  "title": "Aufgaben",
+  "types": {
+    "assignment": "Aufgabe",
+    "exam": "Prüfung",
+    "homework": "Hausaufgaben",
+    "project": "Projekt",
+    "quiz": "Quiz"
+  }
+}

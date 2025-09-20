@@ -19,8 +19,11 @@ import {
 import { useTasks, useCreateTask, useDeleteTask } from "@/data/hooks/use-tasks";
 import { useGroups } from "@/data/hooks/use-groups";
 import { formatDate } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n";
 
 export default function TasksPage() {
+  const { t } = useTranslation("tasks");
+  const { t: tCommon } = useTranslation("common");
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
@@ -65,7 +68,7 @@ export default function TasksPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this task?")) {
+    if (window.confirm(t("delete_confirmation"))) {
       await deleteMutation.mutateAsync(id);
     }
   };
@@ -76,7 +79,7 @@ export default function TasksPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading tasks...</div>
+        <div className="text-gray-500">{t("loading")}</div>
       </div>
     );
   }
@@ -86,17 +89,15 @@ export default function TasksPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Tasks</h1>
-          <p className="text-gray-600 mt-1">
-            Create and manage assignments, quizzes, and exams
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
+          <p className="text-gray-600 mt-1">{t("subtitle")}</p>
         </div>
         <Button
           onClick={() => setShowAddForm(true)}
           className="flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
-          Create Task
+          {t("create_task")}
         </Button>
       </div>
 
@@ -106,7 +107,9 @@ export default function TasksPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Tasks</p>
+                <p className="text-sm text-gray-600">
+                  {t("stats.total_tasks")}
+                </p>
                 <p className="text-2xl font-bold">{tasks.length}</p>
               </div>
               <BookOpen className="h-8 w-8 text-blue-600" />
@@ -117,7 +120,7 @@ export default function TasksPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Published</p>
+                <p className="text-sm text-gray-600">{t("stats.published")}</p>
                 <p className="text-2xl font-bold">
                   {tasks.filter((t) => t.isPublished).length}
                 </p>
@@ -130,7 +133,7 @@ export default function TasksPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Drafts</p>
+                <p className="text-sm text-gray-600">{t("stats.drafts")}</p>
                 <p className="text-2xl font-bold">
                   {tasks.filter((t) => !t.isPublished).length}
                 </p>
@@ -143,7 +146,9 @@ export default function TasksPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Due This Week</p>
+                <p className="text-sm text-gray-600">
+                  {t("stats.due_this_week")}
+                </p>
                 <p className="text-2xl font-bold">
                   {
                     tasks.filter((t) => {
@@ -168,13 +173,13 @@ export default function TasksPage() {
       {showAddForm && (
         <Card>
           <CardHeader>
-            <CardTitle>Create New Task</CardTitle>
+            <CardTitle>{t("form.create_new_task")}</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="title">Title</Label>
+                  <Label htmlFor="title">{t("form.title_label")}</Label>
                   <Input
                     id="title"
                     value={formData.title}
@@ -186,7 +191,7 @@ export default function TasksPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="type">Type</Label>
+                  <Label htmlFor="type">{t("form.type_label")}</Label>
                   <select
                     id="type"
                     value={formData.type}
@@ -195,11 +200,11 @@ export default function TasksPage() {
                     }
                     className="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="ASSIGNMENT">Assignment</option>
-                    <option value="QUIZ">Quiz</option>
-                    <option value="EXAM">Exam</option>
-                    <option value="PROJECT">Project</option>
-                    <option value="HOMEWORK">Homework</option>
+                    <option value="ASSIGNMENT">{t("types.assignment")}</option>
+                    <option value="QUIZ">{t("types.quiz")}</option>
+                    <option value="EXAM">{t("types.exam")}</option>
+                    <option value="PROJECT">{t("types.project")}</option>
+                    <option value="HOMEWORK">{t("types.homework")}</option>
                   </select>
                 </div>
                 <div>
@@ -313,7 +318,7 @@ export default function TasksPage() {
                 />
               </div>
               <div className="flex gap-2">
-                <Button type="submit">Create Task</Button>
+                <Button type="submit">{t("create_task")}</Button>
                 <Button
                   type="button"
                   variant="outline"
@@ -322,7 +327,7 @@ export default function TasksPage() {
                     resetForm();
                   }}
                 >
-                  Cancel
+                  {tCommon("cancel")}
                 </Button>
               </div>
             </form>
@@ -417,9 +422,7 @@ export default function TasksPage() {
         <Card>
           <CardContent className="text-center py-12">
             <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">
-              No tasks found. Create your first task to get started.
-            </p>
+            <p className="text-gray-500">{t("no_tasks")}</p>
           </CardContent>
         </Card>
       )}

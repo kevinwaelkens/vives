@@ -28,6 +28,7 @@ import {
 import { apiClient } from "@/data/api/client";
 import { toast } from "sonner";
 import { formatDate } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n";
 import type { CompetenceRubric } from "@/lib/competences";
 
 interface Assessment {
@@ -53,6 +54,8 @@ interface Assessment {
 }
 
 export default function AssessmentsPage() {
+  const { t } = useTranslation("assessments");
+  const { t: tCommon } = useTranslation("common");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [gradingAssessment, setGradingAssessment] = useState<Assessment | null>(
     null,
@@ -167,7 +170,7 @@ export default function AssessmentsPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading assessments...</div>
+        <div className="text-gray-500">{t("loading")}</div>
       </div>
     );
   }
@@ -192,10 +195,8 @@ export default function AssessmentsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Assessments</h1>
-        <p className="text-gray-600 mt-1">
-          Grade student submissions and provide feedback
-        </p>
+        <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
+        <p className="text-gray-600 mt-1">{t("subtitle")}</p>
       </div>
 
       {/* Stats */}
@@ -204,7 +205,7 @@ export default function AssessmentsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total</p>
+                <p className="text-sm text-gray-600">{t("stats.total")}</p>
                 <p className="text-2xl font-bold">{stats.total}</p>
               </div>
               <FileText className="h-8 w-8 text-gray-600" />
@@ -215,7 +216,7 @@ export default function AssessmentsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Graded</p>
+                <p className="text-sm text-gray-600">{t("stats.graded")}</p>
                 <p className="text-2xl font-bold">{stats.graded}</p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-600" />
@@ -226,7 +227,7 @@ export default function AssessmentsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Pending</p>
+                <p className="text-sm text-gray-600">{t("stats.pending")}</p>
                 <p className="text-2xl font-bold">{stats.submitted}</p>
               </div>
               <Clock className="h-8 w-8 text-blue-600" />
@@ -237,7 +238,7 @@ export default function AssessmentsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Late</p>
+                <p className="text-sm text-gray-600">{t("stats.late")}</p>
                 <p className="text-2xl font-bold">{stats.late}</p>
               </div>
               <AlertCircle className="h-8 w-8 text-yellow-600" />
@@ -248,7 +249,7 @@ export default function AssessmentsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Missing</p>
+                <p className="text-sm text-gray-600">{t("stats.missing")}</p>
                 <p className="text-2xl font-bold">{stats.notSubmitted}</p>
               </div>
               <XCircle className="h-8 w-8 text-red-600" />
@@ -263,25 +264,25 @@ export default function AssessmentsPage() {
           variant={selectedStatus === "all" ? "default" : "outline"}
           onClick={() => setSelectedStatus("all")}
         >
-          All
+          {t("filters.all")}
         </Button>
         <Button
           variant={selectedStatus === "SUBMITTED" ? "default" : "outline"}
           onClick={() => setSelectedStatus("SUBMITTED")}
         >
-          To Grade
+          {t("filters.to_grade")}
         </Button>
         <Button
           variant={selectedStatus === "GRADED" ? "default" : "outline"}
           onClick={() => setSelectedStatus("GRADED")}
         >
-          Graded
+          {t("stats.graded")}
         </Button>
         <Button
           variant={selectedStatus === "NOT_SUBMITTED" ? "default" : "outline"}
           onClick={() => setSelectedStatus("NOT_SUBMITTED")}
         >
-          Not Submitted
+          {t("filters.not_submitted")}
         </Button>
       </div>
 

@@ -1,0 +1,36 @@
+{
+  "add_new_student": "Nieuwe student toevoegen",
+  "add_student": "Student toevoegen",
+  "delete_confirmation": "Weet je zeker dat je deze student wilt verwijderen?",
+  "edit_student": "Student bewerken",
+  "form": {
+    "create_student": "Student aanmaken",
+    "email_label": "E-mail",
+    "group_label": "Groep",
+    "loading_groups": "Groepen laden...",
+    "name_label": "Naam",
+    "notes_label": "Notities",
+    "select_group": "Selecteer een groep",
+    "update_student": "Student bijwerken"
+  },
+  "no_students": "Geen studenten gevonden. Voeg je eerste student toe om te beginnen.",
+  "search_placeholder": "Zoek studenten op naam, e-mail of ID...",
+  "stats": {
+    "active": "Actief",
+    "groups": "Groepen",
+    "inactive": "Inactief",
+    "total_students": "Totaal studenten"
+  },
+  "subtitle": "Beheer studentendossiers en informatie",
+  "table": {
+    "actions": "Acties",
+    "email": "E-mail",
+    "enrolled": "Ingeschreven",
+    "group": "Groep",
+    "name": "Naam",
+    "status": "Status",
+    "student_id": "Student ID",
+    "unassigned": "Niet toegewezen"
+  },
+  "title": "Studenten"
+}

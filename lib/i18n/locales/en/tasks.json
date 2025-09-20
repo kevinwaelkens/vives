@@ -1,0 +1,33 @@
+{
+  "create_task": "Create Task",
+  "delete_confirmation": "Are you sure you want to delete this task?",
+  "form": {
+    "category_label": "Category",
+    "create_new_task": "Create New Task",
+    "description_label": "Description",
+    "due_date_label": "Due Date",
+    "groups_label": "Groups",
+    "instructions_label": "Instructions",
+    "points_label": "Points",
+    "publish_immediately": "Publish immediately",
+    "title_label": "Title",
+    "type_label": "Type"
+  },
+  "loading": "Loading tasks...",
+  "no_tasks": "No tasks found. Create your first task to get started.",
+  "stats": {
+    "drafts": "Drafts",
+    "due_this_week": "Due This Week",
+    "published": "Published",
+    "total_tasks": "Total Tasks"
+  },
+  "subtitle": "Create and manage assignments, quizzes, and exams",
+  "title": "Tasks",
+  "types": {
+    "assignment": "Assignment",
+    "exam": "Exam",
+    "homework": "Homework",
+    "project": "Project",
+    "quiz": "Quiz"
+  }
+}

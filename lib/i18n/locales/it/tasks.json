@@ -1,0 +1,33 @@
+{
+  "create_task": "Crea compito",
+  "delete_confirmation": "Sei sicuro di voler eliminare questo compito?",
+  "form": {
+    "category_label": "Categoria",
+    "create_new_task": "Crea nuovo compito",
+    "description_label": "Descrizione",
+    "due_date_label": "Data di scadenza",
+    "groups_label": "Gruppi",
+    "instructions_label": "Istruzioni",
+    "points_label": "Punti",
+    "publish_immediately": "Pubblica immediatamente",
+    "title_label": "Titolo",
+    "type_label": "Tipo"
+  },
+  "loading": "Caricamento compiti...",
+  "no_tasks": "Nessun compito trovato. Crea il tuo primo compito per iniziare.",
+  "stats": {
+    "drafts": "Bozze",
+    "due_this_week": "Scadenza questa settimana",
+    "published": "Pubblicati",
+    "total_tasks": "Totale compiti"
+  },
+  "subtitle": "Crea e gestisci compiti, quiz ed esami",
+  "title": "Compiti",
+  "types": {
+    "assignment": "Compito",
+    "exam": "Esame",
+    "homework": "Compiti a casa",
+    "project": "Progetto",
+    "quiz": "Quiz"
+  }
+}

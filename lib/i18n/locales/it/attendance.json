@@ -1,0 +1,20 @@
+{
+  "actions": {
+    "mark_all_absent": "Segna tutti assenti",
+    "mark_all_present": "Segna tutti presenti"
+  },
+  "export_report": "Esporta rapporto",
+  "form": {
+    "date_label": "Data",
+    "group_label": "Gruppo",
+    "select_group": "Seleziona un gruppo"
+  },
+  "loading_students": "Caricamento studenti...",
+  "no_students": "Nessuno studente trovato in questo gruppo.",
+  "select_group_message": "Seleziona un gruppo per segnare la presenza",
+  "stats": {
+    "total": "Totale"
+  },
+  "subtitle": "Traccia la presenza quotidiana degli studenti",
+  "title": "Presenza"
+}

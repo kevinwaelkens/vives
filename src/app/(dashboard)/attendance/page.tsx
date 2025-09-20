@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { apiClient } from "@/data/api/client";
 import { toast } from "sonner";
+import { useTranslation } from "@/lib/i18n";
 
 interface AttendanceRecord {
   id: string;
@@ -32,6 +33,8 @@ interface AttendanceRecord {
 }
 
 export default function AttendancePage() {
+  const { t } = useTranslation("attendance");
+  const { t: tCommon } = useTranslation("common");
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0],
   );
@@ -164,8 +167,8 @@ export default function AttendancePage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Attendance</h1>
-        <p className="text-gray-600 mt-1">Track daily student attendance</p>
+        <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
+        <p className="text-gray-600 mt-1">{t("subtitle")}</p>
       </div>
 
       {/* Controls */}

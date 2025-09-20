@@ -1,0 +1,33 @@
+{
+  "create_task": "Créer une tâche",
+  "delete_confirmation": "Êtes-vous sûr de vouloir supprimer cette tâche ?",
+  "form": {
+    "category_label": "Catégorie",
+    "create_new_task": "Créer une nouvelle tâche",
+    "description_label": "Description",
+    "due_date_label": "Date d'échéance",
+    "groups_label": "Groupes",
+    "instructions_label": "Instructions",
+    "points_label": "Points",
+    "publish_immediately": "Publier immédiatement",
+    "title_label": "Titre",
+    "type_label": "Type"
+  },
+  "loading": "Chargement des tâches...",
+  "no_tasks": "Aucune tâche trouvée. Créez votre première tâche pour commencer.",
+  "stats": {
+    "drafts": "Brouillons",
+    "due_this_week": "Échéance cette semaine",
+    "published": "Publiées",
+    "total_tasks": "Total des tâches"
+  },
+  "subtitle": "Créer et gérer les devoirs, quiz et examens",
+  "title": "Tâches",
+  "types": {
+    "assignment": "Devoir",
+    "exam": "Examen",
+    "homework": "Devoirs",
+    "project": "Projet",
+    "quiz": "Quiz"
+  }
+}

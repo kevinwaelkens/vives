@@ -1,0 +1,33 @@
+{
+  "create_task": "Taak aanmaken",
+  "delete_confirmation": "Weet je zeker dat je deze taak wilt verwijderen?",
+  "form": {
+    "category_label": "Categorie",
+    "create_new_task": "Nieuwe taak aanmaken",
+    "description_label": "Beschrijving",
+    "due_date_label": "Vervaldatum",
+    "groups_label": "Groepen",
+    "instructions_label": "Instructies",
+    "points_label": "Punten",
+    "publish_immediately": "Onmiddellijk publiceren",
+    "title_label": "Titel",
+    "type_label": "Type"
+  },
+  "loading": "Taken laden...",
+  "no_tasks": "Geen taken gevonden. Maak je eerste taak aan om te beginnen.",
+  "stats": {
+    "drafts": "Concepten",
+    "due_this_week": "Vervalt deze week",
+    "published": "Gepubliceerd",
+    "total_tasks": "Totaal taken"
+  },
+  "subtitle": "Maak en beheer opdrachten, quizzes en examens",
+  "title": "Taken",
+  "types": {
+    "assignment": "Opdracht",
+    "exam": "Examen",
+    "homework": "Huiswerk",
+    "project": "Project",
+    "quiz": "Quiz"
+  }
+}

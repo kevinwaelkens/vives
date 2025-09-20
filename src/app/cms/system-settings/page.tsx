@@ -4,21 +4,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
-  Settings, 
-  Database, 
-  Mail, 
-  Shield,
-  Save
-} from "lucide-react";
+import { Settings, Database, Mail, Shield, Save } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 export default function CMSSettingsPage() {
+  const { t } = useTranslation("cms");
+  const { t: tCommon } = useTranslation("common");
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">System Settings</h1>
-        <p className="text-gray-600">Configure system-wide settings and preferences</p>
+        <h1 className="text-2xl font-bold text-gray-900">
+          {t("settings.title")}
+        </h1>
+        <p className="text-gray-600">{t("settings.subtitle")}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -27,7 +27,7 @@ export default function CMSSettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Settings className="h-5 w-5" />
-              <span>General Settings</span>
+              <span>{t("settings.general_settings")}</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -45,7 +45,7 @@ export default function CMSSettingsPage() {
             </div>
             <Button>
               <Save className="h-4 w-4 mr-2" />
-              Save Changes
+              {tCommon("save")}
             </Button>
           </CardContent>
         </Card>
@@ -55,7 +55,7 @@ export default function CMSSettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Shield className="h-5 w-5" />
-              <span>Security Settings</span>
+              <span>{t("settings.security_settings")}</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -73,7 +73,7 @@ export default function CMSSettingsPage() {
             </div>
             <Button>
               <Save className="h-4 w-4 mr-2" />
-              Save Changes
+              {tCommon("save")}
             </Button>
           </CardContent>
         </Card>
@@ -83,7 +83,7 @@ export default function CMSSettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Mail className="h-5 w-5" />
-              <span>Email Settings</span>
+              <span>{t("settings.email_settings")}</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -97,11 +97,15 @@ export default function CMSSettingsPage() {
             </div>
             <div>
               <Label htmlFor="from-email">From Email</Label>
-              <Input id="from-email" type="email" placeholder="noreply@school.com" />
+              <Input
+                id="from-email"
+                type="email"
+                placeholder="noreply@school.com"
+              />
             </div>
             <Button>
               <Save className="h-4 w-4 mr-2" />
-              Save Changes
+              {tCommon("save")}
             </Button>
           </CardContent>
         </Card>
@@ -111,23 +115,28 @@ export default function CMSSettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Database className="h-5 w-5" />
-              <span>Database Settings</span>
+              <span>{t("settings.database_settings")}</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="p-4 bg-slate-50 rounded-lg">
-              <p className="text-sm text-gray-600 mb-2">Database Status: <span className="text-green-600 font-medium">Connected</span></p>
-              <p className="text-sm text-gray-600 mb-2">Last Backup: <span className="font-medium">2 hours ago</span></p>
-              <p className="text-sm text-gray-600">Database Size: <span className="font-medium">245 MB</span></p>
+              <p className="text-sm text-gray-600 mb-2">
+                Database Status:{" "}
+                <span className="text-green-600 font-medium">Connected</span>
+              </p>
+              <p className="text-sm text-gray-600 mb-2">
+                Last Backup: <span className="font-medium">2 hours ago</span>
+              </p>
+              <p className="text-sm text-gray-600">
+                Database Size: <span className="font-medium">245 MB</span>
+              </p>
             </div>
             <div className="flex space-x-2">
               <Button variant="outline">
                 <Database className="h-4 w-4 mr-2" />
                 Backup Now
               </Button>
-              <Button variant="outline">
-                Test Connection
-              </Button>
+              <Button variant="outline">Test Connection</Button>
             </div>
           </CardContent>
         </Card>

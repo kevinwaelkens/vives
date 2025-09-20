@@ -1,0 +1,36 @@
+{
+  "add_new_student": "Neuen Student hinzufügen",
+  "add_student": "Student hinzufügen",
+  "delete_confirmation": "Sind Sie sicher, dass Sie diesen Student löschen möchten?",
+  "edit_student": "Student bearbeiten",
+  "form": {
+    "create_student": "Student erstellen",
+    "email_label": "E-Mail",
+    "group_label": "Gruppe",
+    "loading_groups": "Gruppen laden...",
+    "name_label": "Name",
+    "notes_label": "Notizen",
+    "select_group": "Gruppe auswählen",
+    "update_student": "Student aktualisieren"
+  },
+  "no_students": "Keine Studenten gefunden. Fügen Sie Ihren ersten Student hinzu, um zu beginnen.",
+  "search_placeholder": "Studenten nach Name, E-Mail oder ID suchen...",
+  "stats": {
+    "active": "Aktiv",
+    "groups": "Gruppen",
+    "inactive": "Inaktiv",
+    "total_students": "Gesamte Studenten"
+  },
+  "subtitle": "Studentenakten und -informationen verwalten",
+  "table": {
+    "actions": "Aktionen",
+    "email": "E-Mail",
+    "enrolled": "Eingeschrieben",
+    "group": "Gruppe",
+    "name": "Name",
+    "status": "Status",
+    "student_id": "Studenten-ID",
+    "unassigned": "Nicht zugewiesen"
+  },
+  "title": "Studenten"
+}

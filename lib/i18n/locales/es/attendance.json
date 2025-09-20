@@ -1,0 +1,20 @@
+{
+  "actions": {
+    "mark_all_absent": "Marcar todos ausentes",
+    "mark_all_present": "Marcar todos presentes"
+  },
+  "export_report": "Exportar informe",
+  "form": {
+    "date_label": "Fecha",
+    "group_label": "Grupo",
+    "select_group": "Seleccionar un grupo"
+  },
+  "loading_students": "Cargando estudiantes...",
+  "no_students": "No se encontraron estudiantes en este grupo.",
+  "select_group_message": "Selecciona un grupo para marcar la asistencia",
+  "stats": {
+    "total": "Total"
+  },
+  "subtitle": "Rastrear la asistencia diaria de los estudiantes",
+  "title": "Asistencia"
+}

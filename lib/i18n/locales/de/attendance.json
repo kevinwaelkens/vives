@@ -1,0 +1,20 @@
+{
+  "actions": {
+    "mark_all_absent": "Alle als abwesend markieren",
+    "mark_all_present": "Alle als anwesend markieren"
+  },
+  "export_report": "Bericht exportieren",
+  "form": {
+    "date_label": "Datum",
+    "group_label": "Gruppe",
+    "select_group": "Gruppe auswählen"
+  },
+  "loading_students": "Studenten werden geladen...",
+  "no_students": "Keine Studenten in dieser Gruppe gefunden.",
+  "select_group_message": "Bitte wählen Sie eine Gruppe aus, um die Anwesenheit zu markieren",
+  "stats": {
+    "total": "Gesamt"
+  },
+  "subtitle": "Tägliche Anwesenheit der Studenten verfolgen",
+  "title": "Anwesenheit"
+}

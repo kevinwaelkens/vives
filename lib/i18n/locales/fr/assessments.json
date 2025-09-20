@@ -1,0 +1,32 @@
+{
+  "actions": {
+    "grade": "Noter",
+    "view": "Voir"
+  },
+  "filters": {
+    "all": "Toutes",
+    "not_submitted": "Non soumises",
+    "to_grade": "À noter"
+  },
+  "loading": "Chargement des évaluations...",
+  "no_assessments": "Aucune évaluation trouvée.",
+  "no_submission": "Aucune soumission",
+  "stats": {
+    "graded": "Notées",
+    "late": "En retard",
+    "missing": "Manquantes",
+    "pending": "En attente",
+    "total": "Total"
+  },
+  "subtitle": "Noter les soumissions des étudiants et fournir des commentaires",
+  "table": {
+    "all_assessments": "Toutes les évaluations",
+    "grade": "Note",
+    "score": "Score",
+    "student": "Étudiant",
+    "submitted": "Soumis",
+    "task": "Tâche",
+    "type": "Type"
+  },
+  "title": "Évaluations"
+}

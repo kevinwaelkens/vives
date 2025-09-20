@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useT } from "@/lib/translations";
-import { LanguageSelector } from "@/components/translations";
+import { useTranslation } from "@/lib/i18n";
+import { LanguageSelector } from "@/components/i18n/LanguageSelector";
 import {
   Users,
   BookOpen,
@@ -25,14 +25,14 @@ import {
 
 // Navigation items with translation keys
 const navigationItems = [
-  { key: "navigation.dashboard", href: "/dashboard", icon: Home },
-  { key: "navigation.students", href: "/students", icon: Users },
-  { key: "navigation.groups", href: "/groups", icon: UserCheck },
-  { key: "navigation.tasks", href: "/tasks", icon: BookOpen },
-  { key: "navigation.assessments", href: "/assessments", icon: ClipboardList },
-  { key: "navigation.attendance", href: "/attendance", icon: Calendar },
-  { key: "navigation.analytics", href: "/analytics", icon: BarChart3 },
-  { key: "navigation.settings", href: "/settings", icon: Settings },
+  { key: "dashboard", href: "/dashboard", icon: Home },
+  { key: "students", href: "/students", icon: Users },
+  { key: "groups", href: "/groups", icon: UserCheck },
+  { key: "tasks", href: "/tasks", icon: BookOpen },
+  { key: "assessments", href: "/assessments", icon: ClipboardList },
+  { key: "attendance", href: "/attendance", icon: Calendar },
+  { key: "analytics", href: "/analytics", icon: BarChart3 },
+  { key: "settings", href: "/settings", icon: Settings },
 ];
 
 export default function DashboardLayout({
@@ -43,7 +43,7 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const { data: session } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const t = useT();
+  const { t } = useTranslation("navigation");
 
   const handleSignOut = () => {
     signOut({ callbackUrl: "/login" });

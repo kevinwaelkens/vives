@@ -1,75 +1,80 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  BarChart3, 
-  TrendingUp, 
-  Users, 
+import {
+  BarChart3,
+  TrendingUp,
+  Users,
   Activity,
   Clock,
-  Globe
+  Globe,
 } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 export default function CMSAnalyticsPage() {
+  const { t } = useTranslation("cms");
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">System Analytics</h1>
-        <p className="text-gray-600">Monitor system usage and performance metrics</p>
+        <h1 className="text-2xl font-bold text-gray-900">
+          {t("analytics.title")}
+        </h1>
+        <p className="text-gray-600">{t("analytics.subtitle")}</p>
       </div>
 
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Daily Active Users</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t("analytics.daily_active_users")}
+            </CardTitle>
             <Users className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">42</div>
-            <p className="text-xs text-muted-foreground">
-              +12% from yesterday
-            </p>
+            <p className="text-xs text-muted-foreground">+12% from yesterday</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Page Views</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t("analytics.page_views")}
+            </CardTitle>
             <Globe className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">1,247</div>
-            <p className="text-xs text-muted-foreground">
-              +8% from last week
-            </p>
+            <p className="text-xs text-muted-foreground">+8% from last week</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg. Session</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t("analytics.avg_session")}
+            </CardTitle>
             <Clock className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">24m</div>
-            <p className="text-xs text-muted-foreground">
-              +2m from last week
-            </p>
+            <p className="text-xs text-muted-foreground">+2m from last week</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">System Load</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t("analytics.system_load")}
+            </CardTitle>
             <Activity className="h-4 w-4 text-purple-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">23%</div>
-            <p className="text-xs text-muted-foreground">
-              Optimal performance
-            </p>
+            <p className="text-xs text-muted-foreground">Optimal performance</p>
           </CardContent>
         </Card>
       </div>
@@ -85,7 +90,9 @@ export default function CMSAnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="h-64 flex items-center justify-center bg-slate-50 rounded-lg">
-              <p className="text-gray-500">Chart placeholder - User activity over time</p>
+              <p className="text-gray-500">
+                Chart placeholder - User activity over time
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -99,7 +106,9 @@ export default function CMSAnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="h-64 flex items-center justify-center bg-slate-50 rounded-lg">
-              <p className="text-gray-500">Chart placeholder - System performance</p>
+              <p className="text-gray-500">
+                Chart placeholder - System performance
+              </p>
             </div>
           </CardContent>
         </Card>
