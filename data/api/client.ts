@@ -36,8 +36,8 @@ class ApiClient {
 
   async get<T>(url: string, options?: RequestInit): Promise<T> {
     const response = await this.request<T>(url, { ...options, method: "GET" });
-    // Handle both ApiResponse format and direct data format
-    return (response.data !== undefined ? response.data : response) as T;
+    // Return the full response for paginated endpoints, extract data for others
+    return response as T;
   }
 
   async post<T>(url: string, data?: any, options?: RequestInit): Promise<T> {

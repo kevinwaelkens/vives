@@ -7,7 +7,7 @@ export default withAuth(
     const path = req.nextUrl.pathname
 
     // Admin only routes
-    const adminRoutes = ['/admin', '/settings']
+    const adminRoutes = ['/admin', '/settings', '/cms']
     const isAdminRoute = adminRoutes.some(route => path.startsWith(route))
     
     if (isAdminRoute && token?.role !== 'ADMIN') {
@@ -42,5 +42,6 @@ export const config = {
     '/analytics/:path*',
     '/settings/:path*',
     '/admin/:path*',
+    '/cms/:path*',
   ],
 }

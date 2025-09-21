@@ -27,8 +27,8 @@ const cmsNavigationItems = [
   { key: "system_settings", href: "/cms/system-settings", icon: Settings },
   { key: "translations", href: "/cms/translations", icon: Languages },
   { key: "analytics.title", href: "/cms/analytics", icon: BarChart3 },
-  { key: "Database", href: "/cms/database", icon: Database }, // Keep as fallback
-  { key: "Audit Logs", href: "/cms/logs", icon: FileText }, // Keep as fallback
+  { key: "database_management", href: "/cms/database", icon: Database },
+  { key: "audit_logs", href: "/cms/logs", icon: FileText },
 ];
 
 export default function CMSLayout({ children }: { children: React.ReactNode }) {
@@ -140,7 +140,7 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
             {cmsNavigationItems.map((item) => {
               const isActive = pathname === item.href;
               const Icon = item.icon;
-              const itemName = item.key.includes(".") ? t(item.key) : item.key;
+              const itemName = t(item.key);
 
               return (
                 <Link
@@ -218,9 +218,7 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
                   (item) => item.href === pathname,
                 );
                 if (currentItem) {
-                  return currentItem.key.includes(".")
-                    ? t(currentItem.key)
-                    : currentItem.key;
+                  return t(currentItem.key);
                 }
                 return t("title");
               })()}

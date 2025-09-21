@@ -43,6 +43,7 @@ import {
   Key,
   Folder,
 } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 interface Language {
   id: string;
@@ -71,6 +72,7 @@ interface Translation {
 }
 
 export default function CMSTranslationsPage() {
+  const { t } = useTranslation("cms");
   const [languages, setLanguages] = useState<Language[]>([]);
   const [translationKeys, setTranslationKeys] = useState<TranslationKey[]>([]);
   const [loading, setLoading] = useState(true);
@@ -324,19 +326,20 @@ export default function CMSTranslationsPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <Languages className="h-6 w-6" />
-            Translation Management
+            {t("translations")}
           </h1>
           <p className="text-gray-600">
             Manage translation keys and translations for all supported languages
           </p>
         </div>
-        <Button
+        {/* Currently we don't need to allow this as dynamic content can't be used either */}
+        {/* <Button
           onClick={() => openKeyDialog()}
           className="flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
           Add Translation Key
-        </Button>
+        </Button> */}
       </div>
 
       {/* Stats */}
