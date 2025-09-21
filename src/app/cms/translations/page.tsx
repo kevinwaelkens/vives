@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CollapsibleCard } from "@/components/ui/collapsible-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,18 +32,16 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Languages,
   Plus,
   Edit,
   Trash2,
   Search,
-  Filter,
   Check,
-  X,
   Globe,
   Key,
+  Folder,
 } from "lucide-react";
 
 interface Language {
@@ -77,7 +76,6 @@ export default function CMSTranslationsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [selectedLanguage, setSelectedLanguage] = useState<string>("");
 
   // Dialog states
   const [isKeyDialogOpen, setIsKeyDialogOpen] = useState(false);
@@ -450,67 +448,69 @@ export default function CMSTranslationsPage() {
         </CardContent>
       </Card>
 
-      {/* Translation Keys Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Translation Keys</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="text-center py-8">Loading...</div>
-          ) : filteredKeys.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              No translation keys found
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-sm">
-                <thead>
-                  <tr className="border-b bg-gray-50">
-                    <th className="text-left p-3 font-medium">Key</th>
-                    <th className="text-left p-3 font-medium">English</th>
-                    {languages.map((language) => (
-                      <th
-                        key={language.id}
-                        className="text-center p-3 font-medium w-20"
-                      >
-                        <div className="flex flex-col items-center gap-1">
-                          <span className="text-lg">{language.flag}</span>
-                          <span className="text-xs text-gray-600">
-                            {language.code.toUpperCase()}
-                          </span>
-                        </div>
-                      </th>
-                    ))}
-                    <th className="text-center p-3 font-medium w-24">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredKeys.map((key, index) => {
-                    // Group by category for visual separation
-                    const isNewCategory =
-                      index === 0 ||
-                      key.category !== filteredKeys[index - 1]?.category;
+      {/* Translation Keys by Category */}
+      {loading ? (
+        <Card>
+          <CardContent className="text-center py-8">Loading...</CardContent>
+        </Card>
+      ) : filteredKeys.length === 0 ? (
+        <Card>
+          <CardContent className="text-center py-8 text-gray-500">
+            No translation keys found
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-4">
+          {/* Group keys by category */}
+          {(() => {
+            // Group filtered keys by category
+            const keysByCategory = filteredKeys.reduce(
+              (acc, key) => {
+                const category = key.category || "Uncategorized";
+                if (!acc[category]) {
+                  acc[category] = [];
+                }
+                acc[category].push(key);
+                return acc;
+              },
+              {} as Record<string, typeof filteredKeys>,
+            );
 
-                    return (
-                      <>
-                        {isNewCategory && key.category && (
-                          <tr
-                            key={`category-${key.category}`}
-                            className="bg-blue-50"
+            return Object.entries(keysByCategory).map(([category, keys]) => (
+              <CollapsibleCard
+                key={category}
+                title={category.charAt(0).toUpperCase() + category.slice(1)}
+                icon={<Folder className="h-5 w-5" />}
+                badge={<Badge variant="secondary">{keys.length}</Badge>}
+                defaultOpen={true}
+                previewContent={`${keys.length} translation keys`}
+              >
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse text-sm">
+                    <thead>
+                      <tr className="border-b bg-gray-50">
+                        <th className="text-left p-3 font-medium">Key</th>
+                        <th className="text-left p-3 font-medium">English</th>
+                        {languages.map((language) => (
+                          <th
+                            key={language.id}
+                            className="text-center p-3 font-medium w-20"
                           >
-                            <td
-                              colSpan={languages.length + 3}
-                              className="p-2 text-sm font-medium text-blue-800"
-                            >
-                              📁{" "}
-                              {key.category.charAt(0).toUpperCase() +
-                                key.category.slice(1)}
-                            </td>
-                          </tr>
-                        )}
+                            <div className="flex flex-col items-center gap-1">
+                              <span className="text-lg">{language.flag}</span>
+                              <span className="text-xs text-gray-600">
+                                {language.code.toUpperCase()}
+                              </span>
+                            </div>
+                          </th>
+                        ))}
+                        <th className="text-center p-3 font-medium w-24">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {keys.map((key) => (
                         <tr key={key.id} className="border-b hover:bg-gray-50">
                           <td className="p-3 align-top">
                             <div className="space-y-1">
@@ -518,11 +518,6 @@ export default function CMSTranslationsPage() {
                                 <code className="text-xs font-mono bg-gray-100 px-2 py-1 rounded">
                                   {key.key}
                                 </code>
-                                {key.category && (
-                                  <Badge variant="outline" className="text-xs">
-                                    {key.category}
-                                  </Badge>
-                                )}
                               </div>
                               {key.description && (
                                 <p className="text-xs text-gray-500 max-w-xs">
@@ -548,8 +543,9 @@ export default function CMSTranslationsPage() {
                               >
                                 {translation ? (
                                   <div className="space-y-1">
-                                    <div
-                                      className="text-sm cursor-pointer hover:bg-blue-50 p-1 rounded max-w-32 mx-auto truncate"
+                                    <button
+                                      type="button"
+                                      className="text-sm cursor-pointer hover:bg-blue-50 p-1 rounded max-w-32 mx-auto truncate bg-transparent border-none"
                                       onClick={() =>
                                         openTranslationDialog(
                                           key.id,
@@ -560,7 +556,7 @@ export default function CMSTranslationsPage() {
                                       title={translation.text}
                                     >
                                       {translation.text}
-                                    </div>
+                                    </button>
                                     {translation.isApproved && (
                                       <Check className="h-3 w-3 text-green-500 mx-auto" />
                                     )}
@@ -604,15 +600,15 @@ export default function CMSTranslationsPage() {
                             </div>
                           </td>
                         </tr>
-                      </>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CollapsibleCard>
+            ));
+          })()}
+        </div>
+      )}
 
       {/* Key Dialog */}
       <Dialog open={isKeyDialogOpen} onOpenChange={setIsKeyDialogOpen}>

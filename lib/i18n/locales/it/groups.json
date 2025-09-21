@@ -14,7 +14,19 @@
     "total_students_in_groups": "Studenti nei gruppi"
   },
   "subtitle": "Gestisci i gruppi di classe e le assegnazioni degli studenti",
+  "subtitle_tutor": "Visualizza e gestisci i tuoi gruppi assegnati",
+  "subtitle_viewer": "Visualizza i gruppi di classe e le assegnazioni",
   "title": "Gruppi",
+  "create_group": "Crea gruppo",
+  "create_first_group": "Crea primo gruppo",
+  "empty_state": {
+    "tutor_title": "Non sei assegnato a nessun gruppo",
+    "tutor_description": "Contatta un amministratore e chiedi di essere assegnato ai gruppi.",
+    "admin_title": "Nessun gruppo trovato",
+    "admin_description": "Crea il tuo primo gruppo per iniziare.",
+    "viewer_title": "Nessun gruppo disponibile",
+    "viewer_description": "Attualmente non ci sono gruppi nel sistema."
+  },
   "detail": {
     "loading": "Caricamento dettagli gruppo...",
     "not_found": "Gruppo non trovato",

@@ -73,13 +73,13 @@ export default function GroupsPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Groups</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
           <p className="text-gray-600 mt-1">
             {isAdmin
-              ? "Manage class groups and assignments"
+              ? t("subtitle")
               : isTutor
-                ? "View and manage your assigned groups"
-                : "View class groups and assignments"}
+                ? t("subtitle_tutor")
+                : t("subtitle_viewer")}
           </p>
         </div>
         {isAdmin && (
@@ -88,7 +88,7 @@ export default function GroupsPage() {
             className="flex items-center gap-2"
           >
             <Plus className="h-4 w-4" />
-            Create Group
+            {t("create_group")}
           </Button>
         )}
       </div>
@@ -282,28 +282,32 @@ export default function GroupsPage() {
             {isTutor ? (
               <div className="space-y-2">
                 <p className="text-gray-700 font-medium">
-                  You're not assigned to any groups
+                  {t("empty_state.tutor_title")}
                 </p>
                 <p className="text-gray-500">
-                  Contact an administrator and ask to be assigned to groups.
+                  {t("empty_state.tutor_description")}
                 </p>
               </div>
             ) : isAdmin ? (
               <div className="space-y-2">
-                <p className="text-gray-700 font-medium">No groups found</p>
+                <p className="text-gray-700 font-medium">
+                  {t("empty_state.admin_title")}
+                </p>
                 <p className="text-gray-500">
-                  Create your first group to get started.
+                  {t("empty_state.admin_description")}
                 </p>
                 <Button onClick={() => setShowAddForm(true)} className="mt-4">
                   <Plus className="h-4 w-4 mr-2" />
-                  Create First Group
+                  {t("create_first_group")}
                 </Button>
               </div>
             ) : (
               <div className="space-y-2">
-                <p className="text-gray-700 font-medium">No groups available</p>
+                <p className="text-gray-700 font-medium">
+                  {t("empty_state.viewer_title")}
+                </p>
                 <p className="text-gray-500">
-                  There are currently no groups in the system.
+                  {t("empty_state.viewer_description")}
                 </p>
               </div>
             )}

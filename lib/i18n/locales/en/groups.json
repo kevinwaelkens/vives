@@ -14,7 +14,19 @@
     "total_students_in_groups": "Students in Groups"
   },
   "subtitle": "Manage class groups and student assignments",
+  "subtitle_tutor": "View and manage your assigned groups",
+  "subtitle_viewer": "View class groups and assignments",
   "title": "Groups",
+  "create_group": "Create Group",
+  "create_first_group": "Create First Group",
+  "empty_state": {
+    "tutor_title": "You're not assigned to any groups",
+    "tutor_description": "Contact an administrator and ask to be assigned to groups.",
+    "admin_title": "No groups found",
+    "admin_description": "Create your first group to get started.",
+    "viewer_title": "No groups available",
+    "viewer_description": "There are currently no groups in the system."
+  },
   "detail": {
     "loading": "Loading group details...",
     "not_found": "Group not found",

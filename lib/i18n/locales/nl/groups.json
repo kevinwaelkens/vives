@@ -14,7 +14,19 @@
     "total_students_in_groups": "Studenten in groepen"
   },
   "subtitle": "Beheer klasgroepen en studenttoewijzingen",
+  "subtitle_tutor": "Bekijk en beheer je toegewezen groepen",
+  "subtitle_viewer": "Bekijk klasgroepen en toewijzingen",
   "title": "Groepen",
+  "create_group": "Groep aanmaken",
+  "create_first_group": "Eerste groep aanmaken",
+  "empty_state": {
+    "tutor_title": "Je bent niet toegewezen aan groepen",
+    "tutor_description": "Neem contact op met een beheerder en vraag om toegewezen te worden aan groepen.",
+    "admin_title": "Geen groepen gevonden",
+    "admin_description": "Maak je eerste groep aan om te beginnen.",
+    "viewer_title": "Geen groepen beschikbaar",
+    "viewer_description": "Er zijn momenteel geen groepen in het systeem."
+  },
   "detail": {
     "loading": "Groepsdetails laden...",
     "not_found": "Groep niet gevonden",

@@ -14,7 +14,19 @@
     "total_students_in_groups": "Studenten in Gruppen"
   },
   "subtitle": "Klassengruppen und Studentenzuweisungen verwalten",
+  "subtitle_tutor": "Ihre zugewiesenen Gruppen anzeigen und verwalten",
+  "subtitle_viewer": "Klassengruppen und Zuweisungen anzeigen",
   "title": "Gruppen",
+  "create_group": "Gruppe erstellen",
+  "create_first_group": "Erste Gruppe erstellen",
+  "empty_state": {
+    "tutor_title": "Sie sind keiner Gruppe zugewiesen",
+    "tutor_description": "Kontaktieren Sie einen Administrator und bitten Sie um Zuweisung zu Gruppen.",
+    "admin_title": "Keine Gruppen gefunden",
+    "admin_description": "Erstellen Sie Ihre erste Gruppe, um zu beginnen.",
+    "viewer_title": "Keine Gruppen verfügbar",
+    "viewer_description": "Es gibt derzeit keine Gruppen im System."
+  },
   "detail": {
     "loading": "Gruppendetails werden geladen...",
     "not_found": "Gruppe nicht gefunden",
