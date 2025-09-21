@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,6 @@ import {
   Clock,
   AlertCircle,
   Users,
-  TrendingUp,
   Download,
 } from "lucide-react";
 import { apiClient } from "@/data/api/client";
@@ -34,7 +33,6 @@ interface AttendanceRecord {
 
 export default function AttendancePage() {
   const { t } = useTranslation("attendance");
-  const { t: tCommon } = useTranslation("common");
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0],
   );
@@ -42,8 +40,6 @@ export default function AttendancePage() {
   const [attendanceRecords, setAttendanceRecords] = useState<
     Record<string, string>
   >({});
-
-  const queryClient = useQueryClient();
 
   // Fetch groups
   const { data: groups } = useQuery({
@@ -69,7 +65,7 @@ export default function AttendancePage() {
   });
 
   // Fetch attendance for selected date and group
-  const { data: attendance, refetch: refetchAttendance } = useQuery({
+  const { refetch: refetchAttendance } = useQuery({
     queryKey: ["attendance", selectedDate, selectedGroup],
     queryFn: async () => {
       if (!selectedGroup) return [];
@@ -98,11 +94,11 @@ export default function AttendancePage() {
       return apiClient.post("/attendance", data);
     },
     onSuccess: () => {
-      toast.success("Attendance marked");
+      toast.success(t("messages.attendance_marked"));
       refetchAttendance();
     },
     onError: () => {
-      toast.error("Failed to mark attendance");
+      toast.error(t("messages.attendance_failed"));
     },
   });
 
@@ -129,7 +125,7 @@ export default function AttendancePage() {
     );
 
     await Promise.all(promises);
-    toast.success(`All students marked as ${status.toLowerCase()}`);
+    toast.success(t("messages.bulk_marked", { status: status.toLowerCase() }));
   };
 
   const getAttendanceStats = () => {
@@ -176,7 +172,7 @@ export default function AttendancePage() {
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="date">Date</Label>
+              <Label htmlFor="date">{t("form.date_label")}</Label>
               <Input
                 id="date"
                 type="date"
@@ -186,14 +182,14 @@ export default function AttendancePage() {
               />
             </div>
             <div>
-              <Label htmlFor="group">Group</Label>
+              <Label htmlFor="group">{t("form.group_label")}</Label>
               <select
                 id="group"
                 value={selectedGroup}
                 onChange={(e) => setSelectedGroup(e.target.value)}
                 className="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">Select a group</option>
+                <option value="">{t("form.select_group")}</option>
                 {groups?.map((group: any) => (
                   <option key={group.id} value={group.id}>
                     {group.name} ({group.code})
@@ -208,7 +204,7 @@ export default function AttendancePage() {
                 disabled={!selectedGroup}
               >
                 <Download className="h-4 w-4 mr-2" />
-                Export Report
+                {t("export_report")}
               </Button>
             </div>
           </div>
@@ -223,7 +219,7 @@ export default function AttendancePage() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600">Total</p>
+                    <p className="text-sm text-gray-600">{t("stats.total")}</p>
                     <p className="text-2xl font-bold">{totalStudents}</p>
                   </div>
                   <Users className="h-8 w-8 text-gray-600" />
@@ -234,7 +230,9 @@ export default function AttendancePage() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600">Present</p>
+                    <p className="text-sm text-gray-600">
+                      {t("stats.present")}
+                    </p>
                     <p className="text-2xl font-bold text-green-600">
                       {stats.present}
                     </p>
@@ -247,7 +245,7 @@ export default function AttendancePage() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600">Absent</p>
+                    <p className="text-sm text-gray-600">{t("stats.absent")}</p>
                     <p className="text-2xl font-bold text-red-600">
                       {stats.absent}
                     </p>
@@ -260,7 +258,7 @@ export default function AttendancePage() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600">Late</p>
+                    <p className="text-sm text-gray-600">{t("stats.late")}</p>
                     <p className="text-2xl font-bold text-yellow-600">
                       {stats.late}
                     </p>
@@ -273,7 +271,9 @@ export default function AttendancePage() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600">Excused</p>
+                    <p className="text-sm text-gray-600">
+                      {t("stats.excused")}
+                    </p>
                     <p className="text-2xl font-bold text-blue-600">
                       {stats.excused}
                     </p>
@@ -293,14 +293,14 @@ export default function AttendancePage() {
                   variant="outline"
                   className="flex-1"
                 >
-                  Mark All Present
+                  {t("actions.mark_all_present")}
                 </Button>
                 <Button
                   onClick={() => handleBulkMark("ABSENT")}
                   variant="outline"
                   className="flex-1"
                 >
-                  Mark All Absent
+                  {t("actions.mark_all_absent")}
                 </Button>
               </div>
             </CardContent>
@@ -309,12 +309,12 @@ export default function AttendancePage() {
           {/* Student List */}
           <Card>
             <CardHeader>
-              <CardTitle>Students</CardTitle>
+              <CardTitle>{t("students_title")}</CardTitle>
             </CardHeader>
             <CardContent>
               {studentsLoading ? (
                 <div className="text-center py-8 text-gray-500">
-                  Loading students...
+                  {t("loading_students")}
                 </div>
               ) : students && students.length > 0 ? (
                 <div className="space-y-2">
@@ -398,7 +398,7 @@ export default function AttendancePage() {
                 </div>
               ) : (
                 <div className="text-center py-8 text-gray-500">
-                  No students found in this group.
+                  {t("no_students")}
                 </div>
               )}
             </CardContent>
@@ -410,9 +410,7 @@ export default function AttendancePage() {
         <Card>
           <CardContent className="text-center py-12">
             <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">
-              Please select a group to mark attendance
-            </p>
+            <p className="text-gray-500">{t("select_group_message")}</p>
           </CardContent>
         </Card>
       )}

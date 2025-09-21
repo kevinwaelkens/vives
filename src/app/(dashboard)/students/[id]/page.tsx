@@ -177,7 +177,8 @@ export default function StudentDetailPage() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{student.name}</h1>
             <p className="text-gray-500">
-              {student.studentId} • {student.group.name} • {student.status}
+              {student.studentId} • {student.group?.name || "No group"} •{" "}
+              {student.status}
             </p>
           </div>
         </div>
@@ -253,9 +254,12 @@ export default function StudentDetailPage() {
             <GraduationCap className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{student.group.name}</div>
+            <div className="text-2xl font-bold">
+              {student.group?.name || "No group"}
+            </div>
             <p className="text-xs text-muted-foreground">
-              {student.group.code} • Grade {student.group.grade}
+              {student.group?.code || "No code"} • Grade{" "}
+              {student.group?.grade || "N/A"}
             </p>
           </CardContent>
         </Card>
@@ -454,7 +458,8 @@ export default function StudentDetailPage() {
                 </div>
                 <div className="text-sm">
                   <span className="text-gray-500">Group:</span>{" "}
-                  {student.group.name} ({student.group.code})
+                  {student.group?.name || "No group"} (
+                  {student.group?.code || "No code"})
                 </div>
               </div>
             </div>

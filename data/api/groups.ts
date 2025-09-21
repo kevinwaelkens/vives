@@ -31,14 +31,16 @@ export const groupsApi = {
   // Get a single group by ID
   getGroup: async (id: string): Promise<GroupWithRelations> => {
     try {
-      const response = await apiClient.get<GroupWithRelations>(`/groups/${id}`);
+      const response = await apiClient.get<{ data: GroupWithRelations }>(
+        `/groups/${id}`,
+      );
 
-      // The API client already extracts the data, so we just return it
-      if (!response) {
+      // Extract the data from the wrapped response
+      if (!response.data) {
         throw new Error("No data received from API");
       }
 
-      return response;
+      return response.data;
     } catch (error) {
       console.error("Error in getGroup:", error);
       throw error;

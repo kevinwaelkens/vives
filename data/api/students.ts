@@ -32,7 +32,10 @@ export const studentsApi = {
 
   // Get a single student by ID
   getStudent: async (id: string): Promise<StudentWithRelations> => {
-    return apiClient.get<StudentWithRelations>(`/students/${id}`);
+    const response = await apiClient.get<{ data: StudentWithRelations }>(
+      `/students/${id}`,
+    );
+    return response.data;
   },
 
   // Create a new student
@@ -59,7 +62,7 @@ export const studentsApi = {
   ): Promise<{
     success: number;
     failed: number;
-    errors: any[];
+    errors: Array<{ row: number; message: string; field?: string }>;
   }> => {
     const formData = new FormData();
     formData.append("file", file);

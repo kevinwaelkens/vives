@@ -56,11 +56,21 @@ interface AttendanceTranslations {
     select_group: string;
   };
   loading_students: string;
+  messages: {
+    attendance_failed: string;
+    attendance_marked: string;
+    bulk_marked: string;
+  };
   no_students: string;
   select_group_message: string;
   stats: {
+    absent: string;
+    excused: string;
+    late: string;
+    present: string;
     total: string;
   };
+  students_title: string;
   subtitle: string;
   title: string;
 }

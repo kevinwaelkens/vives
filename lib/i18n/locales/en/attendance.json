@@ -10,11 +10,21 @@
     "select_group": "Select a group"
   },
   "loading_students": "Loading students...",
+  "messages": {
+    "attendance_failed": "Failed to mark attendance",
+    "attendance_marked": "Attendance marked",
+    "bulk_marked": "All students marked as {{status}}"
+  },
   "no_students": "No students found in this group.",
   "select_group_message": "Please select a group to mark attendance",
   "stats": {
+    "absent": "Absent",
+    "excused": "Excused",
+    "late": "Late",
+    "present": "Present",
     "total": "Total"
   },
+  "students_title": "Students",
   "subtitle": "Track daily student attendance",
   "title": "Attendance"
 }

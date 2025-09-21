@@ -72,7 +72,10 @@ export const usersApi = {
   },
 
   getUser: async (id: string): Promise<UserWithRelations> => {
-    return apiClient.get<UserWithRelations>(`/users/${id}`);
+    const response = await apiClient.get<{ data: UserWithRelations }>(
+      `/users/${id}`,
+    );
+    return response.data;
   },
 
   createUser: async (data: UserFormData): Promise<User> => {

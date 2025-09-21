@@ -10,11 +10,21 @@
     "select_group": "Selecteer een groep"
   },
   "loading_students": "Studenten laden...",
+  "messages": {
+    "attendance_failed": "Aanwezigheid markeren mislukt",
+    "attendance_marked": "Aanwezigheid gemarkeerd",
+    "bulk_marked": "Alle studenten gemarkeerd als {{status}}"
+  },
   "no_students": "Geen studenten gevonden in deze groep.",
   "select_group_message": "Selecteer een groep om aanwezigheid te markeren",
   "stats": {
+    "absent": "Afwezig",
+    "excused": "Verontschuldigd",
+    "late": "Te laat",
+    "present": "Aanwezig",
     "total": "Totaal"
   },
+  "students_title": "Studenten",
   "subtitle": "Dagelijkse studentenaanwezigheid bijhouden",
   "title": "Aanwezigheid"
 }

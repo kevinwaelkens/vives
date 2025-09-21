@@ -10,11 +10,21 @@
     "select_group": "Seleccionar un grupo"
   },
   "loading_students": "Cargando estudiantes...",
+  "messages": {
+    "attendance_failed": "Error al marcar asistencia",
+    "attendance_marked": "Asistencia marcada",
+    "bulk_marked": "Todos los estudiantes marcados como {{status}}"
+  },
   "no_students": "No se encontraron estudiantes en este grupo.",
   "select_group_message": "Selecciona un grupo para marcar la asistencia",
   "stats": {
+    "absent": "Ausente",
+    "excused": "Justificado",
+    "late": "Tarde",
+    "present": "Presente",
     "total": "Total"
   },
+  "students_title": "Estudiantes",
   "subtitle": "Rastrear la asistencia diaria de los estudiantes",
   "title": "Asistencia"
 }
