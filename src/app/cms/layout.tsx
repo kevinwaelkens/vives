@@ -35,8 +35,14 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { t } = useTranslation("cms");
-  const { t: tCommon } = useTranslation("common");
+  const { t } = useTranslation("cms", {
+    useDynamic: true,
+    fallbackToStatic: true,
+  });
+  const { t: tCommon } = useTranslation("common", {
+    useDynamic: true,
+    fallbackToStatic: true,
+  });
 
   const handleSignOut = () => {
     signOut({ callbackUrl: "/login" });

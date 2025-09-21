@@ -44,6 +44,7 @@ import {
   Folder,
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
+import { useTranslationInvalidation } from "@/lib/i18n/translation-provider";
 
 interface Language {
   id: string;
@@ -72,7 +73,11 @@ interface Translation {
 }
 
 export default function CMSTranslationsPage() {
-  const { t } = useTranslation("cms");
+  const { t } = useTranslation("cms", {
+    useDynamic: true,
+    fallbackToStatic: true,
+  });
+  const { onTranslationKeyUpdated } = useTranslationInvalidation();
   const [languages, setLanguages] = useState<Language[]>([]);
   const [translationKeys, setTranslationKeys] = useState<TranslationKey[]>([]);
   const [loading, setLoading] = useState(true);
@@ -202,6 +207,8 @@ export default function CMSTranslationsPage() {
         await fetchTranslationKeys();
         setIsKeyDialogOpen(false);
         resetKeyForm();
+        // Invalidate translation cache for the category
+        onTranslationKeyUpdated(keyFormData.category);
       }
     } catch (error) {
       console.error("Failed to save translation key:", error);
@@ -230,6 +237,11 @@ export default function CMSTranslationsPage() {
           await fetchTranslationKeys();
           setIsTranslationDialogOpen(false);
           resetTranslationForm();
+          // Invalidate translation cache for the key's category
+          const translationKey = translationKeys.find(
+            (k) => k.id === editingTranslation.keyId,
+          );
+          await onTranslationKeyUpdated(translationKey?.category);
         }
       } else {
         // Create new translation
@@ -249,6 +261,11 @@ export default function CMSTranslationsPage() {
           await fetchTranslationKeys();
           setIsTranslationDialogOpen(false);
           resetTranslationForm();
+          // Invalidate translation cache for the key's category
+          const translationKey = translationKeys.find(
+            (k) => k.id === editingTranslation.keyId,
+          );
+          onTranslationKeyUpdated(translationKey?.category);
         }
       }
     } catch (error) {
@@ -268,6 +285,8 @@ export default function CMSTranslationsPage() {
       if (response.ok) {
         await fetchTranslationKeys();
         setIsDeleteDialogOpen(false);
+        // Invalidate translation cache for the deleted key's category
+        onTranslationKeyUpdated(keyToDelete.category);
         setKeyToDelete(null);
       }
     } catch (error) {

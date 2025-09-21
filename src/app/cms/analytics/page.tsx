@@ -12,7 +12,10 @@ import {
 import { useTranslation } from "@/lib/i18n";
 
 export default function CMSAnalyticsPage() {
-  const { t } = useTranslation("cms");
+  const { t } = useTranslation("cms", {
+    useDynamic: true,
+    fallbackToStatic: true,
+  });
 
   return (
     <div className="space-y-6">

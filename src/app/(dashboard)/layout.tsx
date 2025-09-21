@@ -43,7 +43,10 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { t } = useTranslation("navigation");
+  const { t } = useTranslation("navigation", {
+    useDynamic: true,
+    fallbackToStatic: true,
+  });
   const { title } = usePageTitle();
 
   const handleSignOut = () => {
