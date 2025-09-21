@@ -13,7 +13,7 @@ const updateTranslationSchema = z.object({
 // PUT /api/translations/translations/[id] - Update a specific translation
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -24,8 +24,9 @@ export async function PUT(
     const body = await request.json();
     const validatedData = updateTranslationSchema.parse(body);
 
+    const { id } = await params;
     const translation = await prisma.translation.update({
-      where: { id: params.id },
+      where: { id },
       data: validatedData,
       include: {
         language: true,
@@ -53,7 +54,7 @@ export async function PUT(
 // DELETE /api/translations/translations/[id] - Delete a specific translation
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -61,8 +62,9 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
     await prisma.translation.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });

@@ -28,7 +28,7 @@ const createTranslationSchema = z.object({
 // GET /api/translations/keys/[id] - Get a specific translation key with all translations
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -36,8 +36,9 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
     const translationKey = await prisma.translationKey.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         translations: {
           include: {
@@ -67,7 +68,7 @@ export async function GET(
 // PUT /api/translations/keys/[id] - Update a translation key
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -127,7 +128,7 @@ export async function PUT(
 // DELETE /api/translations/keys/[id] - Delete a translation key and all its translations
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -152,7 +153,7 @@ export async function DELETE(
 // POST /api/translations/keys/[id] - Add a translation for this key
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);

@@ -9,6 +9,10 @@ import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/i18n/LanguageSelector";
 import {
+  PageTitleProvider,
+  usePageTitle,
+} from "@/lib/contexts/PageTitleContext";
+import {
   Users,
   BookOpen,
   ClipboardList,
@@ -35,15 +39,12 @@ const navigationItems = [
   { key: "settings", href: "/settings", icon: Settings },
 ];
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { t } = useTranslation("navigation");
+  const { title } = usePageTitle();
 
   const handleSignOut = () => {
     signOut({ callbackUrl: "/login" });
@@ -186,14 +187,36 @@ export default function DashboardLayout({
           </Button>
           <div className="flex-1">
             <h2 className="text-lg font-semibold text-gray-900">
-              {(() => {
-                const currentItem = navigationItems.find(
-                  (item) => item.href === pathname,
-                );
-                return currentItem
-                  ? t(currentItem.key, currentItem.key.split(".").pop())
-                  : t("navigation.dashboard", "Dashboard");
-              })()}
+              {title ||
+                (() => {
+                  // Check for exact match first
+                  const currentItem = navigationItems.find(
+                    (item) => item.href === pathname,
+                  );
+                  if (currentItem) {
+                    return t(currentItem.key, currentItem.key.split(".").pop());
+                  }
+
+                  // Check for dynamic routes
+                  if (
+                    pathname.startsWith("/groups/") &&
+                    pathname !== "/groups"
+                  ) {
+                    return "Group Details";
+                  }
+                  if (
+                    pathname.startsWith("/students/") &&
+                    pathname !== "/students"
+                  ) {
+                    return "Student Details";
+                  }
+                  if (pathname.startsWith("/tasks/") && pathname !== "/tasks") {
+                    return "Task Details";
+                  }
+
+                  // Default fallback
+                  return t("navigation.dashboard", "Dashboard");
+                })()}
             </h2>
           </div>
         </div>
@@ -202,5 +225,17 @@ export default function DashboardLayout({
         <main className="flex-1 p-3 lg:p-4 overflow-auto">{children}</main>
       </div>
     </div>
+  );
+}
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <PageTitleProvider>
+      <DashboardContent>{children}</DashboardContent>
+    </PageTitleProvider>
   );
 }

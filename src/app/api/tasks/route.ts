@@ -1,67 +1,67 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
-import { prisma } from '@/lib/prisma'
-import { getCurrentUser } from '@/lib/auth/utils'
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth/utils";
 
 const CreateTaskSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  description: z.string().min(1, 'Description is required'),
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
   instructions: z.string().optional(),
-  type: z.enum(['ASSIGNMENT', 'QUIZ', 'EXAM', 'PROJECT', 'HOMEWORK']),
+  type: z.enum(["ASSIGNMENT", "QUIZ", "EXAM", "PROJECT", "HOMEWORK"]),
   category: z.string().optional(),
   points: z.number().min(0).optional(),
   weight: z.number().min(0).max(1).optional(),
   dueDate: z.string().optional(),
-  groupIds: z.array(z.string()).min(1, 'At least one group is required'),
+  groupIds: z.array(z.string()).min(1, "At least one group is required"),
   studentIds: z.array(z.string()).optional(),
   allowLateSubmission: z.boolean().default(true),
   rubric: z.any().optional(),
   isPublished: z.boolean().default(false),
-})
+});
 
 // GET /api/tasks - Get all tasks
 export async function GET(req: NextRequest) {
   try {
-    const user = await getCurrentUser()
+    const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const searchParams = req.nextUrl.searchParams
-    const groupId = searchParams.get('groupId')
-    const type = searchParams.get('type')
-    const isPublished = searchParams.get('isPublished')
-    const search = searchParams.get('search')
-    const page = parseInt(searchParams.get('page') || '1')
-    const pageSize = parseInt(searchParams.get('pageSize') || '10')
+    const searchParams = req.nextUrl.searchParams;
+    const groupId = searchParams.get("groupId");
+    const type = searchParams.get("type");
+    const isPublished = searchParams.get("isPublished");
+    const search = searchParams.get("search");
+    const page = parseInt(searchParams.get("page") || "1");
+    const pageSize = parseInt(searchParams.get("pageSize") || "10");
 
-    const where: any = {}
+    const where: any = {};
 
     if (groupId) {
       where.groups = {
         some: {
           id: groupId,
         },
-      }
+      };
     }
 
     if (type) {
-      where.type = type
+      where.type = type;
     }
 
     if (isPublished !== null) {
-      where.isPublished = isPublished === 'true'
+      where.isPublished = isPublished === "true";
     }
 
     if (search) {
       where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-      ]
+        { title: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+      ];
     }
 
     // If user is a tutor, only show tasks from their groups
-    if (user.role === 'TUTOR') {
+    if (user.role === "TUTOR") {
       where.groups = {
         some: {
           tutors: {
@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
             },
           },
         },
-      }
+      };
     }
 
     const [tasks, total] = await Promise.all([
@@ -87,10 +87,10 @@ export async function GET(req: NextRequest) {
         },
         skip: (page - 1) * pageSize,
         take: pageSize,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
       }),
       prisma.task.count({ where }),
-    ])
+    ]);
 
     return NextResponse.json({
       data: tasks,
@@ -98,28 +98,77 @@ export async function GET(req: NextRequest) {
       page,
       pageSize,
       totalPages: Math.ceil(total / pageSize),
-    })
+    });
   } catch (error) {
-    console.error('Error fetching tasks:', error)
+    console.error("Error fetching tasks:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch tasks' },
-      { status: 500 }
-    )
+      { error: "Failed to fetch tasks" },
+      { status: 500 },
+    );
   }
 }
 
 // POST /api/tasks - Create a new task
 export async function POST(req: NextRequest) {
   try {
-    const user = await getCurrentUser()
-    if (!user || !['ADMIN', 'TUTOR'].includes(user.role)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const user = await getCurrentUser();
+    if (!user || !["ADMIN", "TUTOR"].includes(user.role)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json()
-    const validatedData = CreateTaskSchema.parse(body)
+    const body = await req.json();
+    const validatedData = CreateTaskSchema.parse(body);
 
-    const { groupIds, studentIds, ...taskData } = validatedData
+    const { groupIds, studentIds, ...taskData } = validatedData;
+
+    // If user is a tutor, verify they can create tasks for the specified groups
+    if (user.role === "TUTOR") {
+      const tutorGroups = await prisma.group.findMany({
+        where: {
+          id: { in: groupIds },
+          tutors: {
+            some: {
+              id: user.id,
+            },
+          },
+        },
+        select: { id: true },
+      });
+
+      if (tutorGroups.length !== groupIds.length) {
+        return NextResponse.json(
+          { error: "You can only create tasks for groups you are assigned to" },
+          { status: 403 },
+        );
+      }
+
+      // If specific students are selected, verify they belong to tutor's groups
+      if (studentIds && studentIds.length > 0) {
+        const tutorStudents = await prisma.student.findMany({
+          where: {
+            id: { in: studentIds },
+            group: {
+              tutors: {
+                some: {
+                  id: user.id,
+                },
+              },
+            },
+          },
+          select: { id: true },
+        });
+
+        if (tutorStudents.length !== studentIds.length) {
+          return NextResponse.json(
+            {
+              error:
+                "You can only assign tasks to students in groups you are assigned to",
+            },
+            { status: 403 },
+          );
+        }
+      }
+    }
 
     const task = await prisma.task.create({
       data: {
@@ -139,63 +188,60 @@ export async function POST(req: NextRequest) {
         groups: true,
         students: true,
       },
-    })
+    });
 
     // Create assessments for all students in the connected groups
     if (validatedData.isPublished) {
       const students = await prisma.student.findMany({
         where: {
-          OR: [
-            { groupId: { in: groupIds } },
-            { id: { in: studentIds || [] } },
-          ],
+          OR: [{ groupId: { in: groupIds } }, { id: { in: studentIds || [] } }],
         },
-      })
+      });
 
       await prisma.assessment.createMany({
         data: students.map((student) => ({
           taskId: task.id,
           studentId: student.id,
-          status: 'NOT_SUBMITTED',
+          status: "NOT_SUBMITTED",
         })),
-      })
+      });
 
       // Create notifications for students
       await prisma.notification.createMany({
         data: students.map((student) => ({
           userId: student.id,
-          type: 'TASK_ASSIGNED',
-          title: 'New Task Assigned',
+          type: "TASK_ASSIGNED",
+          title: "New Task Assigned",
           message: `You have been assigned a new task: ${task.title}`,
           data: { taskId: task.id },
         })),
-      })
+      });
     }
 
     // Create audit log
     await prisma.auditLog.create({
       data: {
-        action: 'CREATE',
-        entity: 'Task',
+        action: "CREATE",
+        entity: "Task",
         entityId: task.id,
         userId: user.id,
         newValues: task as any,
       },
-    })
+    });
 
-    return NextResponse.json({ data: task }, { status: 201 })
+    return NextResponse.json({ data: task }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.issues },
-        { status: 400 }
-      )
+        { error: "Validation failed", details: error.issues },
+        { status: 400 },
+      );
     }
 
-    console.error('Error creating task:', error)
+    console.error("Error creating task:", error);
     return NextResponse.json(
-      { error: 'Failed to create task' },
-      { status: 500 }
-    )
+      { error: "Failed to create task" },
+      { status: 500 },
+    );
   }
 }

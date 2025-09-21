@@ -1,50 +1,61 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
-import { prisma } from '@/lib/prisma'
-import { getCurrentUser } from '@/lib/auth/utils'
-import { generateStudentId } from '@/lib/utils'
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth/utils";
+import { generateStudentId } from "@/lib/utils";
 
 const CreateStudentSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  email: z.string().email('Invalid email address'),
-  groupId: z.string().cuid('Invalid group ID'),
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
+  groupId: z.string().cuid("Invalid group ID"),
   dateOfBirth: z.string().optional(),
   notes: z.string().optional(),
-})
+});
 
-const UpdateStudentSchema = CreateStudentSchema.partial()
+const UpdateStudentSchema = CreateStudentSchema.partial();
 
 // GET /api/students - Get all students with filtering
 export async function GET(req: NextRequest) {
   try {
-    const user = await getCurrentUser()
+    const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const searchParams = req.nextUrl.searchParams
-    const groupId = searchParams.get('groupId')
-    const status = searchParams.get('status')
-    const search = searchParams.get('search')
-    const page = parseInt(searchParams.get('page') || '1')
-    const pageSize = parseInt(searchParams.get('pageSize') || '10')
+    const searchParams = req.nextUrl.searchParams;
+    const groupId = searchParams.get("groupId");
+    const status = searchParams.get("status");
+    const search = searchParams.get("search");
+    const page = parseInt(searchParams.get("page") || "1");
+    const pageSize = parseInt(searchParams.get("pageSize") || "10");
 
-    const where: any = {}
+    const where: any = {};
 
     if (groupId) {
-      where.groupId = groupId
+      where.groupId = groupId;
     }
 
     if (status) {
-      where.status = status
+      where.status = status;
     }
 
     if (search) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } },
-        { studentId: { contains: search, mode: 'insensitive' } },
-      ]
+        { name: { contains: search, mode: "insensitive" } },
+        { email: { contains: search, mode: "insensitive" } },
+        { studentId: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    // If user is a tutor, only show students from their assigned groups
+    if (user.role === "TUTOR") {
+      where.group = {
+        tutors: {
+          some: {
+            id: user.id,
+          },
+        },
+      };
     }
 
     const [students, total] = await Promise.all([
@@ -56,10 +67,10 @@ export async function GET(req: NextRequest) {
         },
         skip: (page - 1) * pageSize,
         take: pageSize,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
       }),
       prisma.student.count({ where }),
-    ])
+    ]);
 
     return NextResponse.json({
       data: students,
@@ -67,41 +78,64 @@ export async function GET(req: NextRequest) {
       page,
       pageSize,
       totalPages: Math.ceil(total / pageSize),
-    })
+    });
   } catch (error) {
-    console.error('Error fetching students:', error)
+    console.error("Error fetching students:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch students' },
-      { status: 500 }
-    )
+      { error: "Failed to fetch students" },
+      { status: 500 },
+    );
   }
 }
 
 // POST /api/students - Create a new student
 export async function POST(req: NextRequest) {
   try {
-    const user = await getCurrentUser()
-    if (!user || !['ADMIN', 'TUTOR'].includes(user.role)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const user = await getCurrentUser();
+    if (!user || !["ADMIN", "TUTOR"].includes(user.role)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json()
-    const validatedData = CreateStudentSchema.parse(body)
+    const body = await req.json();
+    const validatedData = CreateStudentSchema.parse(body);
+
+    // If user is a tutor, verify they can create students in the specified group
+    if (user.role === "TUTOR") {
+      const group = await prisma.group.findFirst({
+        where: {
+          id: validatedData.groupId,
+          tutors: {
+            some: {
+              id: user.id,
+            },
+          },
+        },
+      });
+
+      if (!group) {
+        return NextResponse.json(
+          {
+            error: "You can only create students in groups you are assigned to",
+          },
+          { status: 403 },
+        );
+      }
+    }
 
     // Check if email already exists
     const existingStudent = await prisma.student.findUnique({
       where: { email: validatedData.email },
-    })
+    });
 
     if (existingStudent) {
       return NextResponse.json(
-        { error: 'Student with this email already exists' },
-        { status: 400 }
-      )
+        { error: "Student with this email already exists" },
+        { status: 400 },
+      );
     }
 
     // Generate unique student ID
-    const studentId = generateStudentId()
+    const studentId = generateStudentId();
 
     const student = await prisma.student.create({
       data: {
@@ -114,32 +148,32 @@ export async function POST(req: NextRequest) {
       include: {
         group: true,
       },
-    })
+    });
 
     // Create audit log
     await prisma.auditLog.create({
       data: {
-        action: 'CREATE',
-        entity: 'Student',
+        action: "CREATE",
+        entity: "Student",
         entityId: student.id,
         userId: user.id,
         newValues: student as any,
       },
-    })
+    });
 
-    return NextResponse.json({ data: student }, { status: 201 })
+    return NextResponse.json({ data: student }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.issues },
-        { status: 400 }
-      )
+        { error: "Validation failed", details: error.issues },
+        { status: 400 },
+      );
     }
 
-    console.error('Error creating student:', error)
+    console.error("Error creating student:", error);
     return NextResponse.json(
-      { error: 'Failed to create student' },
-      { status: 500 }
-    )
+      { error: "Failed to create student" },
+      { status: 500 },
+    );
   }
 }

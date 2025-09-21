@@ -5,7 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Users, BookOpen, Calendar, Edit2, Trash2, Plus } from "lucide-react";
+import {
+  Users,
+  BookOpen,
+  Calendar,
+  Edit2,
+  Trash2,
+  Plus,
+  Eye,
+} from "lucide-react";
+import Link from "next/link";
 import {
   useGroups,
   useCreateGroup,
@@ -171,7 +180,11 @@ export default function GroupsPage() {
       {/* Groups Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {groups?.map((group) => (
-          <Card key={group.id} className="hover:shadow-lg transition-shadow">
+          <Card
+            key={group.id}
+            className="hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => (window.location.href = `/groups/${group.id}`)}
+          >
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
@@ -180,11 +193,20 @@ export default function GroupsPage() {
                     Code: {group.code}
                   </p>
                 </div>
-                <div className="flex gap-1">
+                <div
+                  className="flex gap-1"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Link href={`/groups/${group.id}`}>
+                    <Button size="sm" variant="ghost" title="View Details">
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </Link>
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setEditingGroup(group as unknown as Group);
                       setFormData({
                         name: group.name,
@@ -200,7 +222,10 @@ export default function GroupsPage() {
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => handleDelete(group.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(group.id);
+                    }}
                     className="text-red-600 hover:text-red-700 hover:bg-red-50"
                   >
                     <Trash2 className="h-4 w-4" />

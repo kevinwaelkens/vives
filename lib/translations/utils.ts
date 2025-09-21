@@ -1,6 +1,14 @@
 // Translation utility functions
 
-import type { Language } from "./types";
+interface Language {
+  id: string;
+  code: string;
+  name: string;
+  nativeName: string;
+  flag?: string;
+  isActive: boolean;
+  isDefault: boolean;
+}
 
 /**
  * Get translation key from nested object notation
@@ -10,7 +18,7 @@ export function getNestedValue(
   obj: Record<string, unknown>,
   path: string,
 ): string | undefined {
-  return path.split(".").reduce((current, key) => current?.[key], obj) as
+  return path.split(".").reduce((current: any, key) => current?.[key], obj) as
     | string
     | undefined;
 }

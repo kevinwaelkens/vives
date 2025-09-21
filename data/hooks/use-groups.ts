@@ -25,8 +25,22 @@ export function useGroups(filters?: GroupFilters) {
 export function useGroup(id: string) {
   return useQuery({
     queryKey: groupKeys.detail(id),
-    queryFn: () => groupsApi.getGroup(id),
+    queryFn: async () => {
+      console.log("useGroup queryFn called with id:", id);
+      const result = await groupsApi.getGroup(id);
+      console.log("useGroup queryFn result:", result);
+
+      if (!result) {
+        throw new Error("Group data is undefined");
+      }
+
+      return result;
+    },
     enabled: !!id,
+    retry: (failureCount, error) => {
+      console.log("useGroup retry:", { failureCount, error });
+      return failureCount < 2;
+    },
   });
 }
 

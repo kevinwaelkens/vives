@@ -30,7 +30,20 @@ export const groupsApi = {
 
   // Get a single group by ID
   getGroup: async (id: string): Promise<GroupWithRelations> => {
-    return apiClient.get<GroupWithRelations>(`/groups/${id}`);
+    try {
+      const response = await apiClient.get<GroupWithRelations>(`/groups/${id}`);
+      console.log("Groups API getGroup response:", response); // Debug logging
+
+      // The API client already extracts the data, so we just return it
+      if (!response) {
+        throw new Error("No data received from API");
+      }
+
+      return response;
+    } catch (error) {
+      console.error("Error in getGroup:", error);
+      throw error;
+    }
   },
 
   // Create a new group
@@ -61,5 +74,26 @@ export const groupsApi = {
   // Delete a group
   deleteGroup: async (id: string): Promise<void> => {
     return apiClient.delete<void>(`/groups/${id}`);
+  },
+
+  // Move student to group
+  moveStudentToGroup: async (
+    groupId: string,
+    studentId: string,
+  ): Promise<void> => {
+    return apiClient.post<void>(`/groups/${groupId}/students`, { studentId });
+  },
+
+  // Remove student from group
+  removeStudentFromGroup: async (
+    groupId: string,
+    studentId: string,
+  ): Promise<void> => {
+    return apiClient.delete<void>(`/groups/${groupId}/students`, {
+      body: JSON.stringify({ studentId }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   },
 };

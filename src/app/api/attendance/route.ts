@@ -1,40 +1,51 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
-import { prisma } from '@/lib/prisma'
-import { getCurrentUser } from '@/lib/auth/utils'
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth/utils";
 
 const MarkAttendanceSchema = z.object({
   studentId: z.string(),
   groupId: z.string(),
   date: z.string(),
-  status: z.enum(['PRESENT', 'ABSENT', 'LATE', 'EXCUSED']),
-  period: z.string().optional().default('full-day'),
+  status: z.enum(["PRESENT", "ABSENT", "LATE", "EXCUSED"]),
+  period: z.string().optional().default("full-day"),
   notes: z.string().optional(),
-})
+});
 
 // GET /api/attendance - Get attendance records
 export async function GET(req: NextRequest) {
   try {
-    const user = await getCurrentUser()
+    const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const searchParams = req.nextUrl.searchParams
-    const date = searchParams.get('date')
-    const groupId = searchParams.get('groupId')
-    const studentId = searchParams.get('studentId')
+    const searchParams = req.nextUrl.searchParams;
+    const date = searchParams.get("date");
+    const groupId = searchParams.get("groupId");
+    const studentId = searchParams.get("studentId");
 
-    const where: any = {}
+    const where: any = {};
 
     if (date) {
-      where.date = new Date(date)
+      where.date = new Date(date);
     }
     if (groupId) {
-      where.groupId = groupId
+      where.groupId = groupId;
     }
     if (studentId) {
-      where.studentId = studentId
+      where.studentId = studentId;
+    }
+
+    // If user is a tutor, only show attendance for students in their assigned groups
+    if (user.role === "TUTOR") {
+      where.group = {
+        tutors: {
+          some: {
+            id: user.id,
+          },
+        },
+      };
     }
 
     const attendance = await prisma.attendance.findMany({
@@ -43,29 +54,56 @@ export async function GET(req: NextRequest) {
         student: true,
         group: true,
       },
-      orderBy: { date: 'desc' },
-    })
+      orderBy: { date: "desc" },
+    });
 
-    return NextResponse.json(attendance)
+    return NextResponse.json(attendance);
   } catch (error) {
-    console.error('Error fetching attendance:', error)
+    console.error("Error fetching attendance:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch attendance' },
-      { status: 500 }
-    )
+      { error: "Failed to fetch attendance" },
+      { status: 500 },
+    );
   }
 }
 
 // POST /api/attendance - Mark attendance
 export async function POST(req: NextRequest) {
   try {
-    const user = await getCurrentUser()
-    if (!user || !['ADMIN', 'TUTOR'].includes(user.role)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const user = await getCurrentUser();
+    if (!user || !["ADMIN", "TUTOR"].includes(user.role)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json()
-    const validatedData = MarkAttendanceSchema.parse(body)
+    const body = await req.json();
+    const validatedData = MarkAttendanceSchema.parse(body);
+
+    // If user is a tutor, verify they can mark attendance for this student/group
+    if (user.role === "TUTOR") {
+      const student = await prisma.student.findFirst({
+        where: {
+          id: validatedData.studentId,
+          groupId: validatedData.groupId,
+          group: {
+            tutors: {
+              some: {
+                id: user.id,
+              },
+            },
+          },
+        },
+      });
+
+      if (!student) {
+        return NextResponse.json(
+          {
+            error:
+              "You can only mark attendance for students in groups you are assigned to",
+          },
+          { status: 403 },
+        );
+      }
+    }
 
     // Check if attendance already exists for this student and date
     const existingAttendance = await prisma.attendance.findFirst({
@@ -74,7 +112,7 @@ export async function POST(req: NextRequest) {
         date: new Date(validatedData.date),
         period: validatedData.period,
       },
-    })
+    });
 
     if (existingAttendance) {
       // Update existing attendance
@@ -86,8 +124,8 @@ export async function POST(req: NextRequest) {
           markedById: user.id,
           markedAt: new Date(),
         },
-      })
-      return NextResponse.json({ data: updated })
+      });
+      return NextResponse.json({ data: updated });
     }
 
     // Create new attendance record
@@ -101,21 +139,21 @@ export async function POST(req: NextRequest) {
         notes: validatedData.notes,
         markedById: user.id,
       },
-    })
+    });
 
-    return NextResponse.json({ data: attendance }, { status: 201 })
+    return NextResponse.json({ data: attendance }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.issues },
-        { status: 400 }
-      )
+        { error: "Validation failed", details: error.issues },
+        { status: 400 },
+      );
     }
 
-    console.error('Error marking attendance:', error)
+    console.error("Error marking attendance:", error);
     return NextResponse.json(
-      { error: 'Failed to mark attendance' },
-      { status: 500 }
-    )
+      { error: "Failed to mark attendance" },
+      { status: 500 },
+    );
   }
 }
