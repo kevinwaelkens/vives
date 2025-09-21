@@ -21,25 +21,12 @@ import {
   useDeleteGroup,
 } from "@/data/hooks/use-groups";
 import { useTranslation } from "@/lib/i18n";
-
-interface Group {
-  id: string;
-  name: string;
-  code: string;
-  academicYear: string;
-  grade: string;
-  tutors: { id: string; name: string; email: string }[];
-  _count: {
-    students: number;
-    tasks: number;
-  };
-}
+import { useSession } from "next-auth/react";
 
 export default function GroupsPage() {
   const { t } = useTranslation("groups");
-  const { t: tCommon } = useTranslation("common");
+  const { data: session } = useSession();
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingGroup, setEditingGroup] = useState<Group | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     code: "",
@@ -50,6 +37,10 @@ export default function GroupsPage() {
   const { data: groups, isLoading } = useGroups();
   const createMutation = useCreateGroup();
   const deleteMutation = useDeleteGroup();
+
+  // Check if current user is admin
+  const isAdmin = session?.user?.role === "ADMIN";
+  const isTutor = session?.user?.role === "TUTOR";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,20 +75,26 @@ export default function GroupsPage() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Groups</h1>
           <p className="text-gray-600 mt-1">
-            Manage class groups and assignments
+            {isAdmin
+              ? "Manage class groups and assignments"
+              : isTutor
+                ? "View and manage your assigned groups"
+                : "View class groups and assignments"}
           </p>
         </div>
-        <Button
-          onClick={() => setShowAddForm(true)}
-          className="flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Create Group
-        </Button>
+        {isAdmin && (
+          <Button
+            onClick={() => setShowAddForm(true)}
+            className="flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Create Group
+          </Button>
+        )}
       </div>
 
       {/* Add Form */}
-      {showAddForm && (
+      {showAddForm && isAdmin && (
         <Card>
           <CardHeader>
             <CardTitle>Create New Group</CardTitle>
@@ -183,7 +180,9 @@ export default function GroupsPage() {
           <Card
             key={group.id}
             className="hover:shadow-lg transition-shadow cursor-pointer"
-            onClick={() => (window.location.href = `/groups/${group.id}`)}
+            onClick={() => {
+              window.location.href = `/groups/${group.id}`;
+            }}
           >
             <CardHeader>
               <div className="flex justify-between items-start">
@@ -193,43 +192,48 @@ export default function GroupsPage() {
                     Code: {group.code}
                   </p>
                 </div>
-                <div
-                  className="flex gap-1"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Link href={`/groups/${group.id}`}>
+                <div className="flex gap-1">
+                  <Link
+                    href={`/groups/${group.id}`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <Button size="sm" variant="ghost" title="View Details">
                       <Eye className="h-4 w-4" />
                     </Button>
                   </Link>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setEditingGroup(group as unknown as Group);
-                      setFormData({
-                        name: group.name,
-                        code: group.code,
-                        academicYear: group.academicYear,
-                        grade: group.grade,
-                      });
-                      setShowAddForm(true);
-                    }}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(group.id);
-                    }}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  {isAdmin && (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setFormData({
+                            name: group.name,
+                            code: group.code,
+                            academicYear: group.academicYear,
+                            grade: group.grade,
+                          });
+                          setShowAddForm(true);
+                        }}
+                        title="Edit Group"
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(group.id);
+                        }}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        title="Delete Group"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </CardHeader>
@@ -248,20 +252,20 @@ export default function GroupsPage() {
                 <div className="flex items-center gap-2 text-gray-600">
                   <Users className="h-4 w-4" />
                   <span className="text-sm">
-                    {(group as any)?._count?.students || 0} Students
+                    {group._count?.students || 0} Students
                   </span>
                 </div>
                 <div className="pt-3 border-t">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">Active Tasks:</span>
                     <span className="font-medium">
-                      {(group as any)?._count?.tasks || 0}
+                      {group._count?.tasks || 0}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm mt-1">
                     <span className="text-gray-500">Tutors:</span>
                     <span className="font-medium">
-                      {(group as any)?.tutors?.length || 0}
+                      {group.tutors?.length || 0}
                     </span>
                   </div>
                 </div>
@@ -275,9 +279,34 @@ export default function GroupsPage() {
         <Card>
           <CardContent className="text-center py-12">
             <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">
-              No groups found. Create your first group to get started.
-            </p>
+            {isTutor ? (
+              <div className="space-y-2">
+                <p className="text-gray-700 font-medium">
+                  You're not assigned to any groups
+                </p>
+                <p className="text-gray-500">
+                  Contact an administrator and ask to be assigned to groups.
+                </p>
+              </div>
+            ) : isAdmin ? (
+              <div className="space-y-2">
+                <p className="text-gray-700 font-medium">No groups found</p>
+                <p className="text-gray-500">
+                  Create your first group to get started.
+                </p>
+                <Button onClick={() => setShowAddForm(true)} className="mt-4">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create First Group
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-gray-700 font-medium">No groups available</p>
+                <p className="text-gray-500">
+                  There are currently no groups in the system.
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
       ) : null}

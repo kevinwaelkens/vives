@@ -41,18 +41,44 @@ export async function GET(
     const student = await prisma.student.findFirst({
       where,
       include: {
-        group: true,
+        group: {
+          include: {
+            tutors: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
         parentContacts: true,
         assessments: {
           include: {
-            task: true,
+            task: {
+              select: {
+                id: true,
+                title: true,
+                description: true,
+                type: true,
+                category: true,
+                points: true,
+                dueDate: true,
+                assignedAt: true,
+              },
+            },
           },
           orderBy: { createdAt: "desc" },
-          take: 10,
         },
         attendance: {
           orderBy: { date: "desc" },
           take: 30,
+        },
+        _count: {
+          select: {
+            assessments: true,
+            attendance: true,
+          },
         },
       },
     });
