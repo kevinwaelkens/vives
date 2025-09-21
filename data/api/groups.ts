@@ -32,7 +32,6 @@ export const groupsApi = {
   getGroup: async (id: string): Promise<GroupWithRelations> => {
     try {
       const response = await apiClient.get<GroupWithRelations>(`/groups/${id}`);
-      console.log("Groups API getGroup response:", response); // Debug logging
 
       // The API client already extracts the data, so we just return it
       if (!response) {

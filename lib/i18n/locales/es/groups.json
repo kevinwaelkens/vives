@@ -14,5 +14,60 @@
     "total_students_in_groups": "Estudiantes en grupos"
   },
   "subtitle": "Gestionar grupos de clase y asignaciones de estudiantes",
-  "title": "Grupos"
+  "title": "Grupos",
+  "detail": {
+    "loading": "Cargando detalles del grupo...",
+    "not_found": "Grupo no encontrado",
+    "not_found_description": "El grupo que buscas no existe o no tienes acceso a él.",
+    "error_loading": "Error al cargar el grupo",
+    "back_to_groups": "Volver a grupos",
+    "edit_group": "Editar grupo",
+    "save_changes": "Guardar cambios",
+    "cancel": "Cancelar",
+    "total_students": "Total de estudiantes",
+    "active_tasks": "Tareas activas",
+    "tutors": "Tutores",
+    "students": "Estudiantes",
+    "recent_tasks": "Tareas recientes",
+    "move_student": "Mover estudiante",
+    "add_student": "Agregar estudiante",
+    "remove_student": "Eliminar estudiante",
+    "create_task": "Crear tarea",
+    "view_all_tasks": "Ver todas las tareas",
+    "no_students": "Aún no hay estudiantes en este grupo.",
+    "no_tasks": "Aún no se han creado tareas para este grupo.",
+    "add_first_student": "Agregar primer estudiante",
+    "create_first_task": "Crear primera tarea",
+    "grade_label": "Grado",
+    "move_student_dialog": {
+      "title": "Mover estudiante a otro grupo",
+      "select_student": "Seleccionar estudiante",
+      "target_group": "Grupo destino",
+      "choose_student": "Elegir un estudiante",
+      "choose_target_group": "Elegir grupo destino",
+      "move_button": "Mover estudiante"
+    },
+    "remove_student_dialog": {
+      "title": "Eliminar estudiante",
+      "description": "¿Estás seguro de que quieres eliminar a {name} de este grupo? Esto eliminará permanentemente al estudiante y todos sus datos.",
+      "remove_button": "Eliminar estudiante"
+    },
+    "edit_dialog": {
+      "title": "Editar grupo",
+      "group_name": "Nombre del grupo",
+      "group_code": "Código del grupo",
+      "academic_year": "Año académico",
+      "grade": "Grado"
+    },
+    "stats": {
+      "assessments": "evaluaciones",
+      "attendance": "asistencia",
+      "submissions": "entregas"
+    },
+    "task_info": {
+      "no_due_date": "Sin fecha de vencimiento",
+      "due_date": "Vence: {date}"
+    }
+  },
+  "delete_confirmation": "¿Estás seguro de que quieres eliminar este grupo?"
 }

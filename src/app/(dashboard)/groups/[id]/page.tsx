@@ -51,6 +51,7 @@ import {
 import { useGroup, useGroups } from "@/data/hooks/use-groups";
 import { groupsApi } from "@/data/api/groups";
 import { usePageTitle } from "@/lib/contexts/PageTitleContext";
+import { useTranslation } from "@/lib/i18n";
 import { useEffect } from "react";
 
 export default function GroupDetailPage() {
@@ -61,6 +62,8 @@ export default function GroupDetailPage() {
   const { data: group, isLoading, refetch, error } = useGroup(groupId);
   const { data: allGroups } = useGroups();
   const { setTitle } = usePageTitle();
+  const { t } = useTranslation("groups");
+  const { t: tCommon } = useTranslation("common");
 
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showMoveStudentDialog, setShowMoveStudentDialog] = useState(false);
@@ -129,7 +132,7 @@ export default function GroupDetailPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading group details...</div>
+        <div className="text-gray-500">{t("detail.loading")}</div>
       </div>
     );
   }
@@ -140,16 +143,14 @@ export default function GroupDetailPage() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Error loading group
+            {t("detail.error_loading")}
           </h2>
           <p className="text-gray-500 mb-4">
-            {error instanceof Error
-              ? error.message
-              : "Failed to load group details"}
+            {error instanceof Error ? error.message : t("detail.error_loading")}
           </p>
           <Button onClick={() => router.push("/groups")}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Groups
+            {t("detail.back_to_groups")}
           </Button>
         </div>
       </div>
@@ -161,15 +162,14 @@ export default function GroupDetailPage() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Group not found
+            {t("detail.not_found")}
           </h2>
           <p className="text-gray-500 mb-4">
-            The group you're looking for doesn't exist or you don't have access
-            to it.
+            {t("detail.not_found_description")}
           </p>
           <Button onClick={() => router.push("/groups")}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Groups
+            {t("detail.back_to_groups")}
           </Button>
         </div>
       </div>
@@ -203,16 +203,18 @@ export default function GroupDetailPage() {
             <DialogTrigger asChild>
               <Button variant="outline">
                 <Edit2 className="h-4 w-4 mr-2" />
-                Edit Group
+                {t("detail.edit_group")}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Edit Group</DialogTitle>
+                <DialogTitle>{t("detail.edit_dialog.title")}</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleEditGroup} className="space-y-4">
                 <div>
-                  <Label htmlFor="name">Group Name</Label>
+                  <Label htmlFor="name">
+                    {t("detail.edit_dialog.group_name")}
+                  </Label>
                   <Input
                     id="name"
                     value={editForm.name}
@@ -223,7 +225,9 @@ export default function GroupDetailPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="code">Group Code</Label>
+                  <Label htmlFor="code">
+                    {t("detail.edit_dialog.group_code")}
+                  </Label>
                   <Input
                     id="code"
                     value={editForm.code}
@@ -234,7 +238,9 @@ export default function GroupDetailPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="academicYear">Academic Year</Label>
+                  <Label htmlFor="academicYear">
+                    {t("detail.edit_dialog.academic_year")}
+                  </Label>
                   <Input
                     id="academicYear"
                     value={editForm.academicYear}
@@ -245,7 +251,7 @@ export default function GroupDetailPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="grade">Grade</Label>
+                  <Label htmlFor="grade">{t("detail.edit_dialog.grade")}</Label>
                   <Input
                     id="grade"
                     value={editForm.grade}
@@ -261,9 +267,9 @@ export default function GroupDetailPage() {
                     variant="outline"
                     onClick={() => setShowEditDialog(false)}
                   >
-                    Cancel
+                    {t("detail.cancel")}
                   </Button>
-                  <Button type="submit">Save Changes</Button>
+                  <Button type="submit">{t("detail.save_changes")}</Button>
                 </div>
               </form>
             </DialogContent>
@@ -276,7 +282,7 @@ export default function GroupDetailPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total Students
+              {t("detail.total_students")}
             </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -287,7 +293,9 @@ export default function GroupDetailPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Tasks</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t("detail.active_tasks")}
+            </CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -297,7 +305,9 @@ export default function GroupDetailPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tutors</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t("detail.tutors")}
+            </CardTitle>
             <GraduationCap className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -315,7 +325,7 @@ export default function GroupDetailPage() {
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              Students ({group.students.length})
+              {t("detail.students")} ({group.students.length})
             </CardTitle>
             <div className="flex gap-2">
               <Dialog
@@ -325,22 +335,30 @@ export default function GroupDetailPage() {
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm">
                     <ArrowRight className="h-4 w-4 mr-2" />
-                    Move Student
+                    {t("detail.move_student")}
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Move Student to Another Group</DialogTitle>
+                    <DialogTitle>
+                      {t("detail.move_student_dialog.title")}
+                    </DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <Label>Select Student</Label>
+                      <Label>
+                        {t("detail.move_student_dialog.select_student")}
+                      </Label>
                       <Select
                         value={selectedStudent}
                         onValueChange={setSelectedStudent}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Choose a student" />
+                          <SelectValue
+                            placeholder={t(
+                              "detail.move_student_dialog.choose_student",
+                            )}
+                          />
                         </SelectTrigger>
                         <SelectContent>
                           {group.students.map((student) => (
@@ -352,13 +370,19 @@ export default function GroupDetailPage() {
                       </Select>
                     </div>
                     <div>
-                      <Label>Target Group</Label>
+                      <Label>
+                        {t("detail.move_student_dialog.target_group")}
+                      </Label>
                       <Select
                         value={targetGroup}
                         onValueChange={setTargetGroup}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Choose target group" />
+                          <SelectValue
+                            placeholder={t(
+                              "detail.move_student_dialog.choose_target_group",
+                            )}
+                          />
                         </SelectTrigger>
                         <SelectContent>
                           {availableGroups.map((g) => (
@@ -374,13 +398,13 @@ export default function GroupDetailPage() {
                         variant="outline"
                         onClick={() => setShowMoveStudentDialog(false)}
                       >
-                        Cancel
+                        {t("detail.cancel")}
                       </Button>
                       <Button
                         onClick={handleMoveStudent}
                         disabled={!selectedStudent || !targetGroup}
                       >
-                        Move Student
+                        {t("detail.move_student_dialog.move_button")}
                       </Button>
                     </div>
                   </div>
@@ -391,7 +415,7 @@ export default function GroupDetailPage() {
                 onClick={() => router.push(`/students?groupId=${groupId}`)}
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add Student
+                {t("detail.add_student")}
               </Button>
             </div>
           </div>
@@ -400,13 +424,13 @@ export default function GroupDetailPage() {
           {group.students.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No students in this group yet.</p>
+              <p>{t("detail.no_students")}</p>
               <Button
                 className="mt-4"
                 onClick={() => router.push(`/students?groupId=${groupId}`)}
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add First Student
+                {t("detail.add_first_student")}
               </Button>
             </div>
           ) : (
@@ -431,10 +455,12 @@ export default function GroupDetailPage() {
                       )}
                       <div className="flex gap-2 text-xs">
                         <Badge variant="secondary">
-                          {student._count.assessments} assessments
+                          {student._count.assessments}{" "}
+                          {t("detail.stats.assessments")}
                         </Badge>
                         <Badge variant="outline">
-                          {student._count.attendance} attendance
+                          {student._count.attendance}{" "}
+                          {t("detail.stats.attendance")}
                         </Badge>
                       </div>
                     </div>
@@ -458,20 +484,24 @@ export default function GroupDetailPage() {
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Remove Student</AlertDialogTitle>
+                            <AlertDialogTitle>
+                              {t("detail.remove_student_dialog.title")}
+                            </AlertDialogTitle>
                             <AlertDialogDescription>
-                              Are you sure you want to remove {student.name}{" "}
-                              from this group? This will permanently delete the
-                              student and all their data.
+                              {t("detail.remove_student_dialog.description", {
+                                name: student.name,
+                              })}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogCancel>
+                              {t("detail.cancel")}
+                            </AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() => handleRemoveStudent(student.id)}
                               className="bg-red-600 hover:bg-red-700"
                             >
-                              Remove Student
+                              {t("detail.remove_student_dialog.remove_button")}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -491,14 +521,14 @@ export default function GroupDetailPage() {
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5" />
-              Recent Tasks ({group.tasks?.length || 0})
+              {t("detail.recent_tasks")} ({group.tasks?.length || 0})
             </CardTitle>
             <Button
               size="sm"
               onClick={() => router.push(`/tasks?groupId=${groupId}`)}
             >
               <Plus className="h-4 w-4 mr-2" />
-              Create Task
+              {t("detail.create_task")}
             </Button>
           </div>
         </CardHeader>
@@ -506,13 +536,13 @@ export default function GroupDetailPage() {
           {!group.tasks || group.tasks.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No tasks created for this group yet.</p>
+              <p>{t("detail.no_tasks")}</p>
               <Button
                 className="mt-4"
                 onClick={() => router.push(`/tasks?groupId=${groupId}`)}
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Create First Task
+                {t("detail.create_first_task")}
               </Button>
             </div>
           ) : (
@@ -529,14 +559,19 @@ export default function GroupDetailPage() {
                         <div className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />
                           {task.dueDate
-                            ? new Date(task.dueDate).toLocaleDateString()
-                            : "No due date"}
+                            ? t("detail.task_info.due_date", {
+                                date: new Date(
+                                  task.dueDate,
+                                ).toLocaleDateString(),
+                              })
+                            : t("detail.task_info.no_due_date")}
                         </div>
                         <Badge variant="secondary">
                           {task.type.toLowerCase()}
                         </Badge>
                         <Badge variant="outline">
-                          {task._count.assessments} submissions
+                          {task._count.assessments}{" "}
+                          {t("detail.stats.submissions")}
                         </Badge>
                       </div>
                     </div>
@@ -556,7 +591,7 @@ export default function GroupDetailPage() {
                     variant="outline"
                     onClick={() => router.push(`/tasks?groupId=${groupId}`)}
                   >
-                    View All Tasks
+                    {t("detail.view_all_tasks")}
                   </Button>
                 </div>
               )}

@@ -14,5 +14,60 @@
     "total_students_in_groups": "Studenti nei gruppi"
   },
   "subtitle": "Gestisci i gruppi di classe e le assegnazioni degli studenti",
-  "title": "Gruppi"
+  "title": "Gruppi",
+  "detail": {
+    "loading": "Caricamento dettagli gruppo...",
+    "not_found": "Gruppo non trovato",
+    "not_found_description": "Il gruppo che stai cercando non esiste o non hai accesso ad esso.",
+    "error_loading": "Errore nel caricamento del gruppo",
+    "back_to_groups": "Torna ai gruppi",
+    "edit_group": "Modifica gruppo",
+    "save_changes": "Salva modifiche",
+    "cancel": "Annulla",
+    "total_students": "Totale studenti",
+    "active_tasks": "Compiti attivi",
+    "tutors": "Tutor",
+    "students": "Studenti",
+    "recent_tasks": "Compiti recenti",
+    "move_student": "Sposta studente",
+    "add_student": "Aggiungi studente",
+    "remove_student": "Rimuovi studente",
+    "create_task": "Crea compito",
+    "view_all_tasks": "Visualizza tutti i compiti",
+    "no_students": "Nessuno studente in questo gruppo ancora.",
+    "no_tasks": "Nessun compito creato per questo gruppo ancora.",
+    "add_first_student": "Aggiungi primo studente",
+    "create_first_task": "Crea primo compito",
+    "grade_label": "Grado",
+    "move_student_dialog": {
+      "title": "Sposta studente in altro gruppo",
+      "select_student": "Seleziona studente",
+      "target_group": "Gruppo destinazione",
+      "choose_student": "Scegli uno studente",
+      "choose_target_group": "Scegli gruppo destinazione",
+      "move_button": "Sposta studente"
+    },
+    "remove_student_dialog": {
+      "title": "Rimuovi studente",
+      "description": "Sei sicuro di voler rimuovere {name} da questo gruppo? Questo eliminerà permanentemente lo studente e tutti i suoi dati.",
+      "remove_button": "Rimuovi studente"
+    },
+    "edit_dialog": {
+      "title": "Modifica gruppo",
+      "group_name": "Nome gruppo",
+      "group_code": "Codice gruppo",
+      "academic_year": "Anno accademico",
+      "grade": "Grado"
+    },
+    "stats": {
+      "assessments": "valutazioni",
+      "attendance": "presenze",
+      "submissions": "consegne"
+    },
+    "task_info": {
+      "no_due_date": "Nessuna scadenza",
+      "due_date": "Scadenza: {date}"
+    }
+  },
+  "delete_confirmation": "Sei sicuro di voler eliminare questo gruppo?"
 }

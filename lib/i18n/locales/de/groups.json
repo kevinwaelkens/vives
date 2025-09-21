@@ -14,5 +14,60 @@
     "total_students_in_groups": "Studenten in Gruppen"
   },
   "subtitle": "Klassengruppen und Studentenzuweisungen verwalten",
-  "title": "Gruppen"
+  "title": "Gruppen",
+  "detail": {
+    "loading": "Gruppendetails werden geladen...",
+    "not_found": "Gruppe nicht gefunden",
+    "not_found_description": "Die gesuchte Gruppe existiert nicht oder Sie haben keinen Zugriff darauf.",
+    "error_loading": "Fehler beim Laden der Gruppe",
+    "back_to_groups": "Zurück zu den Gruppen",
+    "edit_group": "Gruppe bearbeiten",
+    "save_changes": "Änderungen speichern",
+    "cancel": "Abbrechen",
+    "total_students": "Schüler insgesamt",
+    "active_tasks": "Aktive Aufgaben",
+    "tutors": "Tutoren",
+    "students": "Schüler",
+    "recent_tasks": "Aktuelle Aufgaben",
+    "move_student": "Schüler verschieben",
+    "add_student": "Schüler hinzufügen",
+    "remove_student": "Schüler entfernen",
+    "create_task": "Aufgabe erstellen",
+    "view_all_tasks": "Alle Aufgaben anzeigen",
+    "no_students": "Noch keine Schüler in dieser Gruppe.",
+    "no_tasks": "Noch keine Aufgaben für diese Gruppe erstellt.",
+    "add_first_student": "Ersten Schüler hinzufügen",
+    "create_first_task": "Erste Aufgabe erstellen",
+    "grade_label": "Klasse",
+    "move_student_dialog": {
+      "title": "Schüler in andere Gruppe verschieben",
+      "select_student": "Schüler auswählen",
+      "target_group": "Zielgruppe",
+      "choose_student": "Einen Schüler wählen",
+      "choose_target_group": "Zielgruppe wählen",
+      "move_button": "Schüler verschieben"
+    },
+    "remove_student_dialog": {
+      "title": "Schüler entfernen",
+      "description": "Sind Sie sicher, dass Sie {name} aus dieser Gruppe entfernen möchten? Dies wird den Schüler und alle seine Daten dauerhaft löschen.",
+      "remove_button": "Schüler entfernen"
+    },
+    "edit_dialog": {
+      "title": "Gruppe bearbeiten",
+      "group_name": "Gruppenname",
+      "group_code": "Gruppencode",
+      "academic_year": "Schuljahr",
+      "grade": "Klasse"
+    },
+    "stats": {
+      "assessments": "Bewertungen",
+      "attendance": "Anwesenheit",
+      "submissions": "Abgaben"
+    },
+    "task_info": {
+      "no_due_date": "Kein Fälligkeitsdatum",
+      "due_date": "Fällig: {date}"
+    }
+  },
+  "delete_confirmation": "Sind Sie sicher, dass Sie diese Gruppe löschen möchten?"
 }

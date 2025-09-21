@@ -14,5 +14,60 @@
     "total_students_in_groups": "Étudiants dans les groupes"
   },
   "subtitle": "Gérer les groupes de classe et les affectations d'étudiants",
-  "title": "Groupes"
+  "title": "Groupes",
+  "detail": {
+    "loading": "Chargement des détails du groupe...",
+    "not_found": "Groupe introuvable",
+    "not_found_description": "Le groupe que vous recherchez n'existe pas ou vous n'y avez pas accès.",
+    "error_loading": "Erreur lors du chargement du groupe",
+    "back_to_groups": "Retour aux groupes",
+    "edit_group": "Modifier le groupe",
+    "save_changes": "Enregistrer les modifications",
+    "cancel": "Annuler",
+    "total_students": "Total des étudiants",
+    "active_tasks": "Tâches actives",
+    "tutors": "Tuteurs",
+    "students": "Étudiants",
+    "recent_tasks": "Tâches récentes",
+    "move_student": "Déplacer l'étudiant",
+    "add_student": "Ajouter un étudiant",
+    "remove_student": "Supprimer l'étudiant",
+    "create_task": "Créer une tâche",
+    "view_all_tasks": "Voir toutes les tâches",
+    "no_students": "Aucun étudiant dans ce groupe pour le moment.",
+    "no_tasks": "Aucune tâche créée pour ce groupe pour le moment.",
+    "add_first_student": "Ajouter le premier étudiant",
+    "create_first_task": "Créer la première tâche",
+    "grade_label": "Niveau",
+    "move_student_dialog": {
+      "title": "Déplacer l'étudiant vers un autre groupe",
+      "select_student": "Sélectionner un étudiant",
+      "target_group": "Groupe cible",
+      "choose_student": "Choisir un étudiant",
+      "choose_target_group": "Choisir le groupe cible",
+      "move_button": "Déplacer l'étudiant"
+    },
+    "remove_student_dialog": {
+      "title": "Supprimer l'étudiant",
+      "description": "Êtes-vous sûr de vouloir supprimer {name} de ce groupe ? Cela supprimera définitivement l'étudiant et toutes ses données.",
+      "remove_button": "Supprimer l'étudiant"
+    },
+    "edit_dialog": {
+      "title": "Modifier le groupe",
+      "group_name": "Nom du groupe",
+      "group_code": "Code du groupe",
+      "academic_year": "Année académique",
+      "grade": "Niveau"
+    },
+    "stats": {
+      "assessments": "évaluations",
+      "attendance": "présence",
+      "submissions": "soumissions"
+    },
+    "task_info": {
+      "no_due_date": "Aucune date d'échéance",
+      "due_date": "Échéance : {date}"
+    }
+  },
+  "delete_confirmation": "Êtes-vous sûr de vouloir supprimer ce groupe ?"
 }

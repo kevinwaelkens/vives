@@ -14,5 +14,60 @@
     "total_students_in_groups": "Studenten in groepen"
   },
   "subtitle": "Beheer klasgroepen en studenttoewijzingen",
-  "title": "Groepen"
+  "title": "Groepen",
+  "detail": {
+    "loading": "Groepsdetails laden...",
+    "not_found": "Groep niet gevonden",
+    "not_found_description": "De groep die je zoekt bestaat niet of je hebt er geen toegang toe.",
+    "error_loading": "Fout bij het laden van de groep",
+    "back_to_groups": "Terug naar groepen",
+    "edit_group": "Groep bewerken",
+    "save_changes": "Wijzigingen opslaan",
+    "cancel": "Annuleren",
+    "total_students": "Totaal studenten",
+    "active_tasks": "Actieve taken",
+    "tutors": "Tutoren",
+    "students": "Studenten",
+    "recent_tasks": "Recente taken",
+    "move_student": "Student verplaatsen",
+    "add_student": "Student toevoegen",
+    "remove_student": "Student verwijderen",
+    "create_task": "Taak aanmaken",
+    "view_all_tasks": "Alle taken bekijken",
+    "no_students": "Nog geen studenten in deze groep.",
+    "no_tasks": "Nog geen taken aangemaakt voor deze groep.",
+    "add_first_student": "Eerste student toevoegen",
+    "create_first_task": "Eerste taak aanmaken",
+    "grade_label": "Klas",
+    "move_student_dialog": {
+      "title": "Student naar andere groep verplaatsen",
+      "select_student": "Student selecteren",
+      "target_group": "Doelgroep",
+      "choose_student": "Kies een student",
+      "choose_target_group": "Kies doelgroep",
+      "move_button": "Student verplaatsen"
+    },
+    "remove_student_dialog": {
+      "title": "Student verwijderen",
+      "description": "Weet je zeker dat je {name} uit deze groep wilt verwijderen? Dit zal de student en al zijn gegevens permanent verwijderen.",
+      "remove_button": "Student verwijderen"
+    },
+    "edit_dialog": {
+      "title": "Groep bewerken",
+      "group_name": "Groepsnaam",
+      "group_code": "Groepscode",
+      "academic_year": "Academisch jaar",
+      "grade": "Klas"
+    },
+    "stats": {
+      "assessments": "beoordelingen",
+      "attendance": "aanwezigheid",
+      "submissions": "inleveringen"
+    },
+    "task_info": {
+      "no_due_date": "Geen vervaldatum",
+      "due_date": "Vervalt: {date}"
+    }
+  },
+  "delete_confirmation": "Weet je zeker dat je deze groep wilt verwijderen?"
 }

@@ -27,7 +27,6 @@ class ApiClient {
       }
 
       const data = await response.json();
-      console.log(`API ${options?.method || "GET"} ${url}:`, data); // Debug logging
       return data;
     } catch (error) {
       console.error("API request failed:", error);
@@ -37,7 +36,6 @@ class ApiClient {
 
   async get<T>(url: string, options?: RequestInit): Promise<T> {
     const response = await this.request<T>(url, { ...options, method: "GET" });
-    console.log(`API GET ${url}:`, response); // Debug logging
     // Handle both ApiResponse format and direct data format
     return (response.data !== undefined ? response.data : response) as T;
   }
