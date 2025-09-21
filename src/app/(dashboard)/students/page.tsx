@@ -11,7 +11,9 @@ import { useGroups } from "@/data/hooks/use-groups";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CollapsibleCard } from "@/components/ui/collapsible-card";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import {
   Search,
   Plus,
@@ -20,6 +22,7 @@ import {
   Mail,
   Calendar,
   UserCheck,
+  Users,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n";
@@ -284,105 +287,113 @@ export default function StudentsPage() {
       </div>
 
       {/* Students List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>All Students</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {students.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              No students found. Add your first student to get started.
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left p-4 font-medium text-gray-700">
-                      Name
-                    </th>
-                    <th className="text-left p-4 font-medium text-gray-700">
-                      Student ID
-                    </th>
-                    <th className="text-left p-4 font-medium text-gray-700">
-                      Email
-                    </th>
-                    <th className="text-left p-4 font-medium text-gray-700">
-                      Group
-                    </th>
-                    <th className="text-left p-4 font-medium text-gray-700">
-                      Status
-                    </th>
-                    <th className="text-left p-4 font-medium text-gray-700">
-                      Enrolled
-                    </th>
-                    <th className="text-left p-4 font-medium text-gray-700">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {students.map((student) => (
-                    <tr key={student.id} className="border-b hover:bg-gray-50">
-                      <td className="p-4">
-                        <div className="font-medium">{student.name}</div>
-                      </td>
-                      <td className="p-4 text-gray-600">{student.studentId}</td>
-                      <td className="p-4">
-                        <div className="flex items-center gap-1 text-gray-600">
-                          <Mail className="h-4 w-4" />
-                          {student.email}
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm">
-                          {student.group?.name || "Unassigned"}
-                        </span>
-                      </td>
-                      <td className="p-4">
-                        <span
-                          className={`px-2 py-1 rounded text-sm ${
-                            student.status === "ACTIVE"
-                              ? "bg-green-100 text-green-700"
-                              : "bg-gray-100 text-gray-700"
-                          }`}
+      <CollapsibleCard
+        title="All Students"
+        icon={<Users className="h-5 w-5" />}
+        badge={<Badge variant="secondary">{students.length}</Badge>}
+        defaultOpen={true}
+        previewContent={
+          students.length > 0
+            ? `${students
+                .slice(0, 3)
+                .map((s) => s.name)
+                .join(", ")}${students.length > 3 ? "..." : ""}`
+            : "No students found"
+        }
+      >
+        {students.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            No students found. Add your first student to get started.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left p-4 font-medium text-gray-700">
+                    Name
+                  </th>
+                  <th className="text-left p-4 font-medium text-gray-700">
+                    Student ID
+                  </th>
+                  <th className="text-left p-4 font-medium text-gray-700">
+                    Email
+                  </th>
+                  <th className="text-left p-4 font-medium text-gray-700">
+                    Group
+                  </th>
+                  <th className="text-left p-4 font-medium text-gray-700">
+                    Status
+                  </th>
+                  <th className="text-left p-4 font-medium text-gray-700">
+                    Enrolled
+                  </th>
+                  <th className="text-left p-4 font-medium text-gray-700">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {students.map((student) => (
+                  <tr key={student.id} className="border-b hover:bg-gray-50">
+                    <td className="p-4">
+                      <div className="font-medium">{student.name}</div>
+                    </td>
+                    <td className="p-4 text-gray-600">{student.studentId}</td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-1 text-gray-600">
+                        <Mail className="h-4 w-4" />
+                        {student.email}
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm">
+                        {student.group?.name || "Unassigned"}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <span
+                        className={`px-2 py-1 rounded text-sm ${
+                          student.status === "ACTIVE"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        {student.status}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-1 text-gray-600">
+                        <Calendar className="h-4 w-4" />
+                        {formatDate(student.enrolledAt)}
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleEdit(student)}
                         >
-                          {student.status}
-                        </span>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex items-center gap-1 text-gray-600">
-                          <Calendar className="h-4 w-4" />
-                          {formatDate(student.enrolledAt)}
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleEdit(student)}
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleDelete(student.id)}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDelete(student.id)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </CollapsibleCard>
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CollapsibleCard } from "@/components/ui/collapsible-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,12 +36,9 @@ import {
 import {
   Users,
   BookOpen,
-  Calendar,
   Edit2,
-  Trash2,
   Plus,
   ArrowLeft,
-  UserPlus,
   UserMinus,
   ArrowRight,
   Mail,
@@ -63,7 +61,6 @@ export default function GroupDetailPage() {
   const { data: allGroups } = useGroups();
   const { setTitle } = usePageTitle();
   const { t } = useTranslation("groups");
-  const { t: tCommon } = useTranslation("common");
 
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showMoveStudentDialog, setShowMoveStudentDialog] = useState(false);
@@ -320,107 +317,110 @@ export default function GroupDetailPage() {
       </div>
 
       {/* Students Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              {t("detail.students")} ({group.students.length})
-            </CardTitle>
-            <div className="flex gap-2">
-              <Dialog
-                open={showMoveStudentDialog}
-                onOpenChange={setShowMoveStudentDialog}
-              >
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <ArrowRight className="h-4 w-4 mr-2" />
-                    {t("detail.move_student")}
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>
-                      {t("detail.move_student_dialog.title")}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div>
-                      <Label>
-                        {t("detail.move_student_dialog.select_student")}
-                      </Label>
-                      <Select
-                        value={selectedStudent}
-                        onValueChange={setSelectedStudent}
-                      >
-                        <SelectTrigger>
-                          <SelectValue
-                            placeholder={t(
-                              "detail.move_student_dialog.choose_student",
-                            )}
-                          />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {group.students.map((student) => (
-                            <SelectItem key={student.id} value={student.id}>
-                              {student.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>
-                        {t("detail.move_student_dialog.target_group")}
-                      </Label>
-                      <Select
-                        value={targetGroup}
-                        onValueChange={setTargetGroup}
-                      >
-                        <SelectTrigger>
-                          <SelectValue
-                            placeholder={t(
-                              "detail.move_student_dialog.choose_target_group",
-                            )}
-                          />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {availableGroups.map((g) => (
-                            <SelectItem key={g.id} value={g.id}>
-                              {g.name} ({g.code})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowMoveStudentDialog(false)}
-                      >
-                        {t("detail.cancel")}
-                      </Button>
-                      <Button
-                        onClick={handleMoveStudent}
-                        disabled={!selectedStudent || !targetGroup}
-                      >
-                        {t("detail.move_student_dialog.move_button")}
-                      </Button>
-                    </div>
+      <CollapsibleCard
+        title={t("detail.students")}
+        icon={<Users className="h-5 w-5" />}
+        badge={<Badge variant="secondary">{group.students.length}</Badge>}
+        defaultOpen={true}
+        previewContent={
+          group.students.length > 0
+            ? `${group.students
+                .slice(0, 3)
+                .map((s) => s.name)
+                .join(", ")}${group.students.length > 3 ? "..." : ""}`
+            : t("detail.no_students")
+        }
+      >
+        <div className="space-y-4">
+          <div className="flex justify-end gap-2">
+            <Dialog
+              open={showMoveStudentDialog}
+              onOpenChange={setShowMoveStudentDialog}
+            >
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <ArrowRight className="h-4 w-4 mr-2" />
+                  {t("detail.move_student")}
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>
+                    {t("detail.move_student_dialog.title")}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label>
+                      {t("detail.move_student_dialog.select_student")}
+                    </Label>
+                    <Select
+                      value={selectedStudent}
+                      onValueChange={setSelectedStudent}
+                    >
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={t(
+                            "detail.move_student_dialog.choose_student",
+                          )}
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {group.students.map((student) => (
+                          <SelectItem key={student.id} value={student.id}>
+                            {student.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                </DialogContent>
-              </Dialog>
-              <Button
-                size="sm"
-                onClick={() => router.push(`/students?groupId=${groupId}`)}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                {t("detail.add_student")}
-              </Button>
-            </div>
+                  <div>
+                    <Label>
+                      {t("detail.move_student_dialog.target_group")}
+                    </Label>
+                    <Select value={targetGroup} onValueChange={setTargetGroup}>
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={t(
+                            "detail.move_student_dialog.choose_target_group",
+                          )}
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableGroups.map((g) => (
+                          <SelectItem key={g.id} value={g.id}>
+                            {g.name} ({g.code})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowMoveStudentDialog(false)}
+                    >
+                      {t("detail.cancel")}
+                    </Button>
+                    <Button
+                      onClick={handleMoveStudent}
+                      disabled={!selectedStudent || !targetGroup}
+                    >
+                      {t("detail.move_student_dialog.move_button")}
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+            <Button
+              size="sm"
+              onClick={() => router.push(`/students?groupId=${groupId}`)}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              {t("detail.add_student")}
+            </Button>
           </div>
-        </CardHeader>
-        <CardContent>
+
           {group.students.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -512,17 +512,26 @@ export default function GroupDetailPage() {
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </CollapsibleCard>
 
       {/* Tasks Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5" />
-              {t("detail.recent_tasks")} ({group.tasks?.length || 0})
-            </CardTitle>
+      <CollapsibleCard
+        title={t("detail.recent_tasks")}
+        icon={<BookOpen className="h-5 w-5" />}
+        badge={<Badge variant="secondary">{group.tasks?.length || 0}</Badge>}
+        defaultOpen={false}
+        previewContent={
+          group.tasks && group.tasks.length > 0
+            ? `${group.tasks
+                .slice(0, 2)
+                .map((t) => t.title)
+                .join(", ")}${group.tasks.length > 2 ? "..." : ""}`
+            : t("detail.no_tasks")
+        }
+      >
+        <div className="space-y-4">
+          <div className="flex justify-end">
             <Button
               size="sm"
               onClick={() => router.push(`/tasks?groupId=${groupId}`)}
@@ -531,8 +540,7 @@ export default function GroupDetailPage() {
               {t("detail.create_task")}
             </Button>
           </div>
-        </CardHeader>
-        <CardContent>
+
           {!group.tasks || group.tasks.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -597,8 +605,8 @@ export default function GroupDetailPage() {
               )}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </CollapsibleCard>
     </div>
   );
 }
