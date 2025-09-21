@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npm run i18n:generate && next dev",
-    "build": "npm run i18n:generate && next build",
+    "build": "npm run i18n:generate && prisma generate && next build",
     "start": "next start",
     "lint": "biome check",
     "format": "biome format --write",
@@ -17,7 +17,9 @@
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "test:debug": "playwright test --debug",
-    "test:seed": "tsx prisma/test-seed.ts"
+    "test:seed": "tsx prisma/test-seed.ts",
+    "deploy:setup": "tsx scripts/deploy-setup.ts",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

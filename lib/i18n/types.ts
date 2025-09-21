@@ -247,8 +247,19 @@ interface StudentsTranslations {
 }
 
 interface TasksTranslations {
+  assigned_groups: string;
+  back_to_tasks: string;
+  category: string;
   create_task: string;
+  created: string;
   delete_confirmation: string;
+  description: string;
+  details: string;
+  draft: string;
+  due: string;
+  edit_task: string;
+  export_results: string;
+  failed_to_load_task: string;
   form: {
     category_label: string;
     create_new_task: string;
@@ -261,16 +272,47 @@ interface TasksTranslations {
     title_label: string;
     type_label: string;
   };
+  instructions: string;
+  last_updated: string;
   loading: string;
+  loading_task_details: string;
+  no_submissions_for_task: string;
+  no_submissions_yet: string;
   no_tasks: string;
+  not_graded: string;
+  points: string;
+  published: string;
   stats: {
+    average_score: string;
+    awaiting_grading: string;
+    based_on_grades: string;
     drafts: string;
     due_this_week: string;
+    graded: string;
+    missing_submissions: string;
+    not_submitted: string;
+    out_of_students: string;
+    pending: string;
+    percent_of_submissions: string;
     published: string;
+    total_submissions: string;
     total_tasks: string;
   };
+  status: {
+    draft: string;
+    graded: string;
+    late: string;
+    not_submitted: string;
+    submitted: string;
+  };
+  student_submissions: string;
+  submissions_preview: string;
+  submitted: string;
   subtitle: string;
+  task_details: string;
+  task_information: string;
   title: string;
+  type: string;
   types: {
     assignment: string;
     exam: string;

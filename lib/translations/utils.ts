@@ -73,7 +73,10 @@ export function nestedToFlat(
     if (typeof value === "string") {
       flat[newKey] = value;
     } else if (typeof value === "object" && value !== null) {
-      Object.assign(flat, nestedToFlat(value, newKey));
+      Object.assign(
+        flat,
+        nestedToFlat(value as Record<string, unknown>, newKey),
+      );
     }
   }
 
@@ -88,7 +91,7 @@ export function getBrowserLanguage(): string {
 
   const language =
     navigator.language || (navigator as { userLanguage?: string }).userLanguage;
-  return language.split("-")[0]; // Get language code without region
+  return language?.split("-")[0] || "en"; // Get language code without region
 }
 
 /**

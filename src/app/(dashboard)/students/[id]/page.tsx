@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CollapsibleCard } from "@/components/ui/collapsible-card";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ import {
   GraduationCap,
   Target,
   BarChart3,
+  ExternalLink,
 } from "lucide-react";
 import { useStudent } from "@/data/hooks/use-students";
 import { usePageTitle } from "@/lib/contexts/PageTitleContext";
@@ -326,7 +328,15 @@ export default function StudentDetailPage() {
                 <Card key={assessment.id} className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h4 className="font-medium">{assessment.task.title}</h4>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Link
+                          href={`/tasks/${assessment.task.id}`}
+                          className="font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                        >
+                          {assessment.task.title}
+                        </Link>
+                        <ExternalLink className="h-3 w-3 text-gray-400" />
+                      </div>
                       <p className="text-sm text-gray-500 mb-2">
                         {assessment.task.description}
                       </p>

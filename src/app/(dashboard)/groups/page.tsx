@@ -252,20 +252,20 @@ export default function GroupsPage() {
                 <div className="flex items-center gap-2 text-gray-600">
                   <Users className="h-4 w-4" />
                   <span className="text-sm">
-                    {group._count?.students || 0} Students
+                    {(group as any)._count?.students || 0} Students
                   </span>
                 </div>
                 <div className="pt-3 border-t">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">Active Tasks:</span>
                     <span className="font-medium">
-                      {group._count?.tasks || 0}
+                      {(group as any)._count?.tasks || 0}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm mt-1">
                     <span className="text-gray-500">Tutors:</span>
                     <span className="font-medium">
-                      {group.tutors?.length || 0}
+                      {(group as any).tutors?.length || 0}
                     </span>
                   </div>
                 </div>

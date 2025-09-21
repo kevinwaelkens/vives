@@ -1,9 +1,8 @@
-import { NextAuthOptions } from "next-auth";
+import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import type { User as PrismaUser } from "@prisma/client";
 
 declare module "next-auth" {
   interface Session {
@@ -34,11 +33,11 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-    updateAge: 24 * 60 * 60, // 24 hours
+    maxAge: 7 * 24 * 60 * 60, // 7 days (1 week)
+    updateAge: 24 * 60 * 60, // 24 hours - refresh session daily
   },
   jwt: {
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 7 * 24 * 60 * 60, // 7 days (1 week)
   },
   cookies: {
     sessionToken: {
@@ -48,7 +47,27 @@ export const authOptions: NextAuthOptions = {
         sameSite: "lax",
         path: "/",
         secure: process.env.NODE_ENV === "production",
-        maxAge: 30 * 24 * 60 * 60, // 30 days
+        maxAge: 7 * 24 * 60 * 60, // 7 days (1 week)
+      },
+    },
+    callbackUrl: {
+      name: `next-auth.callback-url`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 7 * 24 * 60 * 60, // 7 days (1 week)
+      },
+    },
+    csrfToken: {
+      name: `next-auth.csrf-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 7 * 24 * 60 * 60, // 7 days (1 week)
       },
     },
   },
@@ -109,18 +128,25 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user }) {
+      // Initial sign in
       if (user) {
         token.id = user.id;
         token.role = user.role;
       }
+
+      // Return previous token if the access token has not expired yet
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
+      if (session.user && token) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
       }
       return session;
     },
   },
+  // Enable debug in development
+  debug: process.env.NODE_ENV === "development",
+  // Ensure we use secure settings
+  useSecureCookies: process.env.NODE_ENV === "production",
 };

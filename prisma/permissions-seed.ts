@@ -114,7 +114,7 @@ export async function seedPermissions() {
       const permissionRecords = await prisma.permission.findMany({
         where: {
           name: {
-            in: permissions,
+            in: [...permissions],
           },
         },
       });

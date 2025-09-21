@@ -156,7 +156,7 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
 
           {/* Language Selector - always visible at bottom */}
           <div className="border-t border-slate-700 p-3">
-            <LanguageSelector variant="select" showLabel={false} />
+            <LanguageSelector variant="compact" showLabel={false} />
           </div>
 
           {/* Admin User info - always visible at bottom */}

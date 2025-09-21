@@ -118,7 +118,7 @@ export function useDynamicTranslation(
       // Navigate through nested object
       for (const part of keyParts) {
         if (value && typeof value === "object" && part in value) {
-          value = value[part];
+          value = (value as any)[part];
         } else {
           // Fallback to i18next for complex interpolation or missing keys
           return i18n.t(`${namespace}:${key}`, params) || key;

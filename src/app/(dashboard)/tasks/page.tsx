@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +26,8 @@ import { useTranslation } from "@/lib/i18n";
 export default function TasksPage() {
   const { t } = useTranslation("tasks");
   const { t: tCommon } = useTranslation("common");
+  const searchParams = useSearchParams();
+  const highlightTaskId = searchParams.get("highlight");
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
@@ -60,7 +64,12 @@ export default function TasksPage() {
     e.preventDefault();
     await createMutation.mutateAsync({
       ...formData,
-      type: formData.type as any, // Cast to TaskType
+      type: formData.type as
+        | "ASSIGNMENT"
+        | "QUIZ"
+        | "EXAM"
+        | "PROJECT"
+        | "HOMEWORK",
       dueDate: new Date(formData.dueDate), // Convert string to Date
     });
     setShowAddForm(false);
@@ -74,6 +83,23 @@ export default function TasksPage() {
   };
 
   const tasks = Array.isArray(tasksData) ? tasksData : tasksData?.data || [];
+
+  // Scroll to highlighted task
+  useEffect(() => {
+    if (highlightTaskId && tasks.length > 0) {
+      const timer = setTimeout(() => {
+        const element = document.getElementById(`task-${highlightTaskId}`);
+        if (element) {
+          element.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        }
+      }, 500); // Small delay to ensure rendering is complete
+
+      return () => clearTimeout(timer);
+    }
+  }, [highlightTaskId, tasks]);
   const groups = groupsData || [];
 
   if (isLoading) {
@@ -338,11 +364,19 @@ export default function TasksPage() {
       {/* Tasks List */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {tasks.map((task) => (
-          <Card key={task.id} className="hover:shadow-lg transition-shadow">
+          <Card
+            key={task.id}
+            id={`task-${task.id}`}
+            className={`hover:shadow-lg transition-shadow ${highlightTaskId === task.id ? "ring-2 ring-blue-500 bg-blue-50" : ""}`}
+          >
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <CardTitle className="text-lg">{task.title}</CardTitle>
+                  <Link href={`/tasks/${task.id}`}>
+                    <CardTitle className="text-lg hover:text-blue-600 cursor-pointer transition-colors">
+                      {task.title}
+                    </CardTitle>
+                  </Link>
                   <div className="flex items-center gap-3 mt-2">
                     <span
                       className={`px-2 py-1 rounded text-xs font-medium ${

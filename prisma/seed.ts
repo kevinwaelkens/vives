@@ -204,13 +204,35 @@ async function main() {
   // Create assessments for students
   for (const student of students.slice(0, 5)) {
     // Students in group1 get task1 and task2
+    const isDianaPrince = student.name === "Diana Prince";
+
     await prisma.assessment.create({
       data: {
         taskId: task1.id,
         studentId: student.id,
-        status: Math.random() > 0.3 ? "SUBMITTED" : "NOT_SUBMITTED",
-        score: Math.random() > 0.3 ? Math.floor(Math.random() * 30) + 70 : null,
-        submittedAt: Math.random() > 0.3 ? new Date() : null,
+        status: isDianaPrince
+          ? "GRADED"
+          : Math.random() > 0.3
+            ? "SUBMITTED"
+            : "NOT_SUBMITTED",
+        score: isDianaPrince
+          ? 92
+          : Math.random() > 0.3
+            ? Math.floor(Math.random() * 30) + 70
+            : null,
+        grade: isDianaPrince ? "A-" : null,
+        feedback: isDianaPrince
+          ? "Excellent work! Your analysis was thorough and well-structured. Keep up the great work!"
+          : null,
+        submittedAt: isDianaPrince
+          ? new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+          : Math.random() > 0.3
+            ? new Date()
+            : null, // 2 days ago for Diana
+        gradedAt: isDianaPrince
+          ? new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
+          : null, // 1 day ago for Diana
+        gradedById: isDianaPrince ? tutor1.id : null,
       },
     });
 
@@ -218,7 +240,10 @@ async function main() {
       data: {
         taskId: task2.id,
         studentId: student.id,
-        status: "NOT_SUBMITTED",
+        status: isDianaPrince ? "SUBMITTED" : "NOT_SUBMITTED",
+        submittedAt: isDianaPrince
+          ? new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
+          : null, // 1 day ago for Diana
       },
     });
   }

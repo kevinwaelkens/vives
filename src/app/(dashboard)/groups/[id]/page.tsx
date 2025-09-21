@@ -284,7 +284,9 @@ export default function GroupDetailPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{group._count.students}</div>
+            <div className="text-2xl font-bold">
+              {(group as any)._count?.students || 0}
+            </div>
           </CardContent>
         </Card>
 
@@ -296,7 +298,9 @@ export default function GroupDetailPage() {
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{group._count.tasks}</div>
+            <div className="text-2xl font-bold">
+              {(group as any)._count?.tasks || 0}
+            </div>
           </CardContent>
         </Card>
 
@@ -447,19 +451,19 @@ export default function GroupDetailPage() {
                         <Mail className="h-3 w-3" />
                         {student.email}
                       </div>
-                      {student.parentContacts?.[0] && (
+                      {(student as any).parentContacts?.[0] && (
                         <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
                           <Phone className="h-3 w-3" />
-                          {student.parentContacts[0].name}
+                          {(student as any).parentContacts[0].name}
                         </div>
                       )}
                       <div className="flex gap-2 text-xs">
                         <Badge variant="secondary">
-                          {student._count.assessments}{" "}
+                          {(student as any)._count?.assessments || 0}{" "}
                           {t("detail.stats.assessments")}
                         </Badge>
                         <Badge variant="outline">
-                          {student._count.attendance}{" "}
+                          {(student as any)._count?.attendance || 0}{" "}
                           {t("detail.stats.attendance")}
                         </Badge>
                       </div>
@@ -578,7 +582,7 @@ export default function GroupDetailPage() {
                           {task.type.toLowerCase()}
                         </Badge>
                         <Badge variant="outline">
-                          {task._count.assessments}{" "}
+                          {(task as any)._count?.assessments || 0}{" "}
                           {t("detail.stats.submissions")}
                         </Badge>
                       </div>

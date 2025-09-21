@@ -85,7 +85,7 @@ async function generateI18nFiles() {
       for (let i = 1; i < keyParts.length - 1; i++) {
         const part = keyParts[i];
         if (typeof currentTypeLevel[part] !== "object") {
-          currentTypeLevel[part] = {};
+          (currentTypeLevel as any)[part] = {};
         }
         currentTypeLevel = currentTypeLevel[part] as any;
       }
@@ -109,9 +109,9 @@ async function generateI18nFiles() {
         for (let i = 1; i < keyParts.length - 1; i++) {
           const part = keyParts[i];
           if (!currentTranslationLevel[part]) {
-            currentTranslationLevel[part] = {};
+            (currentTranslationLevel as any)[part] = {};
           }
-          currentTranslationLevel = currentTranslationLevel[part];
+          currentTranslationLevel = currentTranslationLevel[part] as any;
         }
 
         // Set the translation text (fallback to English text if no translation)

@@ -37,10 +37,13 @@ export function DynamicDashboardExample() {
 // Example 2: Using the enhanced hook with dynamic option
 export function EnhancedTranslationExample() {
   // Use dynamic translations with fallback to static
-  const { t, isLoading } = useTranslation("cms", {
+  const result = useTranslation("cms", {
     useDynamic: true,
     fallbackToStatic: true,
   });
+
+  const t = result.t;
+  const isLoading = "isLoading" in result ? result.isLoading : false;
 
   return (
     <div>

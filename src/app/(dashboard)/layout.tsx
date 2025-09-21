@@ -43,10 +43,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { t } = useTranslation("navigation", {
-    useDynamic: true,
-    fallbackToStatic: true,
-  });
+  const { t } = useTranslation("navigation");
   const { title } = usePageTitle();
 
   const handleSignOut = () => {
@@ -97,7 +94,8 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
               {navigationItems.map((item) => {
                 const isActive = pathname === item.href;
                 const Icon = item.icon;
-                const itemName = t(item.key, item.key.split(".").pop());
+                const itemName =
+                  t(item.key) || item.key.split(".").pop() || item.key;
 
                 // Check if user has permission to view this route
                 if (
@@ -145,7 +143,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
           {/* Language Selector - always visible at bottom */}
           <div className="border-t border-gray-200 p-3">
-            <LanguageSelector variant="select" showLabel={false} />
+            <LanguageSelector variant="compact" showLabel={false} />
           </div>
 
           {/* User info - always visible at bottom */}
@@ -197,7 +195,11 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                     (item) => item.href === pathname,
                   );
                   if (currentItem) {
-                    return t(currentItem.key, currentItem.key.split(".").pop());
+                    return (
+                      t(currentItem.key) ||
+                      currentItem.key.split(".").pop() ||
+                      currentItem.key
+                    );
                   }
 
                   // Check for dynamic routes
