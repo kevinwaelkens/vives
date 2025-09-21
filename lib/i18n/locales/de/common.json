@@ -1,10 +1,18 @@
 {
+  "back": "Zurück",
   "cancel": "Abbrechen",
   "delete": "Löschen",
   "edit": "Bearbeiten",
   "error": "Fehler",
+  "export": "Exportieren",
+  "filter": "Filtern",
+  "import": "Importieren",
   "loading": "Laden...",
+  "logout": "Abmelden",
+  "next": "Weiter",
+  "refresh": "Aktualisieren",
   "save": "Speichern",
+  "search": "Suchen",
   "success": "Erfolg",
   "view": "Anzeigen"
 }

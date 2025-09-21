@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -105,13 +105,7 @@ export default function CMSTranslationsPage() {
     isApproved: false,
   });
 
-  // Fetch data
-  useEffect(() => {
-    fetchLanguages();
-    fetchTranslationKeys();
-  }, []);
-
-  const fetchLanguages = async () => {
+  const fetchLanguages = useCallback(async () => {
     try {
       const response = await fetch("/api/translations/languages");
       if (response.ok) {
@@ -121,14 +115,16 @@ export default function CMSTranslationsPage() {
     } catch (error) {
       console.error("Failed to fetch languages:", error);
     }
-  };
+  }, []);
 
-  const fetchTranslationKeys = async () => {
+  const fetchTranslationKeys = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
       if (selectedCategory) params.append("category", selectedCategory);
       if (searchTerm) params.append("search", searchTerm);
+      // Fetch all translation keys by setting a large pageSize
+      params.append("pageSize", "1000");
 
       const response = await fetch(`/api/translations/keys?${params}`);
       if (response.ok) {
@@ -140,7 +136,13 @@ export default function CMSTranslationsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedCategory, searchTerm]);
+
+  // Fetch data
+  useEffect(() => {
+    fetchLanguages();
+    fetchTranslationKeys();
+  }, [fetchLanguages, fetchTranslationKeys]);
 
   // Refetch when filters change
   useEffect(() => {
@@ -149,7 +151,7 @@ export default function CMSTranslationsPage() {
     }, 300);
 
     return () => clearTimeout(debounceTimer);
-  }, [searchTerm, selectedCategory]);
+  }, [fetchTranslationKeys]);
 
   // Get unique categories
   const categories = Array.from(

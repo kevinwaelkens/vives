@@ -3,6 +3,14 @@
 
 import 'react-i18next';
 
+interface AnalyticsTranslations {
+  loading: string;
+  student_performance: string;
+  subtitle: string;
+  task_completion: string;
+  title: string;
+}
+
 interface AssessmentsTranslations {
   actions: {
     grade: string;
@@ -97,12 +105,20 @@ interface CmsTranslations {
 }
 
 interface CommonTranslations {
+  back: string;
   cancel: string;
   delete: string;
   edit: string;
   error: string;
+  export: string;
+  filter: string;
+  import: string;
   loading: string;
+  logout: string;
+  next: string;
+  refresh: string;
   save: string;
+  search: string;
   success: string;
   view: string;
 }
@@ -145,6 +161,25 @@ interface FormsTranslations {
   required_field: string;
 }
 
+interface GroupsTranslations {
+  add_group: string;
+  form: {
+    academic_year_label: string;
+    code_label: string;
+    grade_label: string;
+    name_label: string;
+  };
+  loading: string;
+  no_groups: string;
+  stats: {
+    active_groups: string;
+    total_groups: string;
+    total_students_in_groups: string;
+  };
+  subtitle: string;
+  title: string;
+}
+
 interface NavigationTranslations {
   analytics: string;
   assessments: string;
@@ -154,6 +189,14 @@ interface NavigationTranslations {
   settings: string;
   students: string;
   tasks: string;
+}
+
+interface SettingsTranslations {
+  language_preferences: string;
+  notification_settings: string;
+  profile_settings: string;
+  subtitle: string;
+  title: string;
 }
 
 interface StudentsTranslations {
@@ -228,6 +271,7 @@ interface TasksTranslations {
 }
 
 interface Resources {
+  analytics: AnalyticsTranslations;
   assessments: AssessmentsTranslations;
   attendance: AttendanceTranslations;
   auth: AuthTranslations;
@@ -235,7 +279,9 @@ interface Resources {
   common: CommonTranslations;
   dashboard: DashboardTranslations;
   forms: FormsTranslations;
+  groups: GroupsTranslations;
   navigation: NavigationTranslations;
+  settings: SettingsTranslations;
   students: StudentsTranslations;
   tasks: TasksTranslations;
 }

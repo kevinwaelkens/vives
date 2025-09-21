@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useT } from "@/lib/translations";
-import { LanguageSelector } from "@/components/translations";
+import { useTranslation } from "@/lib/i18n";
+import { LanguageSelector } from "@/components/i18n/LanguageSelector";
 import {
   Users,
   Settings,
@@ -23,10 +23,10 @@ import {
 } from "lucide-react";
 
 const cmsNavigationItems = [
-  { key: "cms.user_management", href: "/cms/users", icon: Users },
-  { key: "cms.system_settings", href: "/cms/system-settings", icon: Settings },
-  { key: "cms.translations", href: "/cms/translations", icon: Languages },
-  { key: "navigation.analytics", href: "/cms/analytics", icon: BarChart3 },
+  { key: "user_management", href: "/cms/users", icon: Users },
+  { key: "system_settings", href: "/cms/system-settings", icon: Settings },
+  { key: "translations", href: "/cms/translations", icon: Languages },
+  { key: "analytics.title", href: "/cms/analytics", icon: BarChart3 },
   { key: "Database", href: "/cms/database", icon: Database }, // Keep as fallback
   { key: "Audit Logs", href: "/cms/logs", icon: FileText }, // Keep as fallback
 ];
@@ -35,7 +35,8 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const t = useT();
+  const { t } = useTranslation("cms");
+  const { t: tCommon } = useTranslation("common");
 
   const handleSignOut = () => {
     signOut({ callbackUrl: "/login" });
@@ -139,11 +140,7 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
             {cmsNavigationItems.map((item) => {
               const isActive = pathname === item.href;
               const Icon = item.icon;
-              const itemName =
-                item.key.startsWith("cms.") ||
-                item.key.startsWith("navigation.")
-                  ? t(item.key, item.key.split(".").pop())
-                  : item.key; // Fallback for items without translation keys
+              const itemName = item.key.includes(".") ? t(item.key) : item.key;
 
               return (
                 <Link
@@ -192,7 +189,7 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
                 variant="ghost"
                 size="icon"
                 onClick={handleSignOut}
-                title={t("auth.logout", "Logout")}
+                title={tCommon("logout") || "Logout"}
                 className="hover:bg-red-600 hover:text-white transition-colors text-slate-400"
               >
                 <LogOut className="h-4 w-4" />
@@ -221,12 +218,11 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
                   (item) => item.href === pathname,
                 );
                 if (currentItem) {
-                  return currentItem.key.startsWith("cms.") ||
-                    currentItem.key.startsWith("navigation.")
-                    ? t(currentItem.key, currentItem.key.split(".").pop())
+                  return currentItem.key.includes(".")
+                    ? t(currentItem.key)
                     : currentItem.key;
                 }
-                return t("cms.title", "CMS Dashboard");
+                return t("title");
               })()}
             </h2>
             <div className="flex items-center space-x-2">

@@ -21,6 +21,7 @@ model User {
   comments      Comment[]
   notifications Notification[]
   auditLogs     AuditLog[]
+  userRoles     UserRole[]
   
   // Metadata
   lastLoginAt   DateTime?
@@ -406,6 +407,82 @@ enum BulkOperationStatus {
   COMPLETED
   FAILED
   CANCELLED
+}
+
+// PERMISSIONS SYSTEM MODELS
+model Permission {
+  id          String   @id @default(cuid())
+  name        String   @unique // e.g., "students.view", "tasks.create"
+  description String?  // Human-readable description
+  category    String   // e.g., "students", "tasks", "cms"
+  
+  // Relations
+  rolePermissions RolePermission[]
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([name])
+  @@index([category])
+}
+
+model SystemRole {
+  id          String   @id @default(cuid())
+  name        String   @unique // e.g., "STUDENT", "TEACHER", "ADMIN"
+  description String?  // Human-readable description
+  isDefault   Boolean  @default(false) // Default role for new users
+  isSystem    Boolean  @default(false) // System-defined roles (cannot be deleted)
+  
+  // Relations
+  rolePermissions RolePermission[]
+  userRoles       UserRole[]
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([name])
+  @@index([isDefault])
+}
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  
+  // Relations
+  roleId       String
+  role         SystemRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  
+  // Metadata
+  createdAt    DateTime   @default(now())
+  
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+}
+
+model UserRole {
+  id        String     @id @default(cuid())
+  
+  // Relations
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roleId    String
+  role      SystemRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  
+  // Context (for scoped permissions)
+  context   Json?      @default("{}")  // e.g., {"groupId": "123"} for group-specific permissions
+  
+  // Metadata
+  assignedAt DateTime  @default(now())
+  assignedBy String?   // User ID who assigned this role
+  expiresAt  DateTime? // Optional expiration
+  
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
 }
 
 // TRANSLATION SYSTEM MODELS

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { LanguageSelector } from "@/components/i18n/LanguageSelector";
 import {
   Users,
   Settings,
@@ -72,7 +73,7 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-slate-50 lg:grid lg:grid-cols-[256px_1fr]">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <button
@@ -91,11 +92,11 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 border-r border-slate-700 shadow-xl transform transition-transform lg:relative lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 border-r border-slate-700 shadow-xl transform transition-transform lg:relative lg:translate-x-0 lg:w-full",
           sidebarOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        <div className="flex h-full flex-col">
+        <div className="grid grid-rows-[auto_auto_1fr_auto_auto] h-screen">
           {/* CMS Logo */}
           <div className="flex h-16 items-center justify-between px-4 border-b border-slate-700 bg-gradient-to-r from-slate-800 to-slate-900">
             <div className="flex items-center space-x-2">
@@ -126,35 +127,39 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
 
-          {/* Navigation */}
-          <nav
-            className="flex-1 space-y-0.5 px-2 py-3"
-            data-testid="cms-navigation"
-          >
-            {cmsNavigation.map((item) => {
-              const isActive = pathname === item.href;
-              const Icon = item.icon;
+          {/* Navigation - scrollable area */}
+          <div className="overflow-y-auto">
+            <nav className="space-y-0.5 px-2 py-3" data-testid="cms-navigation">
+              {cmsNavigation.map((item) => {
+                const isActive = pathname === item.href;
+                const Icon = item.icon;
 
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200",
-                    isActive
-                      ? "bg-emerald-600 text-white border-l-4 border-emerald-400"
-                      : "text-slate-300 hover:bg-slate-800 hover:text-white hover:translate-x-1",
-                  )}
-                  data-testid={`cms-nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
-                >
-                  <Icon className={cn("h-5 w-5", isActive && "text-white")} />
-                  {item.name}
-                </Link>
-              );
-            })}
-          </nav>
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={cn(
+                      "flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200",
+                      isActive
+                        ? "bg-emerald-600 text-white border-l-4 border-emerald-400"
+                        : "text-slate-300 hover:bg-slate-800 hover:text-white hover:translate-x-1",
+                    )}
+                    data-testid={`cms-nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
+                  >
+                    <Icon className={cn("h-5 w-5", isActive && "text-white")} />
+                    {item.name}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
 
-          {/* Admin User info */}
+          {/* Language Selector - always visible at bottom */}
+          <div className="border-t border-slate-700 p-3">
+            <LanguageSelector variant="select" showLabel={false} />
+          </div>
+
+          {/* Admin User info - always visible at bottom */}
           <div className="border-t border-slate-700 p-3 bg-slate-800">
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
@@ -184,7 +189,7 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex flex-col min-w-0 lg:min-h-screen">
         {/* Top bar */}
         <div className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-white px-4 shadow-sm lg:px-6">
           <Button

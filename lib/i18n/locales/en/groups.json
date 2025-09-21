@@ -1,0 +1,18 @@
+{
+  "add_group": "Add Group",
+  "form": {
+    "academic_year_label": "Academic Year",
+    "code_label": "Group Code",
+    "grade_label": "Grade",
+    "name_label": "Group Name"
+  },
+  "loading": "Loading groups...",
+  "no_groups": "No groups found. Create your first group to get started.",
+  "stats": {
+    "active_groups": "Active Groups",
+    "total_groups": "Total Groups",
+    "total_students_in_groups": "Students in Groups"
+  },
+  "subtitle": "Manage class groups and student assignments",
+  "title": "Groups"
+}

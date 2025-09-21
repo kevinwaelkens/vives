@@ -1,26 +1,29 @@
-'use client'
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Users, BookOpen, ClipboardCheck, Calendar } from 'lucide-react'
-import { useQuery } from '@tanstack/react-query'
-import { apiClient } from '@/data/api/client'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users, BookOpen, ClipboardCheck, Calendar } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/data/api/client";
+import { useTranslation } from "@/lib/i18n";
 
 interface DashboardStats {
-  totalStudents: number
-  totalGroups: number
-  totalTasks: number
-  pendingAssessments: number
+  totalStudents: number;
+  totalGroups: number;
+  totalTasks: number;
+  pendingAssessments: number;
   todayAttendance: {
-    present: number
-    absent: number
-    late: number
-    excused: number
-  }
+    present: number;
+    absent: number;
+    late: number;
+    excused: number;
+  };
 }
 
 export default function DashboardPage() {
+  const { t } = useTranslation("dashboard");
+  const { t: tCommon } = useTranslation("common");
   const { data: stats, isLoading } = useQuery({
-    queryKey: ['dashboard-stats'],
+    queryKey: ["dashboard-stats"],
     queryFn: async () => {
       // This would be replaced with actual API call
       return {
@@ -34,16 +37,16 @@ export default function DashboardPage() {
           late: 4,
           excused: 2,
         },
-      } as DashboardStats
+      } as DashboardStats;
     },
-  })
+  });
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading dashboard...</div>
+        <div className="text-gray-500">{t("loading")}</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -51,19 +54,25 @@ export default function DashboardPage() {
       {/* Welcome Section */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600">Welcome to your School Management System</p>
+        <p className="text-gray-600">
+          Welcome to your School Management System
+        </p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Students</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Students
+            </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.totalStudents}</div>
-            <p className="text-xs text-muted-foreground">Active students enrolled</p>
+            <p className="text-xs text-muted-foreground">
+              Active students enrolled
+            </p>
           </CardContent>
         </Card>
 
@@ -85,17 +94,23 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.totalTasks}</div>
-            <p className="text-xs text-muted-foreground">Published assignments</p>
+            <p className="text-xs text-muted-foreground">
+              Published assignments
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Assessments</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Pending Assessments
+            </CardTitle>
             <ClipboardCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.pendingAssessments}</div>
+            <div className="text-2xl font-bold">
+              {stats?.pendingAssessments}
+            </div>
             <p className="text-xs text-muted-foreground">Awaiting grading</p>
           </CardContent>
         </Card>
@@ -201,5 +216,5 @@ export default function DashboardPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

@@ -25,14 +25,17 @@ import {
   Calendar,
 } from "lucide-react";
 import { useAnalytics } from "@/data/hooks/use-analytics";
+import { useTranslation } from "@/lib/i18n";
 
 export default function AnalyticsPage() {
+  const { t } = useTranslation("analytics");
+  const { t: tCommon } = useTranslation("common");
   const { data: analytics, isLoading, error } = useAnalytics();
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading analytics...</div>
+        <div className="text-gray-500">{t("loading")}</div>
       </div>
     );
   }

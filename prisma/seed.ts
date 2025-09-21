@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import seedTranslations from "./translation-seed";
+import { seedPermissions } from "./permissions-seed";
 
 const prisma = new PrismaClient();
 
@@ -18,6 +19,13 @@ async function main() {
   await prisma.parentContact.deleteMany();
   await prisma.student.deleteMany();
   await prisma.group.deleteMany();
+
+  // Clean permissions system data
+  await prisma.userRole.deleteMany();
+  await prisma.rolePermission.deleteMany();
+  await prisma.systemRole.deleteMany();
+  await prisma.permission.deleteMany();
+
   await prisma.user.deleteMany();
 
   // Create users
@@ -286,6 +294,9 @@ async function main() {
 
   // Seed translation system
   await seedTranslations();
+
+  // Seed permissions system
+  await seedPermissions();
 
   console.log("Database seed completed successfully!");
   console.log("\nLogin credentials:");

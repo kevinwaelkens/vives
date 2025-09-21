@@ -11,6 +11,7 @@ import {
   useCreateGroup,
   useDeleteGroup,
 } from "@/data/hooks/use-groups";
+import { useTranslation } from "@/lib/i18n";
 
 interface Group {
   id: string;
@@ -26,6 +27,8 @@ interface Group {
 }
 
 export default function GroupsPage() {
+  const { t } = useTranslation("groups");
+  const { t: tCommon } = useTranslation("common");
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
   const [formData, setFormData] = useState({
@@ -47,7 +50,12 @@ export default function GroupsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this group?")) {
+    if (
+      window.confirm(
+        t("delete_confirmation") ||
+          "Are you sure you want to delete this group?",
+      )
+    ) {
       await deleteMutation.mutateAsync(id);
     }
   };

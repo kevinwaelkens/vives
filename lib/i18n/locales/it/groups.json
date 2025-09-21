@@ -1,0 +1,18 @@
+{
+  "add_group": "Aggiungi gruppo",
+  "form": {
+    "academic_year_label": "Anno accademico",
+    "code_label": "Codice gruppo",
+    "grade_label": "Grado",
+    "name_label": "Nome gruppo"
+  },
+  "loading": "Caricamento gruppi...",
+  "no_groups": "Nessun gruppo trovato. Crea il tuo primo gruppo per iniziare.",
+  "stats": {
+    "active_groups": "Gruppi attivi",
+    "total_groups": "Totale gruppi",
+    "total_students_in_groups": "Studenti nei gruppi"
+  },
+  "subtitle": "Gestisci i gruppi di classe e le assegnazioni degli studenti",
+  "title": "Gruppi"
+}

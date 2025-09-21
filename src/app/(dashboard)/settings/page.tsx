@@ -1,10 +1,16 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   User,
   Mail,
@@ -15,99 +21,108 @@ import {
   Database,
   Save,
   AlertCircle,
-} from 'lucide-react'
-import { toast } from 'sonner'
-import { useSession } from 'next-auth/react'
+} from "lucide-react";
+import { toast } from "sonner";
+import { useSession } from "next-auth/react";
+import { useTranslation } from "@/lib/i18n";
 
 export default function SettingsPage() {
-  const { data: session } = useSession()
-  const [activeTab, setActiveTab] = useState('profile')
+  const { t } = useTranslation("settings");
+  const { t: tCommon } = useTranslation("common");
+  const { data: session } = useSession();
+  const [activeTab, setActiveTab] = useState("profile");
   const [profileData, setProfileData] = useState({
-    name: session?.user?.name || '',
-    email: session?.user?.email || '',
-    phone: '',
-  })
+    name: session?.user?.name || "",
+    email: session?.user?.email || "",
+    phone: "",
+  });
   const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-  })
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
   const [notificationSettings, setNotificationSettings] = useState({
     emailNotifications: true,
     taskReminders: true,
     gradeUpdates: true,
     attendanceAlerts: true,
     weeklyReports: false,
-  })
+  });
 
   const handleProfileUpdate = (e: React.FormEvent) => {
-    e.preventDefault()
-    toast.success('Profile updated successfully')
-  }
+    e.preventDefault();
+    toast.success("Profile updated successfully");
+  };
 
   const handlePasswordChange = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error('Passwords do not match')
-      return
+      toast.error("Passwords do not match");
+      return;
     }
-    toast.success('Password changed successfully')
-    setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
-  }
+    toast.success("Password changed successfully");
+    setPasswordData({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
+  };
 
   const handleNotificationUpdate = () => {
-    toast.success('Notification preferences updated')
-  }
+    toast.success("Notification preferences updated");
+  };
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-1">Manage your account and application preferences</p>
+        <p className="text-gray-600 mt-1">
+          Manage your account and application preferences
+        </p>
       </div>
 
       {/* Tab Navigation */}
       <div className="flex gap-2 border-b">
         <button
-          onClick={() => setActiveTab('profile')}
+          onClick={() => setActiveTab("profile")}
           className={`px-4 py-2 border-b-2 transition-colors ${
-            activeTab === 'profile'
-              ? 'border-blue-600 text-blue-600'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
+            activeTab === "profile"
+              ? "border-blue-600 text-blue-600"
+              : "border-transparent text-gray-600 hover:text-gray-900"
           }`}
         >
           <User className="h-4 w-4 inline mr-2" />
           Profile
         </button>
         <button
-          onClick={() => setActiveTab('security')}
+          onClick={() => setActiveTab("security")}
           className={`px-4 py-2 border-b-2 transition-colors ${
-            activeTab === 'security'
-              ? 'border-blue-600 text-blue-600'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
+            activeTab === "security"
+              ? "border-blue-600 text-blue-600"
+              : "border-transparent text-gray-600 hover:text-gray-900"
           }`}
         >
           <Lock className="h-4 w-4 inline mr-2" />
           Security
         </button>
         <button
-          onClick={() => setActiveTab('notifications')}
+          onClick={() => setActiveTab("notifications")}
           className={`px-4 py-2 border-b-2 transition-colors ${
-            activeTab === 'notifications'
-              ? 'border-blue-600 text-blue-600'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
+            activeTab === "notifications"
+              ? "border-blue-600 text-blue-600"
+              : "border-transparent text-gray-600 hover:text-gray-900"
           }`}
         >
           <Bell className="h-4 w-4 inline mr-2" />
           Notifications
         </button>
         <button
-          onClick={() => setActiveTab('system')}
+          onClick={() => setActiveTab("system")}
           className={`px-4 py-2 border-b-2 transition-colors ${
-            activeTab === 'system'
-              ? 'border-blue-600 text-blue-600'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
+            activeTab === "system"
+              ? "border-blue-600 text-blue-600"
+              : "border-transparent text-gray-600 hover:text-gray-900"
           }`}
         >
           <Globe className="h-4 w-4 inline mr-2" />
@@ -116,13 +131,15 @@ export default function SettingsPage() {
       </div>
 
       {/* Profile Settings */}
-      {activeTab === 'profile' && (
+      {activeTab === "profile" && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
                 <CardTitle>Profile Information</CardTitle>
-                <CardDescription>Update your personal information</CardDescription>
+                <CardDescription>
+                  Update your personal information
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleProfileUpdate} className="space-y-4">
@@ -131,7 +148,9 @@ export default function SettingsPage() {
                     <Input
                       id="name"
                       value={profileData.name}
-                      onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                      onChange={(e) =>
+                        setProfileData({ ...profileData, name: e.target.value })
+                      }
                     />
                   </div>
                   <div>
@@ -140,7 +159,12 @@ export default function SettingsPage() {
                       id="email"
                       type="email"
                       value={profileData.email}
-                      onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                      onChange={(e) =>
+                        setProfileData({
+                          ...profileData,
+                          email: e.target.value,
+                        })
+                      }
                     />
                   </div>
                   <div>
@@ -149,7 +173,12 @@ export default function SettingsPage() {
                       id="phone"
                       type="tel"
                       value={profileData.phone}
-                      onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                      onChange={(e) =>
+                        setProfileData({
+                          ...profileData,
+                          phone: e.target.value,
+                        })
+                      }
                       placeholder="+1 (555) 000-0000"
                     />
                   </div>
@@ -169,7 +198,9 @@ export default function SettingsPage() {
               <CardContent className="space-y-4">
                 <div>
                   <p className="text-sm text-gray-600">Account Type</p>
-                  <p className="font-medium capitalize">{session?.user?.role?.toLowerCase()}</p>
+                  <p className="font-medium capitalize">
+                    {session?.user?.role?.toLowerCase()}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Member Since</p>
@@ -186,12 +217,14 @@ export default function SettingsPage() {
       )}
 
       {/* Security Settings */}
-      {activeTab === 'security' && (
+      {activeTab === "security" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
               <CardTitle>Change Password</CardTitle>
-              <CardDescription>Ensure your account stays secure</CardDescription>
+              <CardDescription>
+                Ensure your account stays secure
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handlePasswordChange} className="space-y-4">
@@ -201,7 +234,12 @@ export default function SettingsPage() {
                     id="currentPassword"
                     type="password"
                     value={passwordData.currentPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                    onChange={(e) =>
+                      setPasswordData({
+                        ...passwordData,
+                        currentPassword: e.target.value,
+                      })
+                    }
                     required
                   />
                 </div>
@@ -211,7 +249,12 @@ export default function SettingsPage() {
                     id="newPassword"
                     type="password"
                     value={passwordData.newPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                    onChange={(e) =>
+                      setPasswordData({
+                        ...passwordData,
+                        newPassword: e.target.value,
+                      })
+                    }
                     required
                   />
                 </div>
@@ -221,7 +264,12 @@ export default function SettingsPage() {
                     id="confirmPassword"
                     type="password"
                     value={passwordData.confirmPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                    onChange={(e) =>
+                      setPasswordData({
+                        ...passwordData,
+                        confirmPassword: e.target.value,
+                      })
+                    }
                     required
                   />
                 </div>
@@ -242,23 +290,35 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Two-Factor Authentication</p>
-                  <p className="text-sm text-gray-600">Add an extra layer of security</p>
+                  <p className="text-sm text-gray-600">
+                    Add an extra layer of security
+                  </p>
                 </div>
-                <Button variant="outline" size="sm">Enable</Button>
+                <Button variant="outline" size="sm">
+                  Enable
+                </Button>
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Login Alerts</p>
-                  <p className="text-sm text-gray-600">Get notified of new logins</p>
+                  <p className="text-sm text-gray-600">
+                    Get notified of new logins
+                  </p>
                 </div>
-                <Button variant="outline" size="sm">Configure</Button>
+                <Button variant="outline" size="sm">
+                  Configure
+                </Button>
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Active Sessions</p>
-                  <p className="text-sm text-gray-600">Manage your active sessions</p>
+                  <p className="text-sm text-gray-600">
+                    Manage your active sessions
+                  </p>
                 </div>
-                <Button variant="outline" size="sm">View</Button>
+                <Button variant="outline" size="sm">
+                  View
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -266,71 +326,108 @@ export default function SettingsPage() {
       )}
 
       {/* Notification Settings */}
-      {activeTab === 'notifications' && (
+      {activeTab === "notifications" && (
         <Card>
           <CardHeader>
             <CardTitle>Notification Preferences</CardTitle>
-            <CardDescription>Choose what notifications you want to receive</CardDescription>
+            <CardDescription>
+              Choose what notifications you want to receive
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Email Notifications</p>
-                  <p className="text-sm text-gray-600">Receive updates via email</p>
+                  <p className="text-sm text-gray-600">
+                    Receive updates via email
+                  </p>
                 </div>
                 <input
                   type="checkbox"
                   checked={notificationSettings.emailNotifications}
-                  onChange={(e) => setNotificationSettings({ ...notificationSettings, emailNotifications: e.target.checked })}
+                  onChange={(e) =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      emailNotifications: e.target.checked,
+                    })
+                  }
                   className="h-4 w-4 rounded border-gray-300"
                 />
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Task Reminders</p>
-                  <p className="text-sm text-gray-600">Get reminded about upcoming tasks</p>
+                  <p className="text-sm text-gray-600">
+                    Get reminded about upcoming tasks
+                  </p>
                 </div>
                 <input
                   type="checkbox"
                   checked={notificationSettings.taskReminders}
-                  onChange={(e) => setNotificationSettings({ ...notificationSettings, taskReminders: e.target.checked })}
+                  onChange={(e) =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      taskReminders: e.target.checked,
+                    })
+                  }
                   className="h-4 w-4 rounded border-gray-300"
                 />
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Grade Updates</p>
-                  <p className="text-sm text-gray-600">Notify when grades are posted</p>
+                  <p className="text-sm text-gray-600">
+                    Notify when grades are posted
+                  </p>
                 </div>
                 <input
                   type="checkbox"
                   checked={notificationSettings.gradeUpdates}
-                  onChange={(e) => setNotificationSettings({ ...notificationSettings, gradeUpdates: e.target.checked })}
+                  onChange={(e) =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      gradeUpdates: e.target.checked,
+                    })
+                  }
                   className="h-4 w-4 rounded border-gray-300"
                 />
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Attendance Alerts</p>
-                  <p className="text-sm text-gray-600">Alert for attendance issues</p>
+                  <p className="text-sm text-gray-600">
+                    Alert for attendance issues
+                  </p>
                 </div>
                 <input
                   type="checkbox"
                   checked={notificationSettings.attendanceAlerts}
-                  onChange={(e) => setNotificationSettings({ ...notificationSettings, attendanceAlerts: e.target.checked })}
+                  onChange={(e) =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      attendanceAlerts: e.target.checked,
+                    })
+                  }
                   className="h-4 w-4 rounded border-gray-300"
                 />
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Weekly Reports</p>
-                  <p className="text-sm text-gray-600">Receive weekly summary reports</p>
+                  <p className="text-sm text-gray-600">
+                    Receive weekly summary reports
+                  </p>
                 </div>
                 <input
                   type="checkbox"
                   checked={notificationSettings.weeklyReports}
-                  onChange={(e) => setNotificationSettings({ ...notificationSettings, weeklyReports: e.target.checked })}
+                  onChange={(e) =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      weeklyReports: e.target.checked,
+                    })
+                  }
                   className="h-4 w-4 rounded border-gray-300"
                 />
               </div>
@@ -344,7 +441,7 @@ export default function SettingsPage() {
       )}
 
       {/* System Settings */}
-      {activeTab === 'system' && (
+      {activeTab === "system" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
@@ -378,7 +475,9 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Export Data</p>
-                  <p className="text-sm text-gray-600">Download all your data</p>
+                  <p className="text-sm text-gray-600">
+                    Download all your data
+                  </p>
                 </div>
                 <Button variant="outline" size="sm">
                   <Database className="h-4 w-4 mr-2" />
@@ -390,7 +489,9 @@ export default function SettingsPage() {
                   <p className="font-medium">Clear Cache</p>
                   <p className="text-sm text-gray-600">Clear temporary data</p>
                 </div>
-                <Button variant="outline" size="sm">Clear</Button>
+                <Button variant="outline" size="sm">
+                  Clear
+                </Button>
               </div>
               <div className="p-4 bg-red-50 rounded-lg">
                 <div className="flex items-start gap-3">
@@ -398,7 +499,8 @@ export default function SettingsPage() {
                   <div>
                     <p className="font-medium text-red-900">Danger Zone</p>
                     <p className="text-sm text-red-700 mt-1">
-                      Delete your account and all associated data. This action cannot be undone.
+                      Delete your account and all associated data. This action
+                      cannot be undone.
                     </p>
                     <Button variant="destructive" size="sm" className="mt-3">
                       Delete Account
@@ -411,5 +513,5 @@ export default function SettingsPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
