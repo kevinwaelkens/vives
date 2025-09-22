@@ -1,4 +1,3 @@
-// prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,80 +8,64 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
+  id            String         @id @default(cuid())
+  email         String         @unique
   name          String
   password      String
-  role          Role      @default(TUTOR)
-  refreshToken  String?   @db.Text
-  
-  // Relations
-  groups        Group[]   @relation("GroupTutors")
+  role          Role           @default(TUTOR)
+  refreshToken  String?
+  lastLoginAt   DateTime?
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  auditLogs     AuditLog[]
   comments      Comment[]
   notifications Notification[]
-  auditLogs     AuditLog[]
   userRoles     UserRole[]
-  
-  // Metadata
-  lastLoginAt   DateTime?
-  isActive      Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
+  groups        Group[]        @relation("GroupTutors")
+
   @@index([email])
   @@index([role])
 }
 
 model Group {
-  id           String    @id @default(cuid())
+  id           String       @id @default(cuid())
   name         String
-  code         String    @unique
+  code         String       @unique
   academicYear String
   grade        String
-  
-  // Relations
-  tutors       User[]    @relation("GroupTutors")
-  students     Student[]
-  tasks        Task[]    @relation("GroupTasks")
+  settings     Json?        @default("{}")
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
   attendance   Attendance[]
-  
-  // Settings
-  settings     Json?     @default("{}")
-  isActive     Boolean   @default(true)
-  
-  // Metadata
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  
+  students     Student[]
+  tasks        Task[]       @relation("GroupTasks")
+  tutors       User[]       @relation("GroupTutors")
+
   @@index([academicYear, grade])
   @@index([code])
 }
 
 model Student {
-  id           String    @id @default(cuid())
-  studentId    String    @unique
-  name         String
-  email        String    @unique
-  dateOfBirth  DateTime?
-  
-  // Relations
-  groupId      String
-  group        Group     @relation(fields: [groupId], references: [id])
-  assessments  Assessment[]
-  tasks        Task[]    @relation("StudentTasks")
-  attendance   Attendance[]
+  id             String          @id @default(cuid())
+  studentId      String          @unique
+  name           String
+  email          String          @unique
+  dateOfBirth    DateTime?
+  groupId        String
+  notes          String?
+  status         StudentStatus   @default(ACTIVE)
+  customFields   Json?           @default("{}")
+  enrolledAt     DateTime        @default(now())
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  assessments    Assessment[]
+  attendance     Attendance[]
   parentContacts ParentContact[]
-  
-  // Additional Info
-  notes        String?   @db.Text
-  status       StudentStatus @default(ACTIVE)
-  customFields Json?     @default("{}")
-  
-  // Metadata
-  enrolledAt   DateTime  @default(now())
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  
+  group          Group           @relation(fields: [groupId], references: [id])
+  tasks          Task[]          @relation("StudentTasks")
+
   @@index([groupId])
   @@index([email])
   @@index([studentId])
@@ -90,92 +73,69 @@ model Student {
 }
 
 model ParentContact {
-  id          String   @id @default(cuid())
-  studentId   String
-  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  name        String
-  email       String
-  phone       String?
-  relationship String  // mother, father, guardian, etc.
-  isPrimary   Boolean  @default(false)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  id           String   @id @default(cuid())
+  studentId    String
+  name         String
+  email        String
+  phone        String?
+  relationship String
+  isPrimary    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  student      Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
   @@index([studentId])
   @@index([email])
 }
 
 model Task {
-  id           String    @id @default(cuid())
-  title        String
-  description  String    @db.Text
-  instructions String?   @db.Text
-  
-  // Task Details
-  type         TaskType  @default(ASSIGNMENT)
-  category     String?
-  points       Float?    @default(100)
-  weight       Float?    @default(1.0)
-  
-  // Scheduling
-  assignedAt   DateTime  @default(now())
-  dueDate      DateTime?
-  
-  // Relations
-  groups       Group[]   @relation("GroupTasks")
-  students     Student[] @relation("StudentTasks")
-  assessments  Assessment[]
-  attachments  Attachment[]
-  
-  // Settings
-  allowLateSubmission Boolean @default(true)
-  rubric       Json?     @default("{}")
-  
-  // Metadata
-  createdById  String
-  isPublished  Boolean   @default(false)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  
+  id                  String       @id @default(cuid())
+  title               String
+  description         String
+  instructions        String?
+  type                TaskType     @default(ASSIGNMENT)
+  category            String?
+  points              Float?       @default(100)
+  weight              Float?       @default(1.0)
+  assignedAt          DateTime     @default(now())
+  dueDate             DateTime?
+  allowLateSubmission Boolean      @default(true)
+  rubric              Json?        @default("{}")
+  createdById         String
+  isPublished         Boolean      @default(false)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  assessments         Assessment[]
+  attachments         Attachment[]
+  groups              Group[]      @relation("GroupTasks")
+  students            Student[]    @relation("StudentTasks")
+
   @@index([dueDate])
   @@index([type])
   @@index([isPublished])
 }
 
 model Assessment {
-  id          String    @id @default(cuid())
-  
-  // Relations
+  id          String           @id @default(cuid())
   taskId      String
-  task        Task      @relation(fields: [taskId], references: [id])
   studentId   String
-  student     Student   @relation(fields: [studentId], references: [id])
-  
-  // Assessment Data
   score       Float?
   grade       String?
-  feedback    String?   @db.Text
-  rubricData  Json?     @default("{}")
-  
-  // Status
+  feedback    String?
+  rubricData  Json?            @default("{}")
   status      AssessmentStatus @default(NOT_SUBMITTED)
   submittedAt DateTime?
   gradedAt    DateTime?
   gradedById  String?
-  
-  // Versioning
-  version     Int       @default(1)
-  isLatest    Boolean   @default(true)
-  
-  // Relations
-  comments    Comment[]
+  version     Int              @default(1)
+  isLatest    Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  student     Student          @relation(fields: [studentId], references: [id])
+  task        Task             @relation(fields: [taskId], references: [id])
   attachments Attachment[]
-  
-  // Metadata
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
+  comments    Comment[]
+
   @@unique([taskId, studentId, version])
   @@index([studentId])
   @@index([taskId])
@@ -183,26 +143,20 @@ model Assessment {
 }
 
 model Attendance {
-  id          String           @id @default(cuid())
-  
-  // Relations
-  studentId   String
-  student     Student          @relation(fields: [studentId], references: [id])
-  groupId     String
-  group       Group            @relation(fields: [groupId], references: [id])
-  
-  // Attendance Data
-  date        DateTime         @db.Date
-  status      AttendanceStatus
-  period      String?          // morning, afternoon, full-day
-  notes       String?
-  
-  // Metadata
-  markedById  String
-  markedAt    DateTime         @default(now())
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  
+  id         String           @id @default(cuid())
+  studentId  String
+  groupId    String
+  date       DateTime         @db.Date
+  status     AttendanceStatus
+  period     String?
+  notes      String?
+  markedById String
+  markedAt   DateTime         @default(now())
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  group      Group            @relation(fields: [groupId], references: [id])
+  student    Student          @relation(fields: [studentId], references: [id])
+
   @@unique([studentId, date, period])
   @@index([studentId])
   @@index([groupId])
@@ -212,141 +166,210 @@ model Attendance {
 
 model Comment {
   id           String     @id @default(cuid())
-  content      String     @db.Text
-  
-  // Relations
+  content      String
   assessmentId String
-  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
   authorId     String
-  author       User       @relation(fields: [authorId], references: [id])
-  
-  // Threading
   parentId     String?
-  parent       Comment?   @relation("CommentReplies", fields: [parentId], references: [id])
-  replies      Comment[]  @relation("CommentReplies")
-  
-  // Metadata
   isEdited     Boolean    @default(false)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
-  
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  author       User       @relation(fields: [authorId], references: [id])
+  parent       Comment?   @relation("CommentReplies", fields: [parentId], references: [id])
+  replies      Comment[]  @relation("CommentReplies")
+
   @@index([assessmentId])
   @@index([authorId])
   @@index([parentId])
 }
 
 model Notification {
-  id          String           @id @default(cuid())
-  
-  // Relations
-  userId      String
-  user        User             @relation(fields: [userId], references: [id])
-  
-  // Notification Data
-  type        NotificationType
-  title       String
-  message     String           @db.Text
-  data        Json?            @default("{}")
-  
-  // Status
-  isRead      Boolean          @default(false)
-  readAt      DateTime?
-  
-  // Metadata
-  createdAt   DateTime         @default(now())
-  
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  data      Json?            @default("{}")
+  isRead    Boolean          @default(false)
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id])
+
   @@index([userId, isRead])
   @@index([type])
   @@index([createdAt])
 }
 
 model Attachment {
-  id          String      @id @default(cuid())
-  
-  // File Info
-  filename    String
-  url         String
-  mimeType    String
-  size        Int
-  
-  // Relations
-  taskId      String?
-  task        Task?       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  id           String      @id @default(cuid())
+  filename     String
+  url          String
+  mimeType     String
+  size         Int
+  taskId       String?
   assessmentId String?
-  assessment  Assessment? @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
-  
-  // Metadata
   uploadedById String
-  createdAt   DateTime    @default(now())
-  
+  createdAt    DateTime    @default(now())
+  assessment   Assessment? @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  task         Task?       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
   @@index([taskId])
   @@index([assessmentId])
 }
 
 model EmailTemplate {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  subject     String
-  content     String   @db.Text
-  variables   Json     @default("[]")
-  isActive    Boolean  @default(true)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  id        String   @id @default(cuid())
+  name      String   @unique
+  subject   String
+  content   String
+  variables Json     @default("[]")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([name])
 }
 
 model BulkOperation {
-  id          String            @id @default(cuid())
+  id          String              @id @default(cuid())
   type        BulkOperationType
   status      BulkOperationStatus @default(PENDING)
-  
-  // Operation Data
   totalItems  Int
-  processed   Int               @default(0)
-  failed      Int               @default(0)
-  errors      Json?             @default("[]")
-  results     Json?             @default("{}")
-  
-  // Metadata
+  processed   Int                 @default(0)
+  failed      Int                 @default(0)
+  errors      Json?               @default("[]")
+  results     Json?               @default("{}")
   startedAt   DateTime?
   completedAt DateTime?
   createdById String
-  createdAt   DateTime          @default(now())
-  
+  createdAt   DateTime            @default(now())
+
   @@index([type, status])
   @@index([createdById])
 }
 
 model AuditLog {
-  id          String   @id @default(cuid())
-  
-  // Action Details
-  action      String
-  entity      String
-  entityId    String?
-  
-  // Change Data
-  oldValues   Json?
-  newValues   Json?
-  
-  // Relations
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  
-  // Metadata
-  ipAddress   String?
-  userAgent   String?
-  createdAt   DateTime @default(now())
-  
+  id        String   @id @default(cuid())
+  action    String
+  entity    String
+  entityId  String?
+  oldValues Json?
+  newValues Json?
+  userId    String
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+
   @@index([entity, entityId])
   @@index([userId])
   @@index([action])
   @@index([createdAt])
 }
 
-// ENUMS
+model Permission {
+  id              String           @id @default(cuid())
+  name            String           @unique
+  description     String?
+  category        String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  rolePermissions RolePermission[]
+
+  @@index([name])
+  @@index([category])
+}
+
+model SystemRole {
+  id              String           @id @default(cuid())
+  name            String           @unique
+  description     String?
+  isDefault       Boolean          @default(false)
+  isSystem        Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  rolePermissions RolePermission[]
+  userRoles       UserRole[]
+
+  @@index([name])
+  @@index([isDefault])
+}
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  roleId       String
+  permissionId String
+  createdAt    DateTime   @default(now())
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  role         SystemRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+}
+
+model UserRole {
+  id         String     @id @default(cuid())
+  userId     String
+  roleId     String
+  context    Json?      @default("{}")
+  assignedAt DateTime   @default(now())
+  assignedBy String?
+  expiresAt  DateTime?
+  role       SystemRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+}
+
+model Language {
+  id           String        @id @default(cuid())
+  code         String        @unique
+  name         String
+  nativeName   String
+  flag         String?
+  isActive     Boolean       @default(true)
+  isDefault    Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  translations Translation[]
+
+  @@index([code])
+  @@index([isActive])
+}
+
+model TranslationKey {
+  id           String        @id @default(cuid())
+  key          String        @unique
+  englishText  String
+  description  String?
+  category     String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  translations Translation[]
+
+  @@index([key])
+  @@index([category])
+}
+
+model Translation {
+  id               String         @id @default(cuid())
+  translationKeyId String
+  languageId       String
+  text             String
+  isApproved       Boolean        @default(false)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  language         Language       @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  translationKey   TranslationKey @relation(fields: [translationKeyId], references: [id], onDelete: Cascade)
+
+  @@unique([translationKeyId, languageId])
+  @@index([translationKeyId])
+  @@index([languageId])
+}
+
 enum Role {
   ADMIN
   TUTOR
@@ -407,141 +430,4 @@ enum BulkOperationStatus {
   COMPLETED
   FAILED
   CANCELLED
-}
-
-// PERMISSIONS SYSTEM MODELS
-model Permission {
-  id          String   @id @default(cuid())
-  name        String   @unique // e.g., "students.view", "tasks.create"
-  description String?  // Human-readable description
-  category    String   // e.g., "students", "tasks", "cms"
-  
-  // Relations
-  rolePermissions RolePermission[]
-  
-  // Metadata
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  @@index([name])
-  @@index([category])
-}
-
-model SystemRole {
-  id          String   @id @default(cuid())
-  name        String   @unique // e.g., "STUDENT", "TEACHER", "ADMIN"
-  description String?  // Human-readable description
-  isDefault   Boolean  @default(false) // Default role for new users
-  isSystem    Boolean  @default(false) // System-defined roles (cannot be deleted)
-  
-  // Relations
-  rolePermissions RolePermission[]
-  userRoles       UserRole[]
-  
-  // Metadata
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  @@index([name])
-  @@index([isDefault])
-}
-
-model RolePermission {
-  id           String     @id @default(cuid())
-  
-  // Relations
-  roleId       String
-  role         SystemRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  permissionId String
-  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-  
-  // Metadata
-  createdAt    DateTime   @default(now())
-  
-  @@unique([roleId, permissionId])
-  @@index([roleId])
-  @@index([permissionId])
-}
-
-model UserRole {
-  id        String     @id @default(cuid())
-  
-  // Relations
-  userId    String
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  roleId    String
-  role      SystemRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  
-  // Context (for scoped permissions)
-  context   Json?      @default("{}")  // e.g., {"groupId": "123"} for group-specific permissions
-  
-  // Metadata
-  assignedAt DateTime  @default(now())
-  assignedBy String?   // User ID who assigned this role
-  expiresAt  DateTime? // Optional expiration
-  
-  @@unique([userId, roleId])
-  @@index([userId])
-  @@index([roleId])
-}
-
-// TRANSLATION SYSTEM MODELS
-model Language {
-  id          String   @id @default(cuid())
-  code        String   @unique // ISO 639-1 codes: en, fr, de, it, nl, es
-  name        String   // English, French, German, Italian, Dutch, Spanish
-  nativeName  String   // English, Français, Deutsch, Italiano, Nederlands, Español
-  flag        String?  // Flag emoji or icon
-  isActive    Boolean  @default(true)
-  isDefault   Boolean  @default(false)
-  
-  // Relations
-  translations Translation[]
-  
-  // Metadata
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  @@index([code])
-  @@index([isActive])
-}
-
-model TranslationKey {
-  id            String   @id @default(cuid())
-  key           String   @unique // Dot notation: auth.login.title, dashboard.welcome
-  englishText   String   @db.Text // Reference English text
-  description   String?  @db.Text // Context for translators
-  category      String?  // Group keys: auth, dashboard, forms, etc.
-  
-  // Relations
-  translations  Translation[]
-  
-  // Metadata
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
-  @@index([key])
-  @@index([category])
-}
-
-model Translation {
-  id              String         @id @default(cuid())
-  
-  // Relations
-  translationKeyId String
-  translationKey   TranslationKey @relation(fields: [translationKeyId], references: [id], onDelete: Cascade)
-  languageId      String
-  language        Language       @relation(fields: [languageId], references: [id], onDelete: Cascade)
-  
-  // Translation Data
-  text            String         @db.Text
-  isApproved      Boolean        @default(false)
-  
-  // Metadata
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  
-  @@unique([translationKeyId, languageId])
-  @@index([translationKeyId])
-  @@index([languageId])
 }
