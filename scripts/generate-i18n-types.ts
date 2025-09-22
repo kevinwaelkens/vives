@@ -85,6 +85,8 @@ export interface TranslationResources {
 }
 
 export type TranslationNamespace = keyof TranslationResources;
+export type TranslationKey = TranslationNamespace;
+export type CategoryKey = TranslationNamespace;
 `;
   
   await fs.writeFile(typesPath, typesContent);
@@ -95,11 +97,16 @@ async function createMinimalHook() {
   const hookPath = path.join(outputDir, "hook.ts");
   
   const hookContent = `// Auto-generated i18n hook (fallback)
-import { useTranslation as useI18nextTranslation } from 'react-i18next';
-import type { TranslationNamespace } from './types';
+import { useTranslation as useI18nTranslation } from 'react-i18next';
+import type { TranslationKey } from './types';
 
-export function useTranslation(namespace: TranslationNamespace) {
-  return useI18nextTranslation(namespace);
+export function useTranslation<T extends TranslationKey = 'common'>(ns?: T) {
+  return useI18nTranslation(ns);
+}
+
+export function useT() {
+  const { t } = useI18nTranslation();
+  return t;
 }
 `;
   
@@ -111,9 +118,9 @@ async function createMinimalIndex() {
   const indexPath = path.join(outputDir, "index.ts");
   
   const indexContent = `// Auto-generated i18n exports (fallback)
-export * from './types';
-export * from './hook';
-export * from './config';
+export { default as i18n } from './config';
+export { useTranslation, useT } from './hook';
+export type { TranslationKey, CategoryKey, TranslationNamespace } from './types';
 `;
   
   await fs.writeFile(indexPath, indexContent);
