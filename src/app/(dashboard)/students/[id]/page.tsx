@@ -31,6 +31,7 @@ import { useStudent } from "@/data/hooks/use-students";
 import { usePageTitle } from "@/lib/contexts/PageTitleContext";
 import { useEffect } from "react";
 import { formatDate } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/hook";
 
 // Simple chart components (we'll create these)
 import { LineChart } from "@/components/charts/LineChart";
@@ -43,16 +44,16 @@ export default function StudentDetailPage() {
 
   const { data: student, isLoading, error } = useStudent(studentId);
   const { setTitle } = usePageTitle();
-  // const { t } = useTranslation("students");
+  const { t } = useTranslation("students");
 
   const [selectedYear, setSelectedYear] = useState<string>("all");
 
   // Set page title when student data loads
   useEffect(() => {
     if (student) {
-      setTitle(`${student.name} - Student Details`);
+      setTitle(`${student.name} - ${t("detail.student_details")}`);
     }
-  }, [student, setTitle]);
+  }, [student, setTitle, t]);
 
   // Process assessment data by year
   const assessmentsByYear = useMemo(() => {
@@ -144,7 +145,7 @@ export default function StudentDetailPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-500">Loading student details...</p>
+          <p className="text-gray-500">{t("detail.loading")}</p>
         </div>
       </div>
     );
@@ -154,10 +155,10 @@ export default function StudentDetailPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="text-red-500 mb-4">Failed to load student details</p>
+          <p className="text-red-500 mb-4">{t("detail.failed_to_load")}</p>
           <Button onClick={() => router.push("/students")}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Students
+            {t("detail.back_to_students")}
           </Button>
         </div>
       </div>
@@ -179,18 +180,18 @@ export default function StudentDetailPage() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{student.name}</h1>
             <p className="text-gray-500">
-              {student.studentId} • {student.group?.name || "No group"} •{" "}
-              {student.status}
+              {student.studentId} •{" "}
+              {student.group?.name || t("detail.no_group")} • {student.status}
             </p>
           </div>
         </div>
         <div className="flex gap-2">
           <Select value={selectedYear} onValueChange={setSelectedYear}>
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="Select year" />
+              <SelectValue placeholder={t("detail.select_year")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Years</SelectItem>
+              <SelectItem value="all">{t("detail.all_years")}</SelectItem>
               {availableYears.map((year) => (
                 <SelectItem key={year} value={year}>
                   {year}
@@ -200,7 +201,7 @@ export default function StudentDetailPage() {
           </Select>
           <Button variant="outline">
             <Mail className="h-4 w-4 mr-2" />
-            Contact
+            {t("detail.contact")}
           </Button>
         </div>
       </div>
@@ -210,27 +211,14 @@ export default function StudentDetailPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total Assignments
+              {t("detail.total_assignments")}
             </CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalAssessments}</div>
             <p className="text-xs text-muted-foreground">
-              {stats.completedAssessments} completed
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Score</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.averageScore}%</div>
-            <p className="text-xs text-muted-foreground">
-              Based on {stats.completedAssessments} assessments
+              {stats.completedAssessments} {t("detail.completed")}
             </p>
           </CardContent>
         </Card>
@@ -238,29 +226,48 @@ export default function StudentDetailPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Completion Rate
+              {t("detail.average_score")}
             </CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.completionRate}%</div>
+            <div className="text-2xl font-bold">{stats.averageScore}%</div>
             <p className="text-xs text-muted-foreground">
-              Assignments completed on time
+              {t("detail.based_on_assessments", {
+                count: stats.completedAssessments,
+              })}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Current Group</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t("detail.completion_rate")}
+            </CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.completionRate}%</div>
+            <p className="text-xs text-muted-foreground">
+              {t("detail.assignments_completed_on_time")}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              {t("detail.current_group")}
+            </CardTitle>
             <GraduationCap className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {student.group?.name || "No group"}
+              {student.group?.name || t("detail.no_group")}
             </div>
             <p className="text-xs text-muted-foreground">
-              {student.group?.code || "No code"} • Grade{" "}
+              {student.group?.code || t("detail.no_code")} • {t("detail.grade")}{" "}
               {student.group?.grade || "N/A"}
             </p>
           </CardContent>
@@ -269,23 +276,25 @@ export default function StudentDetailPage() {
 
       {/* Performance Charts */}
       <CollapsibleCard
-        title="Performance Overview"
+        title={t("detail.performance_overview")}
         icon={<BarChart3 className="h-5 w-5" />}
-        badge={<Badge variant="secondary">Charts</Badge>}
+        badge={<Badge variant="secondary">{t("detail.charts")}</Badge>}
         defaultOpen={true}
-        previewContent="Score trends and performance analytics"
+        previewContent={t("detail.score_trends_analytics")}
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Score Trend</CardTitle>
+              <CardTitle className="text-lg">
+                {t("detail.score_trend")}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-64">
                 <LineChart
                   data={scoresTrend}
-                  xLabel="Assignment #"
-                  yLabel="Score (%)"
+                  xLabel={t("detail.assignment_number")}
+                  yLabel={t("detail.score_percent")}
                 />
               </div>
             </CardContent>
@@ -293,7 +302,9 @@ export default function StudentDetailPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Task Types Distribution</CardTitle>
+              <CardTitle className="text-lg">
+                {t("detail.task_types_distribution")}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-64">
@@ -306,21 +317,21 @@ export default function StudentDetailPage() {
 
       {/* Assignment History */}
       <CollapsibleCard
-        title="Assignment History"
+        title={t("detail.assignment_history")}
         icon={<BookOpen className="h-5 w-5" />}
         badge={<Badge variant="secondary">{filteredAssessments.length}</Badge>}
         defaultOpen={true}
         previewContent={
           filteredAssessments.length > 0
-            ? `Latest: ${filteredAssessments[0]?.task.title}`
-            : "No assignments found"
+            ? t("detail.latest", { title: filteredAssessments[0]?.task.title })
+            : t("detail.no_assignments_found")
         }
       >
         <div className="space-y-4">
           {filteredAssessments.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No assignments found for the selected period.</p>
+              <p>{t("detail.no_assignments_period")}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -344,8 +355,10 @@ export default function StudentDetailPage() {
                         <div className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
                           {assessment.task.dueDate
-                            ? `Due: ${formatDate(assessment.task.dueDate)}`
-                            : "No due date"}
+                            ? t("detail.due", {
+                                date: formatDate(assessment.task.dueDate),
+                              })
+                            : t("detail.no_due_date")}
                         </div>
                         <Badge variant="secondary">
                           {assessment.task.type}
@@ -369,11 +382,15 @@ export default function StudentDetailPage() {
                           {assessment.score}%
                         </div>
                       ) : (
-                        <div className="text-sm text-gray-500">Not graded</div>
+                        <div className="text-sm text-gray-500">
+                          {t("detail.not_graded")}
+                        </div>
                       )}
                       {assessment.submittedAt && (
                         <div className="text-xs text-gray-500">
-                          Submitted: {formatDate(assessment.submittedAt)}
+                          {t("detail.submitted", {
+                            date: formatDate(assessment.submittedAt),
+                          })}
                         </div>
                       )}
                     </div>
@@ -394,16 +411,18 @@ export default function StudentDetailPage() {
 
       {/* Student Information */}
       <CollapsibleCard
-        title="Student Information"
+        title={t("detail.student_information")}
         icon={<User className="h-5 w-5" />}
-        badge={<Badge variant="outline">Details</Badge>}
+        badge={<Badge variant="outline">{t("detail.details")}</Badge>}
         defaultOpen={false}
-        previewContent={`${student.email} • Enrolled ${formatDate(student.enrolledAt)}`}
+        previewContent={`${student.email} • ${t("detail.enrolled", { date: formatDate(student.enrolledAt) })}`}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div>
-              <h4 className="font-medium text-gray-900">Contact Information</h4>
+              <h4 className="font-medium text-gray-900">
+                {t("detail.contact_information")}
+              </h4>
               <div className="mt-2 space-y-2">
                 <div className="flex items-center gap-2 text-sm">
                   <Mail className="h-4 w-4 text-gray-500" />
@@ -412,7 +431,9 @@ export default function StudentDetailPage() {
                 {student.dateOfBirth && (
                   <div className="flex items-center gap-2 text-sm">
                     <Calendar className="h-4 w-4 text-gray-500" />
-                    Born: {formatDate(student.dateOfBirth)}
+                    {t("detail.born", {
+                      date: formatDate(student.dateOfBirth),
+                    })}
                   </div>
                 )}
               </div>
@@ -420,14 +441,16 @@ export default function StudentDetailPage() {
 
             {student.parentContacts && student.parentContacts.length > 0 && (
               <div>
-                <h4 className="font-medium text-gray-900">Parent Contacts</h4>
+                <h4 className="font-medium text-gray-900">
+                  {t("detail.parent_contacts")}
+                </h4>
                 <div className="mt-2 space-y-2">
                   {student.parentContacts.map((contact) => (
                     <div key={contact.id} className="p-3 bg-gray-50 rounded-md">
                       <div className="font-medium">{contact.name}</div>
                       <div className="text-sm text-gray-600 capitalize">
                         {contact.relationship}
-                        {contact.isPrimary && " (Primary)"}
+                        {contact.isPrimary && ` (${t("detail.primary")})`}
                       </div>
                       <div className="flex items-center gap-4 mt-1 text-sm">
                         <div className="flex items-center gap-1">
@@ -451,32 +474,38 @@ export default function StudentDetailPage() {
           <div className="space-y-4">
             <div>
               <h4 className="font-medium text-gray-900">
-                Academic Information
+                {t("detail.academic_information")}
               </h4>
               <div className="mt-2 space-y-2">
                 <div className="text-sm">
-                  <span className="text-gray-500">Student ID:</span>{" "}
+                  <span className="text-gray-500">
+                    {t("detail.student_id")}
+                  </span>{" "}
                   {student.studentId}
                 </div>
                 <div className="text-sm">
-                  <span className="text-gray-500">Status:</span>{" "}
+                  <span className="text-gray-500">{t("detail.status")}</span>{" "}
                   <Badge variant="secondary">{student.status}</Badge>
                 </div>
                 <div className="text-sm">
-                  <span className="text-gray-500">Enrolled:</span>{" "}
+                  <span className="text-gray-500">
+                    {t("detail.enrolled_label")}
+                  </span>{" "}
                   {formatDate(student.enrolledAt)}
                 </div>
                 <div className="text-sm">
-                  <span className="text-gray-500">Group:</span>{" "}
-                  {student.group?.name || "No group"} (
-                  {student.group?.code || "No code"})
+                  <span className="text-gray-500">{t("detail.group")}</span>{" "}
+                  {student.group?.name || t("detail.no_group")} (
+                  {student.group?.code || t("detail.no_code")})
                 </div>
               </div>
             </div>
 
             {student.notes && (
               <div>
-                <h4 className="font-medium text-gray-900">Notes</h4>
+                <h4 className="font-medium text-gray-900">
+                  {t("detail.notes")}
+                </h4>
                 <div className="mt-2 p-3 bg-gray-50 rounded-md">
                   <p className="text-sm text-gray-700">{student.notes}</p>
                 </div>
