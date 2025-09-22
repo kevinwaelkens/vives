@@ -16,10 +16,7 @@ import {
 import { useTranslation } from "@/lib/i18n";
 
 export default function CMSLogsPage() {
-  const { t } = useTranslation("cms", {
-    useDynamic: true,
-    fallbackToStatic: true,
-  });
+  const { t } = useTranslation("cms");
   // Mock audit log data
   const auditLogs = [
     {

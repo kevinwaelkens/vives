@@ -44,9 +44,13 @@ export type {
 // Extended types with relations
 export interface StudentWithRelations extends Student {
   group: Group
-  assessments?: Assessment[]
+  assessments?: (Assessment & { task: Task })[]
   attendance?: Attendance[]
   parentContacts?: ParentContact[]
+  _count?: {
+    assessments: number
+    attendance: number
+  }
 }
 
 export interface GroupWithRelations extends Group {

@@ -15,10 +15,7 @@ import Link from "next/link";
 import { useTranslation } from "@/lib/i18n";
 
 export default function CMSDashboard() {
-  const { t } = useTranslation("cms", {
-    useDynamic: true,
-    fallbackToStatic: true,
-  });
+  const { t } = useTranslation("cms");
 
   // Mock data - replace with actual API calls
   const stats = {

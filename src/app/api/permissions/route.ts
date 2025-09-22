@@ -30,8 +30,6 @@ export async function GET(req: NextRequest) {
             id: ur.role.id,
             name: ur.role.name,
             context: ur.context,
-            assignedAt: ur.assignedAt,
-            expiresAt: ur.expiresAt,
           })) || [],
       },
     });

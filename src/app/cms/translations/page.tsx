@@ -73,10 +73,7 @@ interface Translation {
 }
 
 export default function CMSTranslationsPage() {
-  const { t } = useTranslation("cms", {
-    useDynamic: true,
-    fallbackToStatic: true,
-  });
+  const { t } = useTranslation("cms");
   const { onTranslationKeyUpdated } = useTranslationInvalidation();
   const [languages, setLanguages] = useState<Language[]>([]);
   const [translationKeys, setTranslationKeys] = useState<TranslationKey[]>([]);
@@ -160,7 +157,7 @@ export default function CMSTranslationsPage() {
 
   // Get unique categories
   const categories = Array.from(
-    new Set(translationKeys.map((key) => key.category).filter(Boolean)),
+    new Set(translationKeys.map((key) => key.category).filter((cat): cat is string => Boolean(cat))),
   );
 
   // Filter and sort translation keys

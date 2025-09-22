@@ -15,10 +15,7 @@ import {
 import { useTranslation } from "@/lib/i18n";
 
 export default function CMSDatabasePage() {
-  const { t } = useTranslation("cms", {
-    useDynamic: true,
-    fallbackToStatic: true,
-  });
+  const { t } = useTranslation("cms");
 
   return (
     <div className="space-y-6">

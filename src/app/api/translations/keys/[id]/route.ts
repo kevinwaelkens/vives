@@ -71,6 +71,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     if (!session || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -84,7 +85,7 @@ export async function PUT(
       const existingKey = await prisma.translationKey.findFirst({
         where: {
           key: validatedData.key,
-          id: { not: params.id },
+          id: { not: id },
         },
       });
 
@@ -97,7 +98,7 @@ export async function PUT(
     }
 
     const translationKey = await prisma.translationKey.update({
-      where: { id: params.id },
+      where: { id: id },
       data: validatedData,
       include: {
         translations: {
@@ -112,7 +113,7 @@ export async function PUT(
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid data", details: error.errors },
+        { error: "Invalid data", details: error.issues },
         { status: 400 },
       );
     }
@@ -131,13 +132,14 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     if (!session || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     await prisma.translationKey.delete({
-      where: { id: params.id },
+      where: { id: id },
     });
 
     return NextResponse.json({ success: true });
@@ -156,6 +158,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     if (!session || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -168,7 +171,7 @@ export async function POST(
     const existingTranslation = await prisma.translation.findUnique({
       where: {
         translationKeyId_languageId: {
-          translationKeyId: params.id,
+          translationKeyId: id,
           languageId: validatedData.languageId,
         },
       },
@@ -184,7 +187,7 @@ export async function POST(
     const translation = await prisma.translation.create({
       data: {
         ...validatedData,
-        translationKeyId: params.id,
+        translationKeyId: id,
       },
       include: {
         language: true,
@@ -196,7 +199,7 @@ export async function POST(
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid data", details: error.errors },
+        { error: "Invalid data", details: error.issues },
         { status: 400 },
       );
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,7 +23,7 @@ import { useGroups } from "@/data/hooks/use-groups";
 import { formatDate } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n";
 
-export default function TasksPage() {
+function TasksPageContent() {
   const { t } = useTranslation("tasks");
   const { t: tCommon } = useTranslation("common");
   const searchParams = useSearchParams();
@@ -461,5 +461,13 @@ export default function TasksPage() {
         </Card>
       )}
     </div>
+  );
+}
+
+export default function TasksPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TasksPageContent />
+    </Suspense>
   );
 }

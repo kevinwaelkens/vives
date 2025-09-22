@@ -35,14 +35,8 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { t } = useTranslation("cms", {
-    useDynamic: true,
-    fallbackToStatic: true,
-  });
-  const { t: tCommon } = useTranslation("common", {
-    useDynamic: true,
-    fallbackToStatic: true,
-  });
+  const { t } = useTranslation("cms");
+  const { t: tCommon } = useTranslation("common");
 
   const handleSignOut = () => {
     signOut({ callbackUrl: "/login" });
@@ -170,7 +164,7 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
           {/* Language Selector */}
           <div className="border-t border-slate-700 p-3">
             <LanguageSelector
-              variant="select"
+              variant="compact"
               showLabel={false}
               className="text-white"
             />

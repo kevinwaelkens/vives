@@ -8,14 +8,8 @@ import { Settings, Database, Mail, Shield, Save } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 
 export default function CMSSettingsPage() {
-  const { t } = useTranslation("cms", {
-    useDynamic: true,
-    fallbackToStatic: true,
-  });
-  const { t: tCommon } = useTranslation("common", {
-    useDynamic: true,
-    fallbackToStatic: true,
-  });
+  const { t } = useTranslation("cms");
+  const { t: tCommon } = useTranslation("common");
 
   return (
     <div className="space-y-6">
