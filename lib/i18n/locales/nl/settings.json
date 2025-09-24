@@ -1,0 +1,42 @@
+{
+  "account": {
+    "ensure_secure": "Zorg ervoor dat je account veilig blijft"
+  },
+  "language_preferences": "Taalvoorkeuren",
+  "notification_settings": "Notificatie-instellingen",
+  "notifications": {
+    "attendance_alerts": "Aanwezigheidswaarschuwingen",
+    "description": "Beheer je notificatievoorkeuren",
+    "email_notifications": "E-mailnotificaties",
+    "grade_updates": "Cijferupdates",
+    "task_reminders": "Taakherinneringen",
+    "title": "Notificatievoorkeuren",
+    "weekly_reports": "Wekelijkse rapporten"
+  },
+  "profile": {
+    "description": "Werk je persoonlijke informatie bij",
+    "email": "E-mailadres",
+    "full_name": "Volledige naam",
+    "phone": "Telefoonnummer",
+    "title": "Profielinformatie"
+  },
+  "profile_settings": "Profielinstellingen",
+  "security": {
+    "change_password": "Wachtwoord wijzigen",
+    "confirm_password": "Bevestig nieuw wachtwoord",
+    "current_password": "Huidig wachtwoord",
+    "new_password": "Nieuw wachtwoord",
+    "title": "Beveiligingsinstellingen"
+  },
+  "subtitle": "Beheer je account en applicatievoorkeuren",
+  "system": {
+    "title": "Systeeminstellingen"
+  },
+  "tabs": {
+    "notifications": "Notificaties",
+    "profile": "Profiel",
+    "security": "Beveiliging",
+    "system": "Systeem"
+  },
+  "title": "Instellingen"
+}

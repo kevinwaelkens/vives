@@ -1,0 +1,32 @@
+{
+  "actions": {
+    "grade": "Calificar",
+    "view": "Ver"
+  },
+  "filters": {
+    "all": "Todas",
+    "not_submitted": "No entregadas",
+    "to_grade": "Por calificar"
+  },
+  "loading": "Cargando evaluaciones...",
+  "no_assessments": "No se encontraron evaluaciones.",
+  "no_submission": "Sin entrega",
+  "stats": {
+    "graded": "Calificadas",
+    "late": "Tarde",
+    "missing": "Faltantes",
+    "pending": "Pendientes",
+    "total": "Total"
+  },
+  "subtitle": "Califica las entregas de los estudiantes y proporciona retroalimentación",
+  "table": {
+    "all_assessments": "Todas las evaluaciones",
+    "grade": "Calificación",
+    "score": "Puntuación",
+    "student": "Estudiante",
+    "submitted": "Entregado",
+    "task": "Tarea",
+    "type": "Tipo"
+  },
+  "title": "Evaluaciones"
+}

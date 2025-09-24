@@ -1,0 +1,75 @@
+{
+  "actions": {
+    "delete_group": "Eliminar grupo",
+    "edit_group": "Editar grupo",
+    "view_details": "Ver detalles"
+  },
+  "add_group": "Agregar grupo",
+  "create_group": "Crear grupo",
+  "detail": {
+    "active_tasks": "Tareas activas",
+    "add_first_student": "Agrega tu primer estudiante",
+    "add_student": "Agregar estudiante",
+    "cancel": "Cancelar",
+    "create_first_task": "Crea tu primera tarea",
+    "create_task": "Crear tarea",
+    "edit_dialog": {
+      "academic_year": "Año académico",
+      "grade": "Grado",
+      "group_code": "Código del grupo",
+      "group_name": "Nombre del grupo",
+      "title": "Editar grupo"
+    },
+    "edit_group": "Editar grupo",
+    "loading": "Cargando...",
+    "move_student": "Mover estudiante",
+    "move_student_dialog": {
+      "choose_student": "Elegir un estudiante",
+      "choose_target_group": "Elegir grupo objetivo",
+      "move_button": "Mover estudiante",
+      "select_student": "Seleccionar estudiante",
+      "target_group": "Grupo objetivo",
+      "title": "Mover estudiante"
+    },
+    "no_students": "No se encontraron estudiantes",
+    "no_tasks": "No se encontraron tareas",
+    "recent_tasks": "Tareas recientes",
+    "remove_student_dialog": {
+      "description": "¿Estás seguro de que quieres eliminar este estudiante del grupo?",
+      "remove_button": "Eliminar",
+      "title": "Eliminar estudiante"
+    },
+    "save_changes": "Guardar cambios",
+    "stats": {
+      "assessments": "evaluaciones",
+      "attendance": "asistencia",
+      "submissions": "envíos"
+    },
+    "students": "Estudiantes",
+    "task_info": {
+      "due_date": "Vencimiento"
+    },
+    "total_students": "Total de estudiantes",
+    "tutors": "Tutores"
+  },
+  "form": {
+    "academic_year_label": "Año académico",
+    "code_label": "Código del grupo",
+    "grade_label": "Grado",
+    "name_label": "Nombre del grupo"
+  },
+  "loading": "Cargando grupos...",
+  "no_groups": "No se encontraron grupos. Crea tu primer grupo para comenzar.",
+  "stats": {
+    "academic_year": "Año académico",
+    "active_groups": "Grupos activos",
+    "active_tasks_label": "Tareas activas",
+    "grade": "Grado",
+    "students": "Estudiantes",
+    "total_groups": "Total de grupos",
+    "total_students_in_groups": "Estudiantes en grupos",
+    "tutors_label": "Tutores"
+  },
+  "subtitle": "Gestionar grupos de clase y asignaciones de estudiantes",
+  "title": "Grupos"
+}

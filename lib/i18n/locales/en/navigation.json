@@ -1,0 +1,13 @@
+{
+  "analytics": "Analytics",
+  "assessments": "Assessments",
+  "attendance": "Attendance",
+  "auth": {
+    "logout": "Logout"
+  },
+  "dashboard": "Dashboard",
+  "groups": "Groups",
+  "settings": "Settings",
+  "students": "Students",
+  "tasks": "Tasks"
+}

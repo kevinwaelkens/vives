@@ -4,6 +4,14 @@
 import 'react-i18next';
 
 interface AnalyticsTranslations {
+  average_score_trend: string;
+  avg_class_size: string;
+  avg_submission_rate: string;
+  chart_labels: {
+    absent: string;
+    late: string;
+    present: string;
+  };
   charts: {
     attendance_trend: string;
     grade_distribution: string;
@@ -11,6 +19,7 @@ interface AnalyticsTranslations {
     task_completion_rate: string;
     top_performers: string;
   };
+  detailed_statistics: string;
   error_loading: string;
   loading: string;
   metrics: {
@@ -24,11 +33,14 @@ interface AnalyticsTranslations {
     tasks_completed: string;
   };
   no_data_available: string;
+  pass_rate: string;
   performance_insights: string;
   student_performance: string;
   subtitle: string;
   task_completion: string;
   title: string;
+  total_assignments: string;
+  weekly_attendance: string;
 }
 
 interface AssessmentsTranslations {
@@ -135,6 +147,8 @@ interface CmsTranslations {
 }
 
 interface CommonTranslations {
+  account_info: string;
+  account_type: string;
   back: string;
   cancel: string;
   change_password: string;
@@ -144,9 +158,15 @@ interface CommonTranslations {
   export: string;
   filter: string;
   import: string;
+  last_login: string;
   loading: string;
   logout: string;
+  member_since: string;
   next: string;
+  notification_preferences_updated: string;
+  password_changed: string;
+  passwords_no_match: string;
+  profile_updated: string;
   refresh: string;
   save: string;
   save_changes: string;
@@ -207,6 +227,11 @@ interface FormsTranslations {
 }
 
 interface GroupsTranslations {
+  actions: {
+    delete_group: string;
+    edit_group: string;
+    view_details: string;
+  };
   add_group: string;
   create_group: string;
   detail: {
@@ -264,9 +289,14 @@ interface GroupsTranslations {
   loading: string;
   no_groups: string;
   stats: {
+    academic_year: string;
     active_groups: string;
+    active_tasks_label: string;
+    grade: string;
+    students: string;
     total_groups: string;
     total_students_in_groups: string;
+    tutors_label: string;
   };
   subtitle: string;
   title: string;
@@ -276,6 +306,9 @@ interface NavigationTranslations {
   analytics: string;
   assessments: string;
   attendance: string;
+  auth: {
+    logout: string;
+  };
   dashboard: string;
   groups: string;
   settings: string;
@@ -284,10 +317,14 @@ interface NavigationTranslations {
 }
 
 interface SettingsTranslations {
+  account: {
+    ensure_secure: string;
+  };
   language_preferences: string;
   notification_settings: string;
   notifications: {
     attendance_alerts: string;
+    description: string;
     email_notifications: string;
     grade_updates: string;
     task_reminders: string;
@@ -310,6 +347,9 @@ interface SettingsTranslations {
     title: string;
   };
   subtitle: string;
+  system: {
+    title: string;
+  };
   tabs: {
     notifications: string;
     profile: string;
@@ -320,6 +360,11 @@ interface SettingsTranslations {
 }
 
 interface StudentsTranslations {
+  actions: {
+    delete_student: string;
+    edit_student: string;
+    view_details: string;
+  };
   add_new_student: string;
   add_student: string;
   delete_confirmation: string;
@@ -392,6 +437,7 @@ interface StudentsTranslations {
   subtitle: string;
   table: {
     actions: string;
+    all_students: string;
     email: string;
     enrolled: string;
     group: string;
@@ -404,6 +450,11 @@ interface StudentsTranslations {
 }
 
 interface TasksTranslations {
+  actions: {
+    delete_task: string;
+    edit_task: string;
+    view_details: string;
+  };
   assigned_groups: string;
   back_to_tasks: string;
   category: string;
@@ -440,6 +491,7 @@ interface TasksTranslations {
   points: string;
   published: string;
   stats: {
+    all_tasks: string;
     average_score: string;
     awaiting_grading: string;
     based_on_grades: string;

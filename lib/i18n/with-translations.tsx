@@ -18,8 +18,7 @@ export function withTranslations<P extends object>(
   const { requiredNamespaces, fallback: Fallback, preload = true } = config;
 
   const WithTranslationsComponent = (props: P) => {
-    const { areNamespacesLoaded, areNamespacesLoading, preloadNamespaces } =
-      useTranslationLoading();
+    const { preloadNamespaces } = useTranslationLoading();
 
     // Preload translations on mount
     useEffect(() => {
@@ -28,35 +27,8 @@ export function withTranslations<P extends object>(
       }
     }, [preloadNamespaces]);
 
-    const isLoading = areNamespacesLoading(requiredNamespaces);
-    const isReady = areNamespacesLoaded(requiredNamespaces);
-
-    // Show loading state while translations are being fetched
-    if (isLoading && !isReady) {
-      if (Fallback) {
-        return <Fallback />;
-      }
-
-      // Default loading skeleton
-      return (
-        <div className="animate-pulse space-y-6 p-6">
-          <div className="space-y-2">
-            <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="border rounded-lg p-4 space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                <div className="h-6 bg-gray-200 rounded w-1/2"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    // Render the component once translations are ready
+    // Since we simplified the context, we'll just render the component
+    // and let individual translation hooks handle their own loading states
     return <WrappedComponent {...props} />;
   };
 

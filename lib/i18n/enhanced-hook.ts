@@ -12,7 +12,7 @@ interface UseTranslationOptions {
 export function useTranslation<T extends TranslationKey = "common">(
   ns?: T,
   options: UseTranslationOptions = {},
-) {
+): any {
   const {
     useDynamic = false,
     fallbackToStatic = true,

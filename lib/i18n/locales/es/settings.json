@@ -1,0 +1,42 @@
+{
+  "account": {
+    "ensure_secure": "Asegúrate de que tu cuenta permanezca segura"
+  },
+  "language_preferences": "Preferencias de idioma",
+  "notification_settings": "Configuración de notificaciones",
+  "notifications": {
+    "attendance_alerts": "Alertas de asistencia",
+    "description": "Gestiona tus preferencias de notificación",
+    "email_notifications": "Notificaciones por correo",
+    "grade_updates": "Actualizaciones de calificaciones",
+    "task_reminders": "Recordatorios de tareas",
+    "title": "Preferencias de notificación",
+    "weekly_reports": "Informes semanales"
+  },
+  "profile": {
+    "description": "Actualiza tu información personal",
+    "email": "Dirección de correo electrónico",
+    "full_name": "Nombre completo",
+    "phone": "Número de teléfono",
+    "title": "Información del perfil"
+  },
+  "profile_settings": "Configuración del perfil",
+  "security": {
+    "change_password": "Cambiar contraseña",
+    "confirm_password": "Confirmar nueva contraseña",
+    "current_password": "Contraseña actual",
+    "new_password": "Nueva contraseña",
+    "title": "Configuración de seguridad"
+  },
+  "subtitle": "Gestiona tu cuenta y preferencias de la aplicación",
+  "system": {
+    "title": "Configuración del sistema"
+  },
+  "tabs": {
+    "notifications": "Notificaciones",
+    "profile": "Perfil",
+    "security": "Seguridad",
+    "system": "Sistema"
+  },
+  "title": "Configuración"
+}

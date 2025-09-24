@@ -1,0 +1,32 @@
+{
+  "actions": {
+    "grade": "Beoordelen",
+    "view": "Bekijken"
+  },
+  "filters": {
+    "all": "Alle",
+    "not_submitted": "Niet ingediend",
+    "to_grade": "Te beoordelen"
+  },
+  "loading": "Beoordelingen laden...",
+  "no_assessments": "Geen beoordelingen gevonden.",
+  "no_submission": "Geen inzending",
+  "stats": {
+    "graded": "Beoordeeld",
+    "late": "Te laat",
+    "missing": "Ontbrekend",
+    "pending": "In behandeling",
+    "total": "Totaal"
+  },
+  "subtitle": "Beoordeel studenteninzendingen en geef feedback",
+  "table": {
+    "all_assessments": "Alle beoordelingen",
+    "grade": "Cijfer",
+    "score": "Score",
+    "student": "Student",
+    "submitted": "Ingediend",
+    "task": "Taak",
+    "type": "Type"
+  },
+  "title": "Beoordelingen"
+}

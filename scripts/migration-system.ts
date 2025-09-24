@@ -46,7 +46,6 @@ const migrations: Migration[] = [
       await prisma.translationKey.deleteMany();
       await prisma.language.deleteMany();
       await prisma.userRole.deleteMany();
-      await prisma.role.deleteMany();
       await prisma.permission.deleteMany();
       await prisma.user.deleteMany();
       console.log("✅ Initial setup rolled back");
