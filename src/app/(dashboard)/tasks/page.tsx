@@ -24,8 +24,8 @@ import { formatDate } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n";
 
 function TasksPageContent() {
-  const { t } = useTranslation("tasks");
-  const { t: tCommon } = useTranslation("common");
+  const { t } = useTranslation("tasks", { useDynamic: true });
+  const { t: tCommon } = useTranslation("common", { useDynamic: true });
   const searchParams = useSearchParams();
   const highlightTaskId = searchParams.get("highlight");
   const [showAddForm, setShowAddForm] = useState(false);

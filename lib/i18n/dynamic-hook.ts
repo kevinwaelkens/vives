@@ -84,11 +84,11 @@ export function useDynamicTranslation(
     queryKey,
     queryFn: () => fetchTranslations(namespace, baseLanguage),
     enabled: enabled && typeof window !== "undefined", // Only run on client side
-    staleTime: 5 * 60 * 1000, // 5 minutes - data is fresh for 5 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes - keep in cache longer
-    retry: 2,
-    retryDelay: 1000,
-    refetchOnMount: true, // Always refetch when component mounts
+    staleTime: 1 * 60 * 1000, // 1 minute - shorter stale time for development
+    gcTime: 5 * 60 * 1000, // 5 minutes - shorter cache time
+    retry: 1,
+    retryDelay: 500,
+    refetchOnMount: "always", // Always refetch when component mounts
     refetchOnWindowFocus: false, // Don't refetch on window focus to avoid unnecessary requests
   });
 
@@ -100,18 +100,49 @@ export function useDynamicTranslation(
 
   // Merge dynamic and static translations (dynamic takes priority)
   const translations = useMemo(() => {
+    console.log(`🔄 Translation state for ${namespace}:`, {
+      isLoading,
+      isSuccess,
+      hasData: !!dynamicTranslations,
+      dataKeys: dynamicTranslations
+        ? Object.keys(dynamicTranslations).length
+        : 0,
+      error: error?.message,
+    });
+
     if (isSuccess && dynamicTranslations) {
+      console.log(
+        `✅ Using dynamic translations for ${namespace}:`,
+        Object.keys(dynamicTranslations),
+      );
       return fallbackToStatic
         ? { ...staticTranslations, ...dynamicTranslations }
         : dynamicTranslations;
     }
 
+    console.log(
+      `⚠️ No dynamic translations for ${namespace}, fallback:`,
+      fallbackToStatic,
+    );
     return fallbackToStatic ? staticTranslations : {};
-  }, [dynamicTranslations, staticTranslations, isSuccess, fallbackToStatic]);
+  }, [
+    dynamicTranslations,
+    staticTranslations,
+    isSuccess,
+    fallbackToStatic,
+    isLoading,
+    error,
+    namespace,
+  ]);
 
   // Translation function with nested key support
   const t = useCallback(
     (key: string, params?: Record<string, unknown>): string => {
+      // If translations are still loading and we have no data, return the key
+      if (isLoading && !translations) {
+        return key;
+      }
+
       const keyParts = key.split(".");
       let value: unknown = translations;
 
@@ -120,8 +151,9 @@ export function useDynamicTranslation(
         if (value && typeof value === "object" && part in value) {
           value = (value as any)[part];
         } else {
-          // Fallback to i18next for complex interpolation or missing keys
-          return i18n.t(`${namespace}:${key}`, params) || key;
+          // Return the key if not found (don't fallback to broken static system)
+          console.warn(`Translation key not found: ${namespace}:${key}`);
+          return key;
         }
       }
 
@@ -136,9 +168,13 @@ export function useDynamicTranslation(
       }
 
       // Fallback to original key if not found
+      console.warn(
+        `Translation value is not a string: ${namespace}:${key}`,
+        value,
+      );
       return key;
     },
-    [translations, namespace],
+    [translations, namespace, isLoading],
   );
 
   // Function to invalidate translations cache

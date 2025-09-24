@@ -18,7 +18,7 @@ import { useTranslation } from "@/lib/i18n";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { t } = useTranslation("auth");
+  const { t } = useTranslation("auth", { useDynamic: true });
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

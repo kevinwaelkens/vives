@@ -24,7 +24,7 @@ import { useTranslation } from "@/lib/i18n";
 import { useSession } from "next-auth/react";
 
 export default function GroupsPage() {
-  const { t } = useTranslation("groups");
+  const { t } = useTranslation("groups", { useDynamic: true });
   const { data: session } = useSession();
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({

@@ -27,8 +27,8 @@ import { useSession } from "next-auth/react";
 import { useTranslation } from "@/lib/i18n";
 
 export default function SettingsPage() {
-  const { t } = useTranslation("settings");
-  const { t: tCommon } = useTranslation("common");
+  const { t } = useTranslation("settings", { useDynamic: true });
+  const { t: tCommon } = useTranslation("common", { useDynamic: true });
   const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState("profile");
   const [profileData, setProfileData] = useState({
@@ -76,15 +76,14 @@ export default function SettingsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-1">
-          Manage your account and application preferences
-        </p>
+        <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
+        <p className="text-gray-600 mt-1">{t("subtitle")}</p>
       </div>
 
       {/* Tab Navigation */}
       <div className="flex gap-2 border-b">
         <button
+          type="button"
           onClick={() => setActiveTab("profile")}
           className={`px-4 py-2 border-b-2 transition-colors ${
             activeTab === "profile"
@@ -93,9 +92,10 @@ export default function SettingsPage() {
           }`}
         >
           <User className="h-4 w-4 inline mr-2" />
-          Profile
+          {t("tabs.profile")}
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab("security")}
           className={`px-4 py-2 border-b-2 transition-colors ${
             activeTab === "security"
@@ -104,9 +104,10 @@ export default function SettingsPage() {
           }`}
         >
           <Lock className="h-4 w-4 inline mr-2" />
-          Security
+          {t("tabs.security")}
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab("notifications")}
           className={`px-4 py-2 border-b-2 transition-colors ${
             activeTab === "notifications"
@@ -115,9 +116,10 @@ export default function SettingsPage() {
           }`}
         >
           <Bell className="h-4 w-4 inline mr-2" />
-          Notifications
+          {t("tabs.notifications")}
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab("system")}
           className={`px-4 py-2 border-b-2 transition-colors ${
             activeTab === "system"
@@ -126,7 +128,7 @@ export default function SettingsPage() {
           }`}
         >
           <Globe className="h-4 w-4 inline mr-2" />
-          System
+          {t("tabs.system")}
         </button>
       </div>
 
@@ -136,15 +138,13 @@ export default function SettingsPage() {
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle>Profile Information</CardTitle>
-                <CardDescription>
-                  Update your personal information
-                </CardDescription>
+                <CardTitle>{t("profile.title")}</CardTitle>
+                <CardDescription>{t("profile.description")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleProfileUpdate} className="space-y-4">
                   <div>
-                    <Label htmlFor="name">Full Name</Label>
+                    <Label htmlFor="name">{t("profile.full_name")}</Label>
                     <Input
                       id="name"
                       value={profileData.name}
@@ -154,7 +154,7 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="email">Email Address</Label>
+                    <Label htmlFor="email">{t("profile.email")}</Label>
                     <Input
                       id="email"
                       type="email"
@@ -168,7 +168,7 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="phone">Phone Number</Label>
+                    <Label htmlFor="phone">{t("profile.phone")}</Label>
                     <Input
                       id="phone"
                       type="tel"
@@ -184,7 +184,7 @@ export default function SettingsPage() {
                   </div>
                   <Button type="submit">
                     <Save className="h-4 w-4 mr-2" />
-                    Save Changes
+                    {tCommon("save_changes")}
                   </Button>
                 </form>
               </CardContent>
@@ -221,7 +221,7 @@ export default function SettingsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>Change Password</CardTitle>
+              <CardTitle>{t("security.change_password")}</CardTitle>
               <CardDescription>
                 Ensure your account stays secure
               </CardDescription>
@@ -229,7 +229,9 @@ export default function SettingsPage() {
             <CardContent>
               <form onSubmit={handlePasswordChange} className="space-y-4">
                 <div>
-                  <Label htmlFor="currentPassword">Current Password</Label>
+                  <Label htmlFor="currentPassword">
+                    {t("security.current_password")}
+                  </Label>
                   <Input
                     id="currentPassword"
                     type="password"
@@ -244,7 +246,9 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="newPassword">New Password</Label>
+                  <Label htmlFor="newPassword">
+                    {t("security.new_password")}
+                  </Label>
                   <Input
                     id="newPassword"
                     type="password"
@@ -259,7 +263,9 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                  <Label htmlFor="confirmPassword">
+                    {t("security.confirm_password")}
+                  </Label>
                   <Input
                     id="confirmPassword"
                     type="password"
@@ -275,7 +281,7 @@ export default function SettingsPage() {
                 </div>
                 <Button type="submit">
                   <Lock className="h-4 w-4 mr-2" />
-                  Change Password
+                  {tCommon("change_password")}
                 </Button>
               </form>
             </CardContent>

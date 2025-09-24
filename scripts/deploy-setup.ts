@@ -1,10 +1,11 @@
 #!/usr/bin/env tsx
 /**
  * Deployment Setup Script
- * Run this after deploying to set up the database
+ * Run this after deploying to set up the database using the migration system
  */
 
 import { PrismaClient } from "@prisma/client";
+import { MigrationManager } from "./migration-system";
 
 const prisma = new PrismaClient();
 
@@ -16,24 +17,20 @@ async function main() {
     await prisma.$connect();
     console.log("✅ Database connection successful");
 
-    // Check if database is already seeded
+    // Use migration system for setup
+    const migrationManager = new MigrationManager();
+
+    // Check if database is already initialized
     const userCount = await prisma.user.count();
 
     if (userCount === 0) {
-      console.log("📊 Database is empty, running seed...");
-
-      // Import and run seed
-      const { default: seedTranslations } = await import(
-        "../prisma/translation-seed"
-      );
-      const { seedPermissions } = await import("../prisma/permissions-seed");
-
-      // Run the main seed script
-      const seedModule = await import("../prisma/seed");
-
-      console.log("✅ Database seeded successfully!");
+      console.log("📊 Database is empty, running initial migrations...");
+      await migrationManager.runMigrations();
     } else {
-      console.log(`📊 Database already has ${userCount} users, skipping seed`);
+      console.log(
+        `📊 Database already has ${userCount} users, running incremental migrations...`,
+      );
+      await migrationManager.runMigrations();
     }
 
     console.log("🎉 Production setup complete!");

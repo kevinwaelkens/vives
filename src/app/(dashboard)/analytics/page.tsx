@@ -28,8 +28,7 @@ import { useAnalytics } from "@/data/hooks/use-analytics";
 import { useTranslation } from "@/lib/i18n";
 
 export default function AnalyticsPage() {
-  const { t } = useTranslation("analytics");
-  const { t: tCommon } = useTranslation("common");
+  const { t } = useTranslation("analytics", { useDynamic: true });
   const { data: analytics, isLoading, error } = useAnalytics();
 
   if (isLoading) {
@@ -43,7 +42,7 @@ export default function AnalyticsPage() {
   if (error) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-red-500">Error loading analytics data</div>
+        <div className="text-red-500">{t("error_loading")}</div>
       </div>
     );
   }
@@ -51,7 +50,7 @@ export default function AnalyticsPage() {
   if (!analytics) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">No analytics data available</div>
+        <div className="text-gray-500">{t("no_data_available")}</div>
       </div>
     );
   }
@@ -70,8 +69,8 @@ export default function AnalyticsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
-        <p className="text-gray-600 mt-1">Performance insights and trends</p>
+        <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
+        <p className="text-gray-600 mt-1">{t("performance_insights")}</p>
       </div>
 
       {/* Key Metrics */}
@@ -80,11 +79,13 @@ export default function AnalyticsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Average Score</p>
+                <p className="text-sm text-gray-600">
+                  {t("metrics.average_score")}
+                </p>
                 <p className="text-2xl font-bold">{keyMetrics.averageScore}%</p>
                 <p className="text-xs text-green-600 flex items-center mt-1">
                   <TrendingUp className="h-3 w-3 mr-1" />
-                  Based on graded assessments
+                  {t("metrics.based_on_graded")}
                 </p>
               </div>
               <Award className="h-8 w-8 text-yellow-600" />
@@ -95,13 +96,15 @@ export default function AnalyticsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Attendance Rate</p>
+                <p className="text-sm text-gray-600">
+                  {t("metrics.attendance_rate")}
+                </p>
                 <p className="text-2xl font-bold">
                   {keyMetrics.attendanceRate}%
                 </p>
                 <p className="text-xs text-blue-600 flex items-center mt-1">
                   <Calendar className="h-3 w-3 mr-1" />
-                  Last 7 days
+                  {t("metrics.last_7_days")}
                 </p>
               </div>
               <Users className="h-8 w-8 text-blue-600" />
@@ -112,13 +115,15 @@ export default function AnalyticsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Tasks Completed</p>
+                <p className="text-sm text-gray-600">
+                  {t("metrics.tasks_completed")}
+                </p>
                 <p className="text-2xl font-bold">
                   {keyMetrics.tasksCompleted}
                 </p>
                 <p className="text-xs text-green-600 flex items-center mt-1">
                   <TrendingUp className="h-3 w-3 mr-1" />
-                  Graded assessments
+                  {t("metrics.graded_assessments")}
                 </p>
               </div>
               <BookOpen className="h-8 w-8 text-green-600" />
@@ -129,13 +134,15 @@ export default function AnalyticsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Active Students</p>
+                <p className="text-sm text-gray-600">
+                  {t("metrics.active_students")}
+                </p>
                 <p className="text-2xl font-bold">
                   {keyMetrics.activeStudents}
                 </p>
                 <p className="text-xs text-gray-600 flex items-center mt-1">
                   <Calendar className="h-3 w-3 mr-1" />
-                  Currently enrolled
+                  {t("metrics.currently_enrolled")}
                 </p>
               </div>
               <Users className="h-8 w-8 text-purple-600" />
@@ -149,7 +156,7 @@ export default function AnalyticsPage() {
         {/* Attendance Trend */}
         <Card>
           <CardHeader>
-            <CardTitle>Weekly Attendance</CardTitle>
+            <CardTitle>{t("charts.attendance_trend")}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -170,7 +177,7 @@ export default function AnalyticsPage() {
         {/* Grade Distribution */}
         <Card>
           <CardHeader>
-            <CardTitle>Grade Distribution</CardTitle>
+            <CardTitle>{t("charts.grade_distribution")}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -191,7 +198,7 @@ export default function AnalyticsPage() {
         {/* Task Completion */}
         <Card>
           <CardHeader>
-            <CardTitle>Task Completion Rate</CardTitle>
+            <CardTitle>{t("charts.task_completion_rate")}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
@@ -219,7 +226,7 @@ export default function AnalyticsPage() {
         {/* Performance Trend */}
         <Card>
           <CardHeader>
-            <CardTitle>Average Score Trend</CardTitle>
+            <CardTitle>{t("charts.performance_trend")}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
@@ -243,7 +250,7 @@ export default function AnalyticsPage() {
         {/* Top Performers */}
         <Card>
           <CardHeader>
-            <CardTitle>Top Performers</CardTitle>
+            <CardTitle>{t("charts.top_performers")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">

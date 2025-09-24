@@ -32,7 +32,7 @@ interface AttendanceRecord {
 }
 
 export default function AttendancePage() {
-  const { t } = useTranslation("attendance");
+  const { t } = useTranslation("attendance", { useDynamic: true });
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0],
   );

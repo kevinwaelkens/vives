@@ -43,7 +43,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { t } = useTranslation("navigation");
+  const { t } = useTranslation("navigation", { useDynamic: true });
   const { title } = usePageTitle();
 
   const handleSignOut = () => {
@@ -94,8 +94,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
               {navigationItems.map((item) => {
                 const isActive = pathname === item.href;
                 const Icon = item.icon;
-                const itemName =
-                  t(item.key) || item.key.split(".").pop() || item.key;
+                const itemName = t(item.key);
 
                 // Check if user has permission to view this route
                 if (
@@ -164,7 +163,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 variant="ghost"
                 size="icon"
                 onClick={handleSignOut}
-                title={t("auth.logout", "Logout")}
+                title={t("auth.logout")}
                 className="hover:bg-red-100 hover:text-red-600 transition-colors"
               >
                 <LogOut className="h-4 w-4" />

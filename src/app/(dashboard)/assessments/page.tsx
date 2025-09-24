@@ -54,7 +54,7 @@ interface Assessment {
 }
 
 export default function AssessmentsPage() {
-  const { t } = useTranslation("assessments");
+  const { t } = useTranslation("assessments", { useDynamic: true });
   const { t: tCommon } = useTranslation("common");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [gradingAssessment, setGradingAssessment] = useState<Assessment | null>(

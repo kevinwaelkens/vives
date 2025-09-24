@@ -19,7 +19,7 @@ interface DashboardStats {
 }
 
 export default function DashboardPage() {
-  const { t } = useTranslation("dashboard");
+  const { t } = useTranslation("dashboard", { useDynamic: true });
   const { data: stats, isLoading } = useQuery({
     queryKey: ["dashboard-stats"],
     queryFn: async () => {

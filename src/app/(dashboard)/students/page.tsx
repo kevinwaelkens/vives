@@ -30,8 +30,8 @@ import { useTranslation } from "@/lib/i18n";
 import type { StudentFormData, StudentWithRelations } from "@/types";
 
 export default function StudentsPage() {
-  const { t } = useTranslation("students");
-  const { t: tCommon } = useTranslation("common");
+  const { t } = useTranslation("students", { useDynamic: true });
+  const { t: tCommon } = useTranslation("common", { useDynamic: true });
   const [search, setSearch] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingStudent, setEditingStudent] =

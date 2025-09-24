@@ -4,7 +4,27 @@
 import 'react-i18next';
 
 interface AnalyticsTranslations {
+  charts: {
+    attendance_trend: string;
+    grade_distribution: string;
+    performance_trend: string;
+    task_completion_rate: string;
+    top_performers: string;
+  };
+  error_loading: string;
   loading: string;
+  metrics: {
+    active_students: string;
+    attendance_rate: string;
+    average_score: string;
+    based_on_graded: string;
+    currently_enrolled: string;
+    graded_assessments: string;
+    last_7_days: string;
+    tasks_completed: string;
+  };
+  no_data_available: string;
+  performance_insights: string;
   student_performance: string;
   subtitle: string;
   task_completion: string;
@@ -117,6 +137,7 @@ interface CmsTranslations {
 interface CommonTranslations {
   back: string;
   cancel: string;
+  change_password: string;
   delete: string;
   edit: string;
   error: string;
@@ -128,8 +149,10 @@ interface CommonTranslations {
   next: string;
   refresh: string;
   save: string;
+  save_changes: string;
   search: string;
   success: string;
+  update_profile: string;
   view: string;
 }
 
@@ -140,6 +163,18 @@ interface DashboardTranslations {
     late: string;
     present: string;
     title: string;
+  };
+  detail: {
+    active_tasks: string;
+    add_first_student: string;
+    create_first_task: string;
+    loading: string;
+    no_students: string;
+    no_tasks: string;
+    recent_tasks: string;
+    students: string;
+    total_students: string;
+    tutors: string;
   };
   due_in_days: string;
   due_next_week: string;
@@ -173,6 +208,53 @@ interface FormsTranslations {
 
 interface GroupsTranslations {
   add_group: string;
+  create_group: string;
+  detail: {
+    active_tasks: string;
+    add_first_student: string;
+    add_student: string;
+    cancel: string;
+    create_first_task: string;
+    create_task: string;
+    edit_dialog: {
+      academic_year: string;
+      grade: string;
+      group_code: string;
+      group_name: string;
+      title: string;
+    };
+    edit_group: string;
+    loading: string;
+    move_student: string;
+    move_student_dialog: {
+      choose_student: string;
+      choose_target_group: string;
+      move_button: string;
+      select_student: string;
+      target_group: string;
+      title: string;
+    };
+    no_students: string;
+    no_tasks: string;
+    recent_tasks: string;
+    remove_student_dialog: {
+      description: string;
+      remove_button: string;
+      title: string;
+    };
+    save_changes: string;
+    stats: {
+      assessments: string;
+      attendance: string;
+      submissions: string;
+    };
+    students: string;
+    task_info: {
+      due_date: string;
+    };
+    total_students: string;
+    tutors: string;
+  };
   form: {
     academic_year_label: string;
     code_label: string;
@@ -204,8 +286,36 @@ interface NavigationTranslations {
 interface SettingsTranslations {
   language_preferences: string;
   notification_settings: string;
+  notifications: {
+    attendance_alerts: string;
+    email_notifications: string;
+    grade_updates: string;
+    task_reminders: string;
+    title: string;
+    weekly_reports: string;
+  };
+  profile: {
+    description: string;
+    email: string;
+    full_name: string;
+    phone: string;
+    title: string;
+  };
   profile_settings: string;
+  security: {
+    change_password: string;
+    confirm_password: string;
+    current_password: string;
+    new_password: string;
+    title: string;
+  };
   subtitle: string;
+  tabs: {
+    notifications: string;
+    profile: string;
+    security: string;
+    system: string;
+  };
   title: string;
 }
 
@@ -213,6 +323,53 @@ interface StudentsTranslations {
   add_new_student: string;
   add_student: string;
   delete_confirmation: string;
+  detail: {
+    academic_information: string;
+    all_years: string;
+    assignment_history: string;
+    assignment_number: string;
+    assignments_completed_on_time: string;
+    average_score: string;
+    back_to_students: string;
+    based_on_assessments: string;
+    born: string;
+    charts: string;
+    completed: string;
+    completion_rate: string;
+    contact: string;
+    contact_information: string;
+    current_group: string;
+    details: string;
+    due: string;
+    enrolled: string;
+    enrolled_label: string;
+    failed_to_load: string;
+    grade: string;
+    group: string;
+    latest: string;
+    loading: string;
+    no_assignments_found: string;
+    no_assignments_period: string;
+    no_code: string;
+    no_due_date: string;
+    no_group: string;
+    not_graded: string;
+    notes: string;
+    parent_contacts: string;
+    performance_overview: string;
+    primary: string;
+    score_percent: string;
+    score_trend: string;
+    score_trends_analytics: string;
+    select_year: string;
+    status: string;
+    student_details: string;
+    student_id: string;
+    student_information: string;
+    submitted: string;
+    task_types_distribution: string;
+    total_assignments: string;
+  };
   edit_student: string;
   form: {
     create_student: string;

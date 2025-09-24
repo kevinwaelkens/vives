@@ -14,6 +14,7 @@
     "db:studio": "prisma studio",
     "i18n:generate": "tsx scripts/generate-i18n-types.ts",
     "i18n:seed": "tsx prisma/translation-seed.ts",
+    "migrate": "tsx scripts/migration-system.ts",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "test:debug": "playwright test --debug",
