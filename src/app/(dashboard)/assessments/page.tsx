@@ -29,6 +29,7 @@ import { apiClient } from "@/data/api/client";
 import { toast } from "sonner";
 import { formatDate } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n";
+import { TranslationLoading } from "@/components/ui/translation-loading";
 import type { CompetenceRubric } from "@/lib/competences";
 
 interface Assessment {
@@ -54,7 +55,9 @@ interface Assessment {
 }
 
 export default function AssessmentsPage() {
-  const { t } = useTranslation("assessments", { useDynamic: true });
+  const { t, isLoading: translationsLoading } = useTranslation("assessments", {
+    useDynamic: true,
+  });
   const { t: tCommon } = useTranslation("common");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [gradingAssessment, setGradingAssessment] = useState<Assessment | null>(
@@ -167,6 +170,26 @@ export default function AssessmentsPage() {
     }
   };
 
+  // Show loading skeleton while translations are loading
+  if (translationsLoading) {
+    return (
+      <div className="animate-pulse space-y-6 p-6">
+        <div className="space-y-2">
+          <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="border rounded-lg p-4 space-y-2">
+              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -192,400 +215,416 @@ export default function AssessmentsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
-        <p className="text-gray-600 mt-1">{t("subtitle")}</p>
-      </div>
+    <TranslationLoading isLoading={translationsLoading}>
+      <div className="space-y-6">
+        {/* Header */}
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
+          <p className="text-gray-600 mt-1">{t("subtitle")}</p>
+        </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">{t("stats.total")}</p>
-                <p className="text-2xl font-bold">{stats.total}</p>
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">{t("stats.total")}</p>
+                  <p className="text-2xl font-bold">{stats.total}</p>
+                </div>
+                <FileText className="h-8 w-8 text-gray-600" />
               </div>
-              <FileText className="h-8 w-8 text-gray-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">{t("stats.graded")}</p>
-                <p className="text-2xl font-bold">{stats.graded}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">{t("stats.graded")}</p>
+                  <p className="text-2xl font-bold">{stats.graded}</p>
+                </div>
+                <CheckCircle className="h-8 w-8 text-green-600" />
               </div>
-              <CheckCircle className="h-8 w-8 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">{t("stats.pending")}</p>
-                <p className="text-2xl font-bold">{stats.submitted}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">{t("stats.pending")}</p>
+                  <p className="text-2xl font-bold">{stats.submitted}</p>
+                </div>
+                <Clock className="h-8 w-8 text-blue-600" />
               </div>
-              <Clock className="h-8 w-8 text-blue-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">{t("stats.late")}</p>
-                <p className="text-2xl font-bold">{stats.late}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">{t("stats.late")}</p>
+                  <p className="text-2xl font-bold">{stats.late}</p>
+                </div>
+                <AlertCircle className="h-8 w-8 text-yellow-600" />
               </div>
-              <AlertCircle className="h-8 w-8 text-yellow-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">{t("stats.missing")}</p>
-                <p className="text-2xl font-bold">{stats.notSubmitted}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">{t("stats.missing")}</p>
+                  <p className="text-2xl font-bold">{stats.notSubmitted}</p>
+                </div>
+                <XCircle className="h-8 w-8 text-red-600" />
               </div>
-              <XCircle className="h-8 w-8 text-red-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </div>
 
-      {/* Filter Tabs */}
-      <div className="flex gap-2">
-        <Button
-          variant={selectedStatus === "all" ? "default" : "outline"}
-          onClick={() => setSelectedStatus("all")}
-        >
-          {t("filters.all")}
-        </Button>
-        <Button
-          variant={selectedStatus === "SUBMITTED" ? "default" : "outline"}
-          onClick={() => setSelectedStatus("SUBMITTED")}
-        >
-          {t("filters.to_grade")}
-        </Button>
-        <Button
-          variant={selectedStatus === "GRADED" ? "default" : "outline"}
-          onClick={() => setSelectedStatus("GRADED")}
-        >
-          {t("stats.graded")}
-        </Button>
-        <Button
-          variant={selectedStatus === "NOT_SUBMITTED" ? "default" : "outline"}
-          onClick={() => setSelectedStatus("NOT_SUBMITTED")}
-        >
-          {t("filters.not_submitted")}
-        </Button>
-      </div>
+        {/* Filter Tabs */}
+        <div className="flex gap-2">
+          <Button
+            variant={selectedStatus === "all" ? "default" : "outline"}
+            onClick={() => setSelectedStatus("all")}
+          >
+            {t("filters.all")}
+          </Button>
+          <Button
+            variant={selectedStatus === "SUBMITTED" ? "default" : "outline"}
+            onClick={() => setSelectedStatus("SUBMITTED")}
+          >
+            {t("filters.to_grade")}
+          </Button>
+          <Button
+            variant={selectedStatus === "GRADED" ? "default" : "outline"}
+            onClick={() => setSelectedStatus("GRADED")}
+          >
+            {t("stats.graded")}
+          </Button>
+          <Button
+            variant={selectedStatus === "NOT_SUBMITTED" ? "default" : "outline"}
+            onClick={() => setSelectedStatus("NOT_SUBMITTED")}
+          >
+            {t("filters.not_submitted")}
+          </Button>
+        </div>
 
-      {/* Assessments List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>All Assessments</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left p-4 font-medium text-gray-700">
-                    Student
-                  </th>
-                  <th className="text-left p-4 font-medium text-gray-700">
-                    Task
-                  </th>
-                  <th className="text-left p-4 font-medium text-gray-700">
-                    Type
-                  </th>
-                  <th className="text-left p-4 font-medium text-gray-700">
-                    Status
-                  </th>
-                  <th className="text-left p-4 font-medium text-gray-700">
-                    Score
-                  </th>
-                  <th className="text-left p-4 font-medium text-gray-700">
-                    Grade
-                  </th>
-                  <th className="text-left p-4 font-medium text-gray-700">
-                    Submitted
-                  </th>
-                  <th className="text-left p-4 font-medium text-gray-700">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {assessmentList.map((assessment: Assessment) => (
-                  <tr key={assessment.id} className="border-b hover:bg-gray-50">
-                    <td className="p-4">
-                      <div>
-                        <p className="font-medium">{assessment.student.name}</p>
-                        <p className="text-sm text-gray-500">
-                          {assessment.student.studentId}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <p className="font-medium">{assessment.task.title}</p>
-                    </td>
-                    <td className="p-4">
-                      <span className="text-sm text-gray-600">
-                        {assessment.task.type}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-medium flex items-center gap-1 w-fit ${getStatusColor(assessment.status)}`}
-                      >
-                        {getStatusIcon(assessment.status)}
-                        {assessment.status.replace("_", " ")}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      {assessment.score !== null ? (
-                        <span className="font-medium">
-                          {assessment.score}/{assessment.task.points}
-                        </span>
-                      ) : (
-                        <span className="text-gray-400">-</span>
-                      )}
-                    </td>
-                    <td className="p-4">
-                      {assessment.grade ? (
-                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm font-medium">
-                          {assessment.grade}
-                        </span>
-                      ) : (
-                        <span className="text-gray-400">-</span>
-                      )}
-                    </td>
-                    <td className="p-4">
-                      {assessment.submittedAt ? (
-                        <div className="text-sm text-gray-600">
-                          <Calendar className="h-4 w-4 inline mr-1" />
-                          {formatDate(assessment.submittedAt)}
-                        </div>
-                      ) : (
-                        <span className="text-gray-400">-</span>
-                      )}
-                    </td>
-                    <td className="p-4">
-                      {assessment.status === "SUBMITTED" ||
-                      assessment.status === "LATE_SUBMITTED" ? (
-                        <Button
-                          size="sm"
-                          onClick={() => openGradingDialog(assessment)}
-                          data-testid="grade-assessment-button"
-                        >
-                          Grade
-                        </Button>
-                      ) : assessment.status === "GRADED" ? (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => openGradingDialog(assessment)}
-                          data-testid="view-assessment-button"
-                        >
-                          View
-                        </Button>
-                      ) : (
-                        <span className="text-gray-400 text-sm">
-                          No submission
-                        </span>
-                      )}
-                    </td>
+        {/* Assessments List */}
+        <Card>
+          <CardHeader>
+            <CardTitle>All Assessments</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-4 font-medium text-gray-700">
+                      Student
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-700">
+                      Task
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-700">
+                      Type
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-700">
+                      Status
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-700">
+                      Score
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-700">
+                      Grade
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-700">
+                      Submitted
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-700">
+                      Actions
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {assessmentList.length === 0 && (
-            <div className="text-center py-12 text-gray-500">
-              No assessments found.
+                </thead>
+                <tbody>
+                  {assessmentList.map((assessment: Assessment) => (
+                    <tr
+                      key={assessment.id}
+                      className="border-b hover:bg-gray-50"
+                    >
+                      <td className="p-4">
+                        <div>
+                          <p className="font-medium">
+                            {assessment.student.name}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {assessment.student.studentId}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <p className="font-medium">{assessment.task.title}</p>
+                      </td>
+                      <td className="p-4">
+                        <span className="text-sm text-gray-600">
+                          {assessment.task.type}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <span
+                          className={`px-2 py-1 rounded text-xs font-medium flex items-center gap-1 w-fit ${getStatusColor(assessment.status)}`}
+                        >
+                          {getStatusIcon(assessment.status)}
+                          {assessment.status.replace("_", " ")}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        {assessment.score !== null ? (
+                          <span className="font-medium">
+                            {assessment.score}/{assessment.task.points}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400">-</span>
+                        )}
+                      </td>
+                      <td className="p-4">
+                        {assessment.grade ? (
+                          <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm font-medium">
+                            {assessment.grade}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400">-</span>
+                        )}
+                      </td>
+                      <td className="p-4">
+                        {assessment.submittedAt ? (
+                          <div className="text-sm text-gray-600">
+                            <Calendar className="h-4 w-4 inline mr-1" />
+                            {formatDate(assessment.submittedAt)}
+                          </div>
+                        ) : (
+                          <span className="text-gray-400">-</span>
+                        )}
+                      </td>
+                      <td className="p-4">
+                        {assessment.status === "SUBMITTED" ||
+                        assessment.status === "LATE_SUBMITTED" ? (
+                          <Button
+                            size="sm"
+                            onClick={() => openGradingDialog(assessment)}
+                            data-testid="grade-assessment-button"
+                          >
+                            Grade
+                          </Button>
+                        ) : assessment.status === "GRADED" ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => openGradingDialog(assessment)}
+                            data-testid="view-assessment-button"
+                          >
+                            View
+                          </Button>
+                        ) : (
+                          <span className="text-gray-400 text-sm">
+                            No submission
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          )}
-        </CardContent>
-      </Card>
 
-      {/* Grading Dialog */}
-      <Dialog open={isGradingDialogOpen} onOpenChange={setIsGradingDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Grade Assessment</DialogTitle>
-            <DialogDescription>
-              {gradingAssessment && (
-                <>
-                  {gradingAssessment.student.name} -{" "}
-                  {gradingAssessment.task.title}
-                </>
-              )}
-            </DialogDescription>
-          </DialogHeader>
+            {assessmentList.length === 0 && (
+              <div className="text-center py-12 text-gray-500">
+                No assessments found.
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-          {gradingAssessment && (
-            <Tabs defaultValue="traditional" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger
-                  value="traditional"
-                  className="flex items-center space-x-2"
-                >
-                  <Award className="h-4 w-4" />
-                  <span>Traditional Grading</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="competence"
-                  className="flex items-center space-x-2"
-                >
-                  <Brain className="h-4 w-4" />
-                  <span>STEAM/CT Competences</span>
-                </TabsTrigger>
-              </TabsList>
+        {/* Grading Dialog */}
+        <Dialog
+          open={isGradingDialogOpen}
+          onOpenChange={setIsGradingDialogOpen}
+        >
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Grade Assessment</DialogTitle>
+              <DialogDescription>
+                {gradingAssessment && (
+                  <>
+                    {gradingAssessment.student.name} -{" "}
+                    {gradingAssessment.task.title}
+                  </>
+                )}
+              </DialogDescription>
+            </DialogHeader>
 
-              <TabsContent value="traditional" className="mt-6">
-                <form
-                  onSubmit={handleGrade}
-                  className="space-y-4"
-                  data-testid="grading-form"
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {gradingAssessment && (
+              <Tabs defaultValue="traditional" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger
+                    value="traditional"
+                    className="flex items-center space-x-2"
+                  >
+                    <Award className="h-4 w-4" />
+                    <span>Traditional Grading</span>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="competence"
+                    className="flex items-center space-x-2"
+                  >
+                    <Brain className="h-4 w-4" />
+                    <span>STEAM/CT Competences</span>
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="traditional" className="mt-6">
+                  <form
+                    onSubmit={handleGrade}
+                    className="space-y-4"
+                    data-testid="grading-form"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="score">Score</Label>
+                        <Input
+                          id="score"
+                          type="number"
+                          min="0"
+                          max={gradingAssessment.task.points}
+                          value={gradeData.score}
+                          onChange={(e) =>
+                            setGradeData({
+                              ...gradeData,
+                              score: parseInt(e.target.value),
+                            })
+                          }
+                          placeholder={`Out of ${gradingAssessment.task.points}`}
+                          required
+                          data-testid="score-input"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="grade">Grade</Label>
+                        <select
+                          id="grade"
+                          value={gradeData.grade}
+                          onChange={(e) =>
+                            setGradeData({
+                              ...gradeData,
+                              grade: e.target.value,
+                            })
+                          }
+                          className="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          required
+                          data-testid="grade-select"
+                        >
+                          <option value="">Select Grade</option>
+                          <option value="A+">A+</option>
+                          <option value="A">A</option>
+                          <option value="A-">A-</option>
+                          <option value="B+">B+</option>
+                          <option value="B">B</option>
+                          <option value="B-">B-</option>
+                          <option value="C+">C+</option>
+                          <option value="C">C</option>
+                          <option value="C-">C-</option>
+                          <option value="D">D</option>
+                          <option value="F">F</option>
+                        </select>
+                      </div>
+                    </div>
                     <div>
-                      <Label htmlFor="score">Score</Label>
-                      <Input
-                        id="score"
-                        type="number"
-                        min="0"
-                        max={gradingAssessment.task.points}
-                        value={gradeData.score}
+                      <Label htmlFor="feedback">Feedback</Label>
+                      <textarea
+                        id="feedback"
+                        value={gradeData.feedback}
                         onChange={(e) =>
                           setGradeData({
                             ...gradeData,
-                            score: parseInt(e.target.value),
+                            feedback: e.target.value,
                           })
                         }
-                        placeholder={`Out of ${gradingAssessment.task.points}`}
-                        required
-                        data-testid="score-input"
+                        className="w-full h-24 px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Provide feedback for the student"
+                        data-testid="feedback-textarea"
                       />
                     </div>
-                    <div>
-                      <Label htmlFor="grade">Grade</Label>
-                      <select
-                        id="grade"
-                        value={gradeData.grade}
-                        onChange={(e) =>
-                          setGradeData({ ...gradeData, grade: e.target.value })
-                        }
-                        className="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                        data-testid="grade-select"
+                    <div className="flex gap-2">
+                      <Button type="submit" data-testid="submit-grade-button">
+                        Submit Grade
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={closeGradingDialog}
+                        data-testid="cancel-grade-button"
                       >
-                        <option value="">Select Grade</option>
-                        <option value="A+">A+</option>
-                        <option value="A">A</option>
-                        <option value="A-">A-</option>
-                        <option value="B+">B+</option>
-                        <option value="B">B</option>
-                        <option value="B-">B-</option>
-                        <option value="C+">C+</option>
-                        <option value="C">C</option>
-                        <option value="C-">C-</option>
-                        <option value="D">D</option>
-                        <option value="F">F</option>
-                      </select>
+                        Cancel
+                      </Button>
+                    </div>
+                  </form>
+                </TabsContent>
+
+                <TabsContent value="competence" className="mt-6">
+                  <div className="space-y-6">
+                    <CompetenceAssessmentComponent
+                      initialRubric={competenceRubric || undefined}
+                      onRubricChange={setCompetenceRubric}
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => {
+                          if (competenceRubric) {
+                            // Auto-fill traditional grading based on competence assessment
+                            const overallScore =
+                              competenceRubric.overallScore || 0;
+                            let grade = "F";
+                            if (overallScore >= 90) grade = "A+";
+                            else if (overallScore >= 85) grade = "A";
+                            else if (overallScore >= 80) grade = "A-";
+                            else if (overallScore >= 75) grade = "B+";
+                            else if (overallScore >= 70) grade = "B";
+                            else if (overallScore >= 65) grade = "B-";
+                            else if (overallScore >= 60) grade = "C+";
+                            else if (overallScore >= 55) grade = "C";
+                            else if (overallScore >= 50) grade = "C-";
+                            else if (overallScore >= 40) grade = "D";
+
+                            setGradeData({
+                              score: overallScore,
+                              grade,
+                              feedback: competenceRubric.notes || "",
+                            });
+                          }
+                          handleGrade({
+                            preventDefault: () => {},
+                          } as React.FormEvent);
+                        }}
+                        data-testid="submit-competence-grade-button"
+                      >
+                        Submit Competence Assessment
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={closeGradingDialog}
+                        data-testid="cancel-competence-grade-button"
+                      >
+                        Cancel
+                      </Button>
                     </div>
                   </div>
-                  <div>
-                    <Label htmlFor="feedback">Feedback</Label>
-                    <textarea
-                      id="feedback"
-                      value={gradeData.feedback}
-                      onChange={(e) =>
-                        setGradeData({ ...gradeData, feedback: e.target.value })
-                      }
-                      className="w-full h-24 px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Provide feedback for the student"
-                      data-testid="feedback-textarea"
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <Button type="submit" data-testid="submit-grade-button">
-                      Submit Grade
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={closeGradingDialog}
-                      data-testid="cancel-grade-button"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </form>
-              </TabsContent>
-
-              <TabsContent value="competence" className="mt-6">
-                <div className="space-y-6">
-                  <CompetenceAssessmentComponent
-                    initialRubric={competenceRubric || undefined}
-                    onRubricChange={setCompetenceRubric}
-                  />
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => {
-                        if (competenceRubric) {
-                          // Auto-fill traditional grading based on competence assessment
-                          const overallScore =
-                            competenceRubric.overallScore || 0;
-                          let grade = "F";
-                          if (overallScore >= 90) grade = "A+";
-                          else if (overallScore >= 85) grade = "A";
-                          else if (overallScore >= 80) grade = "A-";
-                          else if (overallScore >= 75) grade = "B+";
-                          else if (overallScore >= 70) grade = "B";
-                          else if (overallScore >= 65) grade = "B-";
-                          else if (overallScore >= 60) grade = "C+";
-                          else if (overallScore >= 55) grade = "C";
-                          else if (overallScore >= 50) grade = "C-";
-                          else if (overallScore >= 40) grade = "D";
-
-                          setGradeData({
-                            score: overallScore,
-                            grade,
-                            feedback: competenceRubric.notes || "",
-                          });
-                        }
-                        handleGrade({
-                          preventDefault: () => {},
-                        } as React.FormEvent);
-                      }}
-                      data-testid="submit-competence-grade-button"
-                    >
-                      Submit Competence Assessment
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={closeGradingDialog}
-                      data-testid="cancel-competence-grade-button"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-          )}
-        </DialogContent>
-      </Dialog>
-    </div>
+                </TabsContent>
+              </Tabs>
+            )}
+          </DialogContent>
+        </Dialog>
+      </div>
+    </TranslationLoading>
   );
 }

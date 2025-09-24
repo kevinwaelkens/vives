@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { SessionProvider } from "next-auth/react";
 import { useState } from "react";
 import { TranslationProvider } from "@/lib/i18n/translation-provider";
+import { TranslationLoadingProvider } from "@/lib/i18n/translation-loading-context";
 
 // Initialize i18n
 import "@/lib/i18n";
@@ -28,7 +29,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
       <QueryClientProvider client={queryClient}>
-        <TranslationProvider>{children}</TranslationProvider>
+        <TranslationLoadingProvider>
+          <TranslationProvider>{children}</TranslationProvider>
+        </TranslationLoadingProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </SessionProvider>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/i18n/LanguageSelector";
+import { useTranslationLoading } from "@/lib/i18n/translation-loading-context";
 import {
   PageTitleProvider,
   usePageTitle,
@@ -43,8 +44,16 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { t } = useTranslation("navigation", { useDynamic: true });
+  const { t, isLoading: navigationLoading } = useTranslation("navigation", {
+    useDynamic: true,
+  });
   const { title } = usePageTitle();
+  const { preloadNamespaces } = useTranslationLoading();
+
+  // Preload essential namespaces on mount
+  useEffect(() => {
+    preloadNamespaces(["navigation", "common", "dashboard"]);
+  }, [preloadNamespaces]);
 
   const handleSignOut = () => {
     signOut({ callbackUrl: "/login" });
@@ -91,38 +100,53 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           {/* Navigation - scrollable area */}
           <div className="overflow-y-auto">
             <nav className="space-y-0.5 px-2 py-3" data-testid="navigation">
-              {navigationItems.map((item) => {
-                const isActive = pathname === item.href;
-                const Icon = item.icon;
-                const itemName = t(item.key);
+              {navigationLoading ? (
+                // Show loading skeleton for navigation
+                <div className="space-y-1">
+                  {[...Array(8)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-2.5 px-3 py-1.5"
+                    >
+                      <div className="h-5 w-5 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                navigationItems.map((item) => {
+                  const isActive = pathname === item.href;
+                  const Icon = item.icon;
+                  const itemName = t(item.key);
 
-                // Check if user has permission to view this route
-                if (
-                  item.key === "navigation.settings" &&
-                  session?.user?.role !== "ADMIN"
-                ) {
-                  return null;
-                }
+                  // Check if user has permission to view this route
+                  if (
+                    item.key === "navigation.settings" &&
+                    session?.user?.role !== "ADMIN"
+                  ) {
+                    return null;
+                  }
 
-                return (
-                  <Link
-                    key={item.key}
-                    href={item.href}
-                    className={cn(
-                      "flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200",
-                      isActive
-                        ? "bg-blue-50 text-blue-700 border-l-4 border-blue-700"
-                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:translate-x-1",
-                    )}
-                    data-testid={`nav-${item.key.split(".").pop()}`}
-                  >
-                    <Icon
-                      className={cn("h-5 w-5", isActive && "text-blue-700")}
-                    />
-                    {itemName}
-                  </Link>
-                );
-              })}
+                  return (
+                    <Link
+                      key={item.key}
+                      href={item.href}
+                      className={cn(
+                        "flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200",
+                        isActive
+                          ? "bg-blue-50 text-blue-700 border-l-4 border-blue-700"
+                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:translate-x-1",
+                      )}
+                      data-testid={`nav-${item.key.split(".").pop()}`}
+                    >
+                      <Icon
+                        className={cn("h-5 w-5", isActive && "text-blue-700")}
+                      />
+                      {itemName}
+                    </Link>
+                  );
+                })
+              )}
 
               {/* CMS Access for Admins */}
               {session?.user?.role === "ADMIN" && (
@@ -186,42 +210,45 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             <Menu className="h-5 w-5" />
           </Button>
           <div className="flex-1">
-            <h2 className="text-lg font-semibold text-gray-900">
-              {title ||
-                (() => {
-                  // Check for exact match first
-                  const currentItem = navigationItems.find(
-                    (item) => item.href === pathname,
-                  );
-                  if (currentItem) {
-                    return (
-                      t(currentItem.key) ||
-                      currentItem.key.split(".").pop() ||
-                      currentItem.key
+            {navigationLoading ? (
+              <div className="h-7 bg-gray-200 rounded w-32 animate-pulse"></div>
+            ) : (
+              <h2 className="text-lg font-semibold text-gray-900">
+                {title ||
+                  (() => {
+                    // Check for exact match first
+                    const currentItem = navigationItems.find(
+                      (item) => item.href === pathname,
                     );
-                  }
+                    if (currentItem) {
+                      return t(currentItem.key);
+                    }
 
-                  // Check for dynamic routes
-                  if (
-                    pathname.startsWith("/groups/") &&
-                    pathname !== "/groups"
-                  ) {
-                    return "Group Details";
-                  }
-                  if (
-                    pathname.startsWith("/students/") &&
-                    pathname !== "/students"
-                  ) {
-                    return "Student Details";
-                  }
-                  if (pathname.startsWith("/tasks/") && pathname !== "/tasks") {
-                    return "Task Details";
-                  }
+                    // Check for dynamic routes
+                    if (
+                      pathname.startsWith("/groups/") &&
+                      pathname !== "/groups"
+                    ) {
+                      return "Group Details";
+                    }
+                    if (
+                      pathname.startsWith("/students/") &&
+                      pathname !== "/students"
+                    ) {
+                      return "Student Details";
+                    }
+                    if (
+                      pathname.startsWith("/tasks/") &&
+                      pathname !== "/tasks"
+                    ) {
+                      return "Task Details";
+                    }
 
-                  // Default fallback
-                  return t("navigation.dashboard", "Dashboard");
-                })()}
-            </h2>
+                    // Default fallback
+                    return t("dashboard");
+                  })()}
+              </h2>
+            )}
           </div>
         </div>
 

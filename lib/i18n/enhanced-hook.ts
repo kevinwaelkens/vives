@@ -6,13 +6,18 @@ import type { TranslationKey } from "./types";
 interface UseTranslationOptions {
   useDynamic?: boolean;
   fallbackToStatic?: boolean;
+  showLoadingFallback?: boolean;
 }
 
 export function useTranslation<T extends TranslationKey = "common">(
   ns?: T,
   options: UseTranslationOptions = {},
 ) {
-  const { useDynamic = false, fallbackToStatic = true } = options;
+  const {
+    useDynamic = false,
+    fallbackToStatic = true,
+    showLoadingFallback = true,
+  } = options;
 
   // Static translation (original behavior)
   const staticTranslation = useI18nTranslation(ns);
@@ -29,6 +34,8 @@ export function useTranslation<T extends TranslationKey = "common">(
       ...dynamicTranslation,
       // Maintain compatibility with react-i18next interface
       i18n: staticTranslation.i18n,
+      // Enhanced loading information
+      showLoadingFallback,
     };
   }
 

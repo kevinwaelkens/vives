@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useEffect } from "react";
 import i18n from "./config";
 
 // Available namespaces
@@ -190,6 +190,9 @@ export function useDynamicTranslation(
       queryKey: ["translations"],
     });
   }, [queryClient]);
+
+  // Remove custom event system to prevent infinite re-renders
+  // Loading state management is now handled directly by the components
 
   return {
     t,
