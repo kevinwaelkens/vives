@@ -1,3 +1,4 @@
+// Dynamic translation hook (fallback)
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useEffect } from "react";
 import i18n from "./config";
@@ -23,57 +24,25 @@ interface TranslationOptions {
   enabled?: boolean;
 }
 
-// Fetch translations from API
-async function fetchTranslations(
-  namespace: string,
-  language: string,
-): Promise<Record<string, unknown>> {
-  try {
-    const url = `/api/translations/namespace/${namespace}?language=${language}`;
-    console.log(`🌐 Fetching from: ${url}`);
-
-    const response = await fetch(url);
-    console.log(`📡 Status: ${response.status}`);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`❌ Error ${response.status}:`, errorText);
-      throw new Error(
-        `Failed to fetch translations for ${namespace}: ${response.status}`,
-      );
-    }
-
-    const data = await response.json();
-    console.log(`✅ Got ${Object.keys(data).length} keys for ${namespace}`);
-    return data;
-  } catch (error) {
-    console.error(`❌ Fetch failed for ${namespace}:`, error);
-    throw error;
-  }
-}
-
-// Get static fallback translations
-function getStaticTranslations(
-  namespace: string,
-  language: string,
-): Record<string, unknown> {
-  const resources = i18n.getResourceBundle(language, namespace);
-  return resources || {};
-}
-
+// Dynamic translation implementation for build environments
 export function useDynamicTranslation(
   namespace: TranslationNamespace = "common",
   options: TranslationOptions = {},
 ) {
-  const { fallbackToStatic = true, enabled = true } = options;
+  const { fallbackToStatic = false, enabled = true } = options;
   const currentLanguage = i18n.language || "en";
-  // Handle regional language codes (e.g., en-BE -> en, nl-BE -> nl)
   const baseLanguage = currentLanguage.split("-")[0];
 
   const queryClient = useQueryClient();
-
-  // Query for dynamic translations
   const queryKey = ["translations", namespace, baseLanguage];
+
+  const fetchTranslations = async (ns: string, lang: string) => {
+    const response = await fetch(`/api/translations/namespace/${ns}?language=${lang}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch translations for ${ns}`);
+    }
+    return response.json();
+  };
 
   const {
     data: dynamicTranslations,
@@ -83,82 +52,33 @@ export function useDynamicTranslation(
   } = useQuery({
     queryKey,
     queryFn: () => fetchTranslations(namespace, baseLanguage),
-    enabled: enabled && typeof window !== "undefined", // Only run on client side
-    staleTime: 1 * 60 * 1000, // 1 minute - shorter stale time for development
-    gcTime: 5 * 60 * 1000, // 5 minutes - shorter cache time
-    retry: 1,
-    retryDelay: 500,
-    refetchOnMount: "always", // Always refetch when component mounts
-    refetchOnWindowFocus: false, // Don't refetch on window focus to avoid unnecessary requests
+    enabled: enabled && typeof window !== "undefined",
+    staleTime: 1 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+    retry: 2,
+    retryDelay: 1000,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
   });
 
-  // Get static translations as fallback
-  const staticTranslations = useMemo(
-    () => getStaticTranslations(namespace, baseLanguage),
-    [namespace, baseLanguage],
-  );
-
-  // Merge dynamic and static translations (dynamic takes priority)
   const translations = useMemo(() => {
-    console.log(`🔄 Translation state for ${namespace}:`, {
-      isLoading,
-      isSuccess,
-      hasData: !!dynamicTranslations,
-      dataKeys: dynamicTranslations
-        ? Object.keys(dynamicTranslations).length
-        : 0,
-      error: error?.message,
-    });
+    return dynamicTranslations || {};
+  }, [dynamicTranslations]);
 
-    if (isSuccess && dynamicTranslations) {
-      console.log(
-        `✅ Using dynamic translations for ${namespace}:`,
-        Object.keys(dynamicTranslations),
-      );
-      return fallbackToStatic
-        ? { ...staticTranslations, ...dynamicTranslations }
-        : dynamicTranslations;
-    }
-
-    console.log(
-      `⚠️ No dynamic translations for ${namespace}, fallback:`,
-      fallbackToStatic,
-    );
-    return fallbackToStatic ? staticTranslations : {};
-  }, [
-    dynamicTranslations,
-    staticTranslations,
-    isSuccess,
-    fallbackToStatic,
-    isLoading,
-    error,
-    namespace,
-  ]);
-
-  // Translation function with nested key support
   const t = useCallback(
     (key: string, params?: Record<string, unknown>): string => {
-      // If translations are still loading and we have no data, return the key
-      if (isLoading && !translations) {
-        return key;
-      }
-
       const keyParts = key.split(".");
       let value: unknown = translations;
 
-      // Navigate through nested object
       for (const part of keyParts) {
         if (value && typeof value === "object" && part in value) {
           value = (value as any)[part];
         } else {
-          // Return the key if not found (don't fallback to broken static system)
-          console.warn(`Translation key not found: ${namespace}:${key}`);
-          return key;
+          return key; // Return key if not found
         }
       }
 
       if (typeof value === "string") {
-        // Simple parameter interpolation
         if (params) {
           return value.replace(/\{\{(\w+)\}\}/g, (match, paramKey) => {
             return params[paramKey]?.toString() || match;
@@ -167,32 +87,20 @@ export function useDynamicTranslation(
         return value;
       }
 
-      // Fallback to original key if not found
-      console.warn(
-        `Translation value is not a string: ${namespace}:${key}`,
-        value,
-      );
       return key;
     },
-    [translations, namespace, isLoading],
+    [translations, namespace],
   );
 
-  // Function to invalidate translations cache
   const invalidateTranslations = useCallback(() => {
-    queryClient.invalidateQueries({
-      queryKey: ["translations", namespace],
-    });
-  }, [queryClient, namespace]);
+    queryClient.invalidateQueries({ queryKey });
+  }, [queryClient, queryKey]);
 
-  // Function to invalidate all translation caches
   const invalidateAllTranslations = useCallback(() => {
     queryClient.invalidateQueries({
       queryKey: ["translations"],
     });
   }, [queryClient]);
-
-  // Remove custom event system to prevent infinite re-renders
-  // Loading state management is now handled directly by the components
 
   return {
     t,
@@ -202,35 +110,7 @@ export function useDynamicTranslation(
     translations,
     invalidateTranslations,
     invalidateAllTranslations,
-    // Compatibility with react-i18next
-    ready: isSuccess || fallbackToStatic,
+    ready: isSuccess,
     i18n,
-  };
-}
-
-// Utility function to invalidate multiple namespaces
-export function useMultipleTranslationInvalidation() {
-  const queryClient = useQueryClient();
-
-  const invalidateNamespaces = useCallback(
-    (namespaces: TranslationNamespace[]) => {
-      namespaces.forEach((namespace) => {
-        queryClient.invalidateQueries({
-          queryKey: ["translations", namespace],
-        });
-      });
-    },
-    [queryClient],
-  );
-
-  const invalidateAll = useCallback(() => {
-    queryClient.invalidateQueries({
-      queryKey: ["translations"],
-    });
-  }, [queryClient]);
-
-  return {
-    invalidateNamespaces,
-    invalidateAll,
   };
 }

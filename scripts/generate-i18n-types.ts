@@ -25,62 +25,8 @@ interface TypeDefinition {
   };
 }
 
-async function createFallbackI18nFiles() {
-  console.log("📁 Creating fallback i18n files for build environment...");
-
-  const outputDir = path.join(process.cwd(), "lib", "i18n");
-  const localesDir = path.join(outputDir, "locales");
-
-  // Ensure directories exist
-  await fs.mkdir(localesDir, { recursive: true });
-
-  // Create minimal fallback files for common languages
-  const fallbackLanguages = ["en", "fr", "de", "it", "nl", "es"];
-  const fallbackCategories = [
-    "common",
-    "navigation",
-    "dashboard",
-    "auth",
-    "tasks",
-    "students",
-    "groups",
-    "attendance",
-    "assessments",
-    "analytics",
-    "cms",
-    "forms",
-    "settings",
-  ];
-
-  for (const lang of fallbackLanguages) {
-    const langDir = path.join(localesDir, lang);
-    await fs.mkdir(langDir, { recursive: true });
-
-    for (const category of fallbackCategories) {
-      const filePath = path.join(langDir, `${category}.json`);
-
-      // Check if file already exists
-      try {
-        await fs.access(filePath);
-        console.log(`✓ Using existing ${lang}/${category}.json`);
-      } catch {
-        // Create minimal fallback file
-        await fs.writeFile(filePath, JSON.stringify({}, null, 2));
-        console.log(`✓ Created fallback ${lang}/${category}.json`);
-      }
-    }
-  }
-
-  // Create minimal type definitions
-  await createMinimalTypeDefinitions();
-  await createMinimalConfig();
-  await createMinimalHook();
-  await createMinimalEnhancedHook();
-  await createMinimalDynamicHook();
-  await createMinimalTranslationProvider();
-  await createMinimalTranslationLoadingContext();
-  await createMinimalIndex();
-}
+// This function is now replaced by createMinimalTypeScriptFiles
+// Keeping for backward compatibility but not used
 
 async function createMinimalTypeDefinitions() {
   const outputDir = path.join(process.cwd(), "lib", "i18n");
@@ -228,27 +174,93 @@ interface TranslationOptions {
   enabled?: boolean;
 }
 
-// Fallback implementation that just uses static translations
+// Dynamic translation implementation for build environments
 export function useDynamicTranslation(
   namespace: TranslationNamespace = "common",
   options: TranslationOptions = {},
 ) {
-  const { fallbackToStatic = true, enabled = true } = options;
+  const { fallbackToStatic = false, enabled = true } = options;
+  const currentLanguage = i18n.language || "en";
+  const baseLanguage = currentLanguage.split("-")[0];
 
-  // In fallback mode, just return static data
-  const t = useCallback((key: string, params?: Record<string, unknown>): string => {
-    return i18n.t(\`\${namespace}:\${key}\`, params) || key;
-  }, [namespace]);
+  const queryClient = useQueryClient();
+  const queryKey = ["translations", namespace, baseLanguage];
+
+  const fetchTranslations = async (ns: string, lang: string) => {
+    const response = await fetch(\`/api/translations/namespace/\${ns}?language=\${lang}\`);
+    if (!response.ok) {
+      throw new Error(\`Failed to fetch translations for \${ns}\`);
+    }
+    return response.json();
+  };
+
+  const {
+    data: dynamicTranslations,
+    isLoading,
+    error,
+    isSuccess,
+  } = useQuery({
+    queryKey,
+    queryFn: () => fetchTranslations(namespace, baseLanguage),
+    enabled: enabled && typeof window !== "undefined",
+    staleTime: 1 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+    retry: 2,
+    retryDelay: 1000,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
+  });
+
+  const translations = useMemo(() => {
+    return dynamicTranslations || {};
+  }, [dynamicTranslations]);
+
+  const t = useCallback(
+    (key: string, params?: Record<string, unknown>): string => {
+      const keyParts = key.split(".");
+      let value: unknown = translations;
+
+      for (const part of keyParts) {
+        if (value && typeof value === "object" && part in value) {
+          value = (value as any)[part];
+        } else {
+          return key; // Return key if not found
+        }
+      }
+
+      if (typeof value === "string") {
+        if (params) {
+          return value.replace(/\\{\\{(\\w+)\\}\\}/g, (match, paramKey) => {
+            return params[paramKey]?.toString() || match;
+          });
+        }
+        return value;
+      }
+
+      return key;
+    },
+    [translations, namespace],
+  );
+
+  const invalidateTranslations = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey });
+  }, [queryClient, queryKey]);
+
+  const invalidateAllTranslations = useCallback(() => {
+    queryClient.invalidateQueries({
+      queryKey: ["translations"],
+    });
+  }, [queryClient]);
 
   return {
     t,
-    isLoading: false,
-    error: null,
-    isSuccess: true,
-    translations: {},
-    invalidateTranslations: () => {},
-    invalidateAllTranslations: () => {},
-    ready: true,
+    isLoading,
+    error,
+    isSuccess,
+    translations,
+    invalidateTranslations,
+    invalidateAllTranslations,
+    ready: isSuccess,
     i18n,
   };
 }
@@ -386,16 +398,80 @@ export function useTranslationLoading() {
   await fs.writeFile(contextPath, contextContent);
 }
 
+async function createMinimalTypeScriptFiles() {
+  console.log("📁 Creating minimal TypeScript files for build environment...");
+  
+  const outputDir = path.join(process.cwd(), "lib", "i18n");
+  await fs.mkdir(outputDir, { recursive: true });
+
+  // Create minimal types (just enough for TypeScript compilation)
+  await createMinimalTypeDefinitions();
+  
+  // Create a minimal config that doesn't require JSON files
+  await createMinimalBuildConfig();
+  
+  // Create enhanced hooks for dynamic translations only
+  await createMinimalEnhancedHook();
+  await createMinimalDynamicHook();
+  await createMinimalTranslationProvider();
+  await createMinimalTranslationLoadingContext();
+  
+  // Create index that exports enhanced hooks
+  await createMinimalIndex();
+}
+
+async function createMinimalBuildConfig() {
+  const outputDir = path.join(process.cwd(), "lib", "i18n");
+  const configPath = path.join(outputDir, "config.ts");
+
+  // Config that works without static JSON files - relies entirely on dynamic API
+  const configContent = `// Dynamic-only i18n configuration for build environments
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
+
+i18n
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    fallbackLng: "en",
+    debug: process.env.NODE_ENV === "development",
+
+    interpolation: {
+      escapeValue: false,
+    },
+
+    detection: {
+      order: ["localStorage", "navigator", "htmlTag"],
+      caches: ["localStorage"],
+    },
+
+    defaultNS: "common",
+    ns: [
+      "analytics", "assessments", "attendance", "auth", "cms", "common",
+      "dashboard", "forms", "groups", "navigation", "settings", "students", "tasks"
+    ],
+    
+    // No static resources - everything will be loaded dynamically
+    resources: {},
+  });
+
+export default i18n;
+`;
+
+  await fs.writeFile(configPath, configContent);
+}
+
 async function generateI18nFiles() {
   console.log("🌍 Generating i18n types and files from database...");
 
   // Check if we're in a build environment without database access
   if (process.env.VERCEL || process.env.CI) {
     console.log(
-      "⚠️  Build environment detected, using fallback i18n generation",
+      "⚠️  Build environment detected, creating minimal TypeScript files only",
     );
-    await createFallbackI18nFiles();
-    console.log("🎉 Fallback i18n files generated successfully!");
+    await createMinimalTypeScriptFiles();
+    console.log("🎉 Minimal TypeScript files created for build!");
     return;
   }
 
@@ -548,7 +624,7 @@ async function generateI18nFiles() {
     // In build environments, fall back to creating minimal files
     if (process.env.VERCEL || process.env.CI) {
       console.log("🔄 Falling back to minimal i18n files for build...");
-      await createFallbackI18nFiles();
+      await createMinimalTypeScriptFiles();
       console.log("🎉 Fallback i18n files generated successfully!");
     } else {
       process.exit(1);

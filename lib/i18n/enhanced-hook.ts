@@ -1,4 +1,4 @@
-// Enhanced useTranslation hook that supports both static and dynamic translations
+// Enhanced useTranslation hook that supports both static and dynamic translations (fallback)
 import { useTranslation as useI18nTranslation } from "react-i18next";
 import { useDynamicTranslation, TranslationNamespace } from "./dynamic-hook";
 import type { TranslationKey } from "./types";

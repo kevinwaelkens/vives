@@ -8,42 +8,14 @@ interface TranslationLoadingContextType {
   preloadNamespaces: (namespaces: TranslationNamespace[]) => void;
 }
 
-const TranslationLoadingContext = createContext<
-  TranslationLoadingContextType | undefined
->(undefined);
+const TranslationLoadingContext = createContext<TranslationLoadingContextType | undefined>(undefined);
 
-export function TranslationLoadingProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function TranslationLoadingProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
 
-  // Preload multiple namespaces
-  const preloadNamespaces = useCallback(
-    (namespaces: TranslationNamespace[]) => {
-      namespaces.forEach((namespace) => {
-        // Prefetch the query for current language
-        const currentLang =
-          typeof window !== "undefined"
-            ? localStorage.getItem("i18nextLng") || "en"
-            : "en";
-
-        queryClient.prefetchQuery({
-          queryKey: ["translations", namespace, currentLang],
-          queryFn: async () => {
-            const response = await fetch(
-              `/api/translations/namespace/${namespace}?language=${currentLang}`,
-            );
-            if (!response.ok) throw new Error(`Failed to fetch ${namespace}`);
-            return response.json();
-          },
-          staleTime: 1 * 60 * 1000,
-        });
-      });
-    },
-    [queryClient],
-  );
+  const preloadNamespaces = useCallback((namespaces: TranslationNamespace[]) => {
+    // Fallback implementation - do nothing
+  }, [queryClient]);
 
   const contextValue: TranslationLoadingContextType = {
     preloadNamespaces,
@@ -59,9 +31,7 @@ export function TranslationLoadingProvider({
 export function useTranslationLoading() {
   const context = useContext(TranslationLoadingContext);
   if (context === undefined) {
-    throw new Error(
-      "useTranslationLoading must be used within a TranslationLoadingProvider",
-    );
+    throw new Error("useTranslationLoading must be used within a TranslationLoadingProvider");
   }
   return context;
 }
