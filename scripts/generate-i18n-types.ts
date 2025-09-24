@@ -73,7 +73,12 @@ async function createFallbackI18nFiles() {
 
   // Create minimal type definitions
   await createMinimalTypeDefinitions();
+  await createMinimalConfig();
   await createMinimalHook();
+  await createMinimalEnhancedHook();
+  await createMinimalDynamicHook();
+  await createMinimalTranslationProvider();
+  await createMinimalTranslationLoadingContext();
   await createMinimalIndex();
 }
 
@@ -127,17 +132,258 @@ export function useT() {
   await fs.writeFile(hookPath, hookContent);
 }
 
+async function createMinimalEnhancedHook() {
+  const outputDir = path.join(process.cwd(), "lib", "i18n");
+  const enhancedHookPath = path.join(outputDir, "enhanced-hook.ts");
+
+  const enhancedHookContent = `// Enhanced useTranslation hook that supports both static and dynamic translations (fallback)
+import { useTranslation as useI18nTranslation } from "react-i18next";
+import { useDynamicTranslation, TranslationNamespace } from "./dynamic-hook";
+import type { TranslationKey } from "./types";
+
+interface UseTranslationOptions {
+  useDynamic?: boolean;
+  fallbackToStatic?: boolean;
+  showLoadingFallback?: boolean;
+}
+
+export function useTranslation<T extends TranslationKey = "common">(
+  ns?: T,
+  options: UseTranslationOptions = {},
+): any {
+  const {
+    useDynamic = false,
+    fallbackToStatic = true,
+    showLoadingFallback = true,
+  } = options;
+
+  // Static translation (original behavior)
+  const staticTranslation = useI18nTranslation(ns);
+
+  // Dynamic translation (new behavior)
+  const dynamicTranslation = useDynamicTranslation(ns as TranslationNamespace, {
+    fallbackToStatic,
+    enabled: useDynamic,
+  });
+
+  // Return the appropriate translation system
+  if (useDynamic) {
+    return {
+      ...dynamicTranslation,
+      // Maintain compatibility with react-i18next interface
+      i18n: staticTranslation.i18n,
+      // Enhanced loading information
+      showLoadingFallback,
+    };
+  }
+
+  return staticTranslation;
+}
+
+// Convenience hook for always using dynamic translations
+export function useDynamicTranslationHook<T extends TranslationKey = "common">(
+  ns?: T,
+  options: Omit<UseTranslationOptions, "useDynamic"> = {},
+) {
+  return useTranslation(ns, { ...options, useDynamic: true });
+}
+
+// Legacy hook for backward compatibility
+export function useT() {
+  const { t } = useI18nTranslation();
+  return t;
+}
+`;
+
+  await fs.writeFile(enhancedHookPath, enhancedHookContent);
+}
+
+async function createMinimalDynamicHook() {
+  const outputDir = path.join(process.cwd(), "lib", "i18n");
+  const dynamicHookPath = path.join(outputDir, "dynamic-hook.ts");
+
+  const dynamicHookContent = `// Dynamic translation hook (fallback)
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo, useEffect } from "react";
+import i18n from "./config";
+
+// Available namespaces
+export type TranslationNamespace =
+  | "analytics"
+  | "assessments"
+  | "attendance"
+  | "auth"
+  | "cms"
+  | "common"
+  | "dashboard"
+  | "forms"
+  | "groups"
+  | "navigation"
+  | "settings"
+  | "students"
+  | "tasks";
+
+interface TranslationOptions {
+  fallbackToStatic?: boolean;
+  enabled?: boolean;
+}
+
+// Fallback implementation that just uses static translations
+export function useDynamicTranslation(
+  namespace: TranslationNamespace = "common",
+  options: TranslationOptions = {},
+) {
+  const { fallbackToStatic = true, enabled = true } = options;
+
+  // In fallback mode, just return static data
+  const t = useCallback((key: string, params?: Record<string, unknown>): string => {
+    return i18n.t(\`\${namespace}:\${key}\`, params) || key;
+  }, [namespace]);
+
+  return {
+    t,
+    isLoading: false,
+    error: null,
+    isSuccess: true,
+    translations: {},
+    invalidateTranslations: () => {},
+    invalidateAllTranslations: () => {},
+    ready: true,
+    i18n,
+  };
+}
+`;
+
+  await fs.writeFile(dynamicHookPath, dynamicHookContent);
+}
+
 async function createMinimalIndex() {
   const outputDir = path.join(process.cwd(), "lib", "i18n");
   const indexPath = path.join(outputDir, "index.ts");
 
-  const indexContent = `// Auto-generated i18n exports (fallback)
-export { default as i18n } from './config';
-export { useTranslation, useT } from './hook';
-export type { TranslationKey, CategoryKey, TranslationNamespace } from './types';
+  const indexContent = `// Enhanced i18n exports with dynamic translation support (fallback)
+
+export { default as i18n } from "./config";
+export {
+  useTranslation,
+  useDynamicTranslationHook,
+  useT,
+} from "./enhanced-hook";
+export { useDynamicTranslation } from "./dynamic-hook";
+export type { TranslationKey, CategoryKey } from "./types";
 `;
 
   await fs.writeFile(indexPath, indexContent);
+}
+
+async function createMinimalConfig() {
+  const outputDir = path.join(process.cwd(), "lib", "i18n");
+  const configPath = path.join(outputDir, "config.ts");
+
+  const configContent = `// Auto-generated i18n configuration (fallback)
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
+
+i18n
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    fallbackLng: "en",
+    debug: process.env.NODE_ENV === "development",
+
+    interpolation: {
+      escapeValue: false,
+    },
+
+    detection: {
+      order: ["localStorage", "navigator", "htmlTag"],
+      caches: ["localStorage"],
+    },
+
+    defaultNS: "common",
+    ns: [
+      "analytics", "assessments", "attendance", "auth", "cms", "common",
+      "dashboard", "forms", "groups", "navigation", "settings", "students", "tasks"
+    ],
+  });
+
+export default i18n;
+`;
+
+  await fs.writeFile(configPath, configContent);
+}
+
+async function createMinimalTranslationProvider() {
+  const outputDir = path.join(process.cwd(), "lib", "i18n");
+  const providerPath = path.join(outputDir, "translation-provider.tsx");
+
+  const providerContent = `"use client";
+
+import { I18nextProvider } from "react-i18next";
+import i18n from "./config";
+
+export function TranslationProvider({ children }: { children: React.ReactNode }) {
+  return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;
+}
+
+// Fallback implementation for translation invalidation
+export function useTranslationInvalidation() {
+  return {
+    invalidateTranslations: (category?: string) => {},
+    invalidateAllTranslations: () => {},
+    onTranslationKeyUpdated: (category?: string) => {},
+  };
+}
+`;
+
+  await fs.writeFile(providerPath, providerContent);
+}
+
+async function createMinimalTranslationLoadingContext() {
+  const outputDir = path.join(process.cwd(), "lib", "i18n");
+  const contextPath = path.join(outputDir, "translation-loading-context.tsx");
+
+  const contextContent = `"use client";
+
+import React, { createContext, useContext, useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { TranslationNamespace } from "./dynamic-hook";
+
+interface TranslationLoadingContextType {
+  preloadNamespaces: (namespaces: TranslationNamespace[]) => void;
+}
+
+const TranslationLoadingContext = createContext<TranslationLoadingContextType | undefined>(undefined);
+
+export function TranslationLoadingProvider({ children }: { children: React.ReactNode }) {
+  const queryClient = useQueryClient();
+
+  const preloadNamespaces = useCallback((namespaces: TranslationNamespace[]) => {
+    // Fallback implementation - do nothing
+  }, [queryClient]);
+
+  const contextValue: TranslationLoadingContextType = {
+    preloadNamespaces,
+  };
+
+  return (
+    <TranslationLoadingContext.Provider value={contextValue}>
+      {children}
+    </TranslationLoadingContext.Provider>
+  );
+}
+
+export function useTranslationLoading() {
+  const context = useContext(TranslationLoadingContext);
+  if (context === undefined) {
+    throw new Error("useTranslationLoading must be used within a TranslationLoadingProvider");
+  }
+  return context;
+}
+`;
+
+  await fs.writeFile(contextPath, contextContent);
 }
 
 async function generateI18nFiles() {
