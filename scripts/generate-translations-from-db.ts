@@ -31,22 +31,47 @@ async function generateTranslationFiles() {
       `📋 Found ${languages.length} active languages: ${languages.map((l) => l.code).join(", ")}`,
     );
 
-    // Get all published translations
-    const translations = await prisma.translation.findMany({
-      where: {
-        isPublished: true,
-        isApproved: true,
-      },
-      include: {
-        translationKey: true,
-        language: true,
-      },
-      orderBy: [
-        { language: { code: "asc" } },
-        { translationKey: { category: "asc" } },
-        { translationKey: { key: "asc" } },
-      ],
-    });
+    // Get all translations (with backward compatibility)
+    // Try to get published translations first, fall back to approved if isPublished doesn't exist
+    let translations;
+    try {
+      translations = await prisma.translation.findMany({
+        where: {
+          isPublished: true,
+          isApproved: true,
+        },
+        include: {
+          translationKey: true,
+          language: true,
+        },
+        orderBy: [
+          { language: { code: "asc" } },
+          { translationKey: { category: "asc" } },
+          { translationKey: { key: "asc" } },
+        ],
+      });
+    } catch (error: any) {
+      // If isPublished column doesn't exist, fall back to just approved translations
+      if (error.code === 'P2022' && error.meta?.column?.includes('isPublished')) {
+        console.log("⚠️  isPublished column not found, using approved translations only");
+        translations = await prisma.translation.findMany({
+          where: {
+            isApproved: true,
+          },
+          include: {
+            translationKey: true,
+            language: true,
+          },
+          orderBy: [
+            { language: { code: "asc" } },
+            { translationKey: { category: "asc" } },
+            { translationKey: { key: "asc" } },
+          ],
+        });
+      } else {
+        throw error;
+      }
+    }
 
     console.log(`📝 Found ${translations.length} published translations`);
 
