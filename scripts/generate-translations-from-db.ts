@@ -74,77 +74,19 @@ async function generateTranslationFiles() {
       `📋 Found ${languages.length} active languages: ${languages.map((l) => l.code).join(", ")}`,
     );
 
-    // Get all translations with progressive fallback strategy
-    let translations;
-    
-    // Strategy 1: Try all translations first (most compatible)
-    try {
-      console.log("📝 Attempting to fetch all translations...");
-      translations = await prisma.translation.findMany({
-        include: {
-          translationKey: true,
-          language: true,
-        },
-        orderBy: [
-          { language: { code: "asc" } },
-          { translationKey: { category: "asc" } },
-          { translationKey: { key: "asc" } },
-        ],
-      });
-      console.log(`✅ Successfully fetched ${translations.length} translations (no filtering)`);
-    } catch (error: any) {
-      console.error("❌ Failed to fetch translations:", error);
-      throw error;
-    }
-
-    // Strategy 2: Filter approved translations if the column exists
-    if (translations.length > 0) {
-      try {
-        const approvedTranslations = await prisma.translation.findMany({
-          where: {
-            isApproved: true,
-          },
-          include: {
-            translationKey: true,
-            language: true,
-          },
-          orderBy: [
-            { language: { code: "asc" } },
-            { translationKey: { category: "asc" } },
-            { translationKey: { key: "asc" } },
-          ],
-        });
-        console.log(`✅ Found ${approvedTranslations.length} approved translations, using those`);
-        translations = approvedTranslations;
-      } catch (approvedError: any) {
-        console.log("⚠️  isApproved column not found, using all translations");
-      }
-    }
-
-    // Strategy 3: Filter published translations if the column exists
-    if (translations.length > 0) {
-      try {
-        const publishedTranslations = await prisma.translation.findMany({
-          where: {
-            isPublished: true,
-            isApproved: true,
-          },
-          include: {
-            translationKey: true,
-            language: true,
-          },
-          orderBy: [
-            { language: { code: "asc" } },
-            { translationKey: { category: "asc" } },
-            { translationKey: { key: "asc" } },
-          ],
-        });
-        console.log(`✅ Found ${publishedTranslations.length} published translations, using those`);
-        translations = publishedTranslations;
-      } catch (publishedError: any) {
-        console.log("⚠️  isPublished column not found, using approved/all translations");
-      }
-    }
+    // Get all translations (no filtering for maximum compatibility)
+    console.log("📝 Fetching all translations from database...");
+    const translations = await prisma.translation.findMany({
+      include: {
+        translationKey: true,
+        language: true,
+      },
+      orderBy: [
+        { language: { code: "asc" } },
+        { translationKey: { category: "asc" } },
+        { translationKey: { key: "asc" } },
+      ],
+    });
 
     console.log(`📝 Found ${translations.length} published translations`);
 
