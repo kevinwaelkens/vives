@@ -10,18 +10,24 @@
 import fs from "fs/promises";
 import path from "path";
 
-// Try to use shared Prisma instance, fallback to new instance if needed
-let prisma: any;
-try {
-  // Use shared instance from lib/prisma.ts
-  const { prisma: sharedPrisma } = require("../lib/prisma");
-  prisma = sharedPrisma;
-} catch (error) {
-  // Fallback to creating a new instance if shared one fails
-  console.log("⚠️  Using fallback Prisma instance");
-  const { PrismaClient } = require("@prisma/client");
-  prisma = new PrismaClient();
-}
+// Create a completely isolated Prisma instance for build scripts
+// This prevents conflicts with any existing connections
+const { PrismaClient } = require("@prisma/client");
+
+// Add a unique connection parameter to avoid prepared statement conflicts
+const databaseUrl = process.env.DATABASE_URL;
+const uniqueUrl = databaseUrl?.includes('?') 
+  ? `${databaseUrl}&application_name=translation_build_${Date.now()}`
+  : `${databaseUrl}?application_name=translation_build_${Date.now()}`;
+
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: uniqueUrl,
+    },
+  },
+  log: ['error'], // Minimal logging to avoid conflicts
+});
 
 interface TranslationData {
   [key: string]: string | TranslationData;
@@ -30,12 +36,32 @@ interface TranslationData {
 async function generateTranslationFiles() {
   console.log("🌍 Generating translation files from database...");
 
+  // Add a small delay to avoid connection conflicts in build environments
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
   try {
-    // Get all active languages
-    const languages = await prisma.language.findMany({
-      where: { isActive: true },
-      orderBy: { code: "asc" },
-    });
+    // Get all active languages (with retry for connection conflicts)
+    let languages;
+    let retryCount = 0;
+    const maxRetries = 3;
+    
+    while (retryCount < maxRetries) {
+      try {
+        languages = await prisma.language.findMany({
+          where: { isActive: true },
+          orderBy: { code: "asc" },
+        });
+        break; // Success, exit retry loop
+      } catch (error: any) {
+        retryCount++;
+        if (error.message?.includes('prepared statement') && retryCount < maxRetries) {
+          console.log(`⚠️  Connection conflict detected, retrying (${retryCount}/${maxRetries})...`);
+          await new Promise(resolve => setTimeout(resolve, 2000 * retryCount)); // Exponential backoff
+          continue;
+        }
+        throw error; // Re-throw if not a connection conflict or max retries reached
+      }
+    }
 
     console.log(
       `📋 Found ${languages.length} active languages: ${languages.map((l) => l.code).join(", ")}`,
@@ -161,13 +187,11 @@ async function generateTranslationFiles() {
     console.error("❌ Failed to generate translation files:", error);
     throw error;
   } finally {
-    // Only disconnect if we created our own instance
-    if (prisma && typeof prisma.$disconnect === 'function') {
-      try {
-        await prisma.$disconnect();
-      } catch (disconnectError) {
-        console.log("⚠️  Could not disconnect Prisma:", disconnectError);
-      }
+    // Always disconnect our isolated instance
+    try {
+      await prisma.$disconnect();
+    } catch (disconnectError) {
+      console.log("⚠️  Could not disconnect Prisma:", disconnectError);
     }
   }
 }
