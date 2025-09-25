@@ -98,31 +98,53 @@ async function generateTranslationFiles() {
       const errorMessage = error?.message || "";
       const errorCode = error?.code;
       const columnInfo = error?.meta?.column || "";
-      
-      console.log("🔍 Translation query error:", { errorCode, errorMessage, columnInfo });
-      
+
+      console.log("🔍 Translation query error:", {
+        errorCode,
+        errorMessage,
+        columnInfo,
+      });
+
       if (
         (errorCode === "P2022" && columnInfo.includes("isPublished")) ||
         errorMessage.includes("isPublished") ||
-        errorMessage.includes("column") && errorMessage.includes("Translation.isPublished")
+        (errorMessage.includes("column") &&
+          errorMessage.includes("Translation.isPublished"))
       ) {
         console.log(
           "⚠️  isPublished column not found, using approved translations only",
         );
-        translations = await prisma.translation.findMany({
-          where: {
-            isApproved: true,
-          },
-          include: {
-            translationKey: true,
-            language: true,
-          },
-          orderBy: [
-            { language: { code: "asc" } },
-            { translationKey: { category: "asc" } },
-            { translationKey: { key: "asc" } },
-          ],
-        });
+        
+        // Try with isApproved, fallback to all translations if that also doesn't exist
+        try {
+          translations = await prisma.translation.findMany({
+            where: {
+              isApproved: true,
+            },
+            include: {
+              translationKey: true,
+              language: true,
+            },
+            orderBy: [
+              { language: { code: "asc" } },
+              { translationKey: { category: "asc" } },
+              { translationKey: { key: "asc" } },
+            ],
+          });
+        } catch (approvedError: any) {
+          console.log("⚠️  isApproved column also not found, using all translations");
+          translations = await prisma.translation.findMany({
+            include: {
+              translationKey: true,
+              language: true,
+            },
+            orderBy: [
+              { language: { code: "asc" } },
+              { translationKey: { category: "asc" } },
+              { translationKey: { key: "asc" } },
+            ],
+          });
+        }
       } else {
         throw error;
       }
