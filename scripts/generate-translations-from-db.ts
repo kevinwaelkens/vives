@@ -16,7 +16,7 @@ const { PrismaClient } = require("@prisma/client");
 
 // Add a unique connection parameter to avoid prepared statement conflicts
 const databaseUrl = process.env.DATABASE_URL;
-const uniqueUrl = databaseUrl?.includes('?') 
+const uniqueUrl = databaseUrl?.includes("?")
   ? `${databaseUrl}&application_name=translation_build_${Date.now()}`
   : `${databaseUrl}?application_name=translation_build_${Date.now()}`;
 
@@ -26,7 +26,7 @@ const prisma = new PrismaClient({
       url: uniqueUrl,
     },
   },
-  log: ['error'], // Minimal logging to avoid conflicts
+  log: ["error"], // Minimal logging to avoid conflicts
 });
 
 interface TranslationData {
@@ -37,14 +37,14 @@ async function generateTranslationFiles() {
   console.log("🌍 Generating translation files from database...");
 
   // Add a small delay to avoid connection conflicts in build environments
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   try {
     // Get all active languages (with retry for connection conflicts)
     let languages;
     let retryCount = 0;
     const maxRetries = 3;
-    
+
     while (retryCount < maxRetries) {
       try {
         languages = await prisma.language.findMany({
@@ -54,9 +54,16 @@ async function generateTranslationFiles() {
         break; // Success, exit retry loop
       } catch (error: any) {
         retryCount++;
-        if (error.message?.includes('prepared statement') && retryCount < maxRetries) {
-          console.log(`⚠️  Connection conflict detected, retrying (${retryCount}/${maxRetries})...`);
-          await new Promise(resolve => setTimeout(resolve, 2000 * retryCount)); // Exponential backoff
+        if (
+          error.message?.includes("prepared statement") &&
+          retryCount < maxRetries
+        ) {
+          console.log(
+            `⚠️  Connection conflict detected, retrying (${retryCount}/${maxRetries})...`,
+          );
+          await new Promise((resolve) =>
+            setTimeout(resolve, 2000 * retryCount),
+          ); // Exponential backoff
           continue;
         }
         throw error; // Re-throw if not a connection conflict or max retries reached
@@ -88,9 +95,16 @@ async function generateTranslationFiles() {
       });
     } catch (error: any) {
       // If isPublished column doesn't exist, fall back to just approved translations
+      const errorMessage = error?.message || "";
+      const errorCode = error?.code;
+      const columnInfo = error?.meta?.column || "";
+      
+      console.log("🔍 Translation query error:", { errorCode, errorMessage, columnInfo });
+      
       if (
-        error.code === "P2022" &&
-        error.meta?.column?.includes("isPublished")
+        (errorCode === "P2022" && columnInfo.includes("isPublished")) ||
+        errorMessage.includes("isPublished") ||
+        errorMessage.includes("column") && errorMessage.includes("Translation.isPublished")
       ) {
         console.log(
           "⚠️  isPublished column not found, using approved translations only",
