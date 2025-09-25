@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npm run i18n:generate || echo 'i18n generation failed, continuing...' && next dev",
-    "build": "npm run i18n:generate && npm run i18n:build && prisma generate && next build",
+    "build": "npm run i18n:generate && (npm run i18n:build || echo 'Database translation build failed, using static files') && prisma generate && next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "lint": "biome check",

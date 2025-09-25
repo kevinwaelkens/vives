@@ -36,6 +36,12 @@ interface TranslationData {
 async function generateTranslationFiles() {
   console.log("🌍 Generating translation files from database...");
 
+  // Check if database is available
+  if (!process.env.DATABASE_URL) {
+    console.log("⚠️  No DATABASE_URL found, skipping database translation generation");
+    return;
+  }
+
   // Add a small delay to avoid connection conflicts in build environments
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -157,8 +163,15 @@ async function generateTranslationFiles() {
     await generateTypeDefinitions(translationsByLanguage);
 
     console.log("🎉 Translation files generated successfully!");
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ Failed to generate translation files:", error);
+    
+    // If it's a connection error, don't fail the build
+    if (error.message?.includes('connect') || error.code === 'P1001' || error.code === 'P1017') {
+      console.log("⚠️  Database connection failed during build, this is expected in some environments");
+      return;
+    }
+    
     throw error;
   } finally {
     // Always disconnect our isolated instance
