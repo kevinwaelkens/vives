@@ -7,11 +7,21 @@
  * or when translations are published.
  */
 
-import { PrismaClient } from "@prisma/client";
 import fs from "fs/promises";
 import path from "path";
 
-const prisma = new PrismaClient();
+// Try to use shared Prisma instance, fallback to new instance if needed
+let prisma: any;
+try {
+  // Use shared instance from lib/prisma.ts
+  const { prisma: sharedPrisma } = require("../lib/prisma");
+  prisma = sharedPrisma;
+} catch (error) {
+  // Fallback to creating a new instance if shared one fails
+  console.log("⚠️  Using fallback Prisma instance");
+  const { PrismaClient } = require("@prisma/client");
+  prisma = new PrismaClient();
+}
 
 interface TranslationData {
   [key: string]: string | TranslationData;
@@ -52,8 +62,13 @@ async function generateTranslationFiles() {
       });
     } catch (error: any) {
       // If isPublished column doesn't exist, fall back to just approved translations
-      if (error.code === 'P2022' && error.meta?.column?.includes('isPublished')) {
-        console.log("⚠️  isPublished column not found, using approved translations only");
+      if (
+        error.code === "P2022" &&
+        error.meta?.column?.includes("isPublished")
+      ) {
+        console.log(
+          "⚠️  isPublished column not found, using approved translations only",
+        );
         translations = await prisma.translation.findMany({
           where: {
             isApproved: true,
@@ -146,7 +161,14 @@ async function generateTranslationFiles() {
     console.error("❌ Failed to generate translation files:", error);
     throw error;
   } finally {
-    await prisma.$disconnect();
+    // Only disconnect if we created our own instance
+    if (prisma && typeof prisma.$disconnect === 'function') {
+      try {
+        await prisma.$disconnect();
+      } catch (disconnectError) {
+        console.log("⚠️  Could not disconnect Prisma:", disconnectError);
+      }
+    }
   }
 }
 
