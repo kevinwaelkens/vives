@@ -1,0 +1,44 @@
+{
+  "attendance": {
+    "absent": "Absent",
+    "excused": "Excused",
+    "late": "Late",
+    "present": "Present",
+    "title": "Today's Attendance"
+  },
+  "detail": {
+    "active_tasks": "Active Tasks",
+    "add_first_student": "Add your first student",
+    "create_first_task": "Create your first task",
+    "loading": "Loading...",
+    "no_students": "No students found",
+    "no_tasks": "No tasks found",
+    "recent_tasks": "Recent Tasks",
+    "students": "Students",
+    "total_students": "Total Students",
+    "tutors": "Tutors"
+  },
+  "due_in_days": "Due: In {{count}} days",
+  "due_next_week": "Due: Next Week",
+  "due_tomorrow": "Due: Tomorrow",
+  "late_submission": "Late",
+  "loading": "Loading dashboard...",
+  "overview": "Overview",
+  "recent_activity": "Recent Activity",
+  "recent_submissions": "Recent Submissions",
+  "recent_tasks": "Recent Tasks",
+  "statistics": "Statistics",
+  "stats": {
+    "active_class_groups": "Active class groups",
+    "active_students_enrolled": "Active students enrolled",
+    "active_tasks": "Active Tasks",
+    "awaiting_grading": "Awaiting grading",
+    "pending_assessments": "Pending Assessments",
+    "published_assignments": "Published assignments",
+    "total_groups": "Total Groups",
+    "total_students": "Total Students"
+  },
+  "submitted": "Submitted",
+  "title": "Dashboard",
+  "welcome": "Welcome to School Management System"
+}

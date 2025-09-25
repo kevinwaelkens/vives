@@ -1,0 +1,42 @@
+{
+  "account": {
+    "ensure_secure": "Stellen Sie sicher, dass Ihr Konto sicher bleibt"
+  },
+  "language_preferences": "Spracheinstellungen",
+  "notification_settings": "Benachrichtigungseinstellungen",
+  "notifications": {
+    "attendance_alerts": "Anwesenheitswarnungen",
+    "description": "Verwalten Sie Ihre Benachrichtigungseinstellungen",
+    "email_notifications": "E-Mail-Benachrichtigungen",
+    "grade_updates": "Notenaktualisierungen",
+    "task_reminders": "Aufgabenerinnerungen",
+    "title": "Benachrichtigungseinstellungen",
+    "weekly_reports": "Wöchentliche Berichte"
+  },
+  "profile": {
+    "description": "Aktualisieren Sie Ihre persönlichen Daten",
+    "email": "E-Mail-Adresse",
+    "full_name": "Vollständiger Name",
+    "phone": "Telefonnummer",
+    "title": "Profilinformationen"
+  },
+  "profile_settings": "Profileinstellungen",
+  "security": {
+    "change_password": "Passwort ändern",
+    "confirm_password": "Neues Passwort bestätigen",
+    "current_password": "Aktuelles Passwort",
+    "new_password": "Neues Passwort",
+    "title": "Sicherheitseinstellungen"
+  },
+  "subtitle": "Verwalten Sie Ihr Konto und Anwendungseinstellungen",
+  "system": {
+    "title": "Systemeinstellungen"
+  },
+  "tabs": {
+    "notifications": "Benachrichtigungen",
+    "profile": "Profil",
+    "security": "Sicherheit",
+    "system": "System"
+  },
+  "title": "Einstellungen"
+}

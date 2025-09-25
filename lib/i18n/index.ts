@@ -1,4 +1,4 @@
-// Enhanced i18n exports with dynamic translation support (fallback)
+// Enhanced i18n exports with dynamic translation support
 
 export { default as i18n } from "./config";
 export {

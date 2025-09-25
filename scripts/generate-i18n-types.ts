@@ -98,21 +98,21 @@ export function useTranslation<T extends TranslationKey = "common">(
   options: UseTranslationOptions = {},
 ): any {
   const {
-    useDynamic = false,
+    useDynamic = true, // Default to dynamic in hybrid system
     fallbackToStatic = true,
     showLoadingFallback = true,
   } = options;
 
-  // Static translation (original behavior)
+  // Static translation (fallback behavior)
   const staticTranslation = useI18nTranslation(ns);
 
-  // Dynamic translation (new behavior)
+  // Dynamic translation (preferred behavior)
   const dynamicTranslation = useDynamicTranslation(ns as TranslationNamespace, {
     fallbackToStatic,
     enabled: useDynamic,
   });
 
-  // Return the appropriate translation system
+  // In hybrid system, always try dynamic first, fall back to static
   if (useDynamic) {
     return {
       ...dynamicTranslation,
@@ -398,26 +398,196 @@ export function useTranslationLoading() {
   await fs.writeFile(contextPath, contextContent);
 }
 
-async function createMinimalTypeScriptFiles() {
-  console.log("📁 Creating minimal TypeScript files for build environment...");
-  
-  const outputDir = path.join(process.cwd(), "lib", "i18n");
-  await fs.mkdir(outputDir, { recursive: true });
+async function createHybridI18nFiles() {
+  console.log(
+    "📁 Creating hybrid static/dynamic i18n files for build environment...",
+  );
 
-  // Create minimal types (just enough for TypeScript compilation)
+  const outputDir = path.join(process.cwd(), "lib", "i18n");
+  const localesDir = path.join(outputDir, "locales");
+
+  await fs.mkdir(outputDir, { recursive: true });
+  await fs.mkdir(localesDir, { recursive: true });
+
+  // Check if we have existing JSON files from previous builds
+  const hasExistingFiles = await checkForExistingTranslationFiles();
+
+  if (hasExistingFiles) {
+    console.log("✅ Using existing translation files from previous build");
+  } else {
+    console.log(
+      "⚠️  No existing translation files found, creating minimal fallbacks",
+    );
+    await createMinimalTranslationFiles();
+  }
+
+  // Always create the TypeScript infrastructure
   await createMinimalTypeDefinitions();
-  
-  // Create a minimal config that doesn't require JSON files
-  await createMinimalBuildConfig();
-  
-  // Create enhanced hooks for dynamic translations only
+  await createHybridConfig();
   await createMinimalEnhancedHook();
   await createMinimalDynamicHook();
   await createMinimalTranslationProvider();
   await createMinimalTranslationLoadingContext();
-  
-  // Create index that exports enhanced hooks
   await createMinimalIndex();
+}
+
+async function checkForExistingTranslationFiles(): Promise<boolean> {
+  const outputDir = path.join(process.cwd(), "lib", "i18n");
+  const localesDir = path.join(outputDir, "locales");
+
+  try {
+    const enDir = path.join(localesDir, "en");
+    await fs.access(path.join(enDir, "common.json"));
+    await fs.access(path.join(enDir, "navigation.json"));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function createMinimalTranslationFiles() {
+  const outputDir = path.join(process.cwd(), "lib", "i18n");
+  const localesDir = path.join(outputDir, "locales");
+
+  const fallbackLanguages = ["en", "fr", "de", "it", "nl", "es"];
+  const fallbackCategories = [
+    "common",
+    "navigation",
+    "dashboard",
+    "auth",
+    "tasks",
+    "students",
+    "groups",
+    "attendance",
+    "assessments",
+    "analytics",
+    "cms",
+    "forms",
+    "settings",
+  ];
+
+  for (const lang of fallbackLanguages) {
+    const langDir = path.join(localesDir, lang);
+    await fs.mkdir(langDir, { recursive: true });
+
+    for (const category of fallbackCategories) {
+      const filePath = path.join(langDir, `${category}.json`);
+      // Create minimal fallback with key structure but no content
+      await fs.writeFile(
+        filePath,
+        JSON.stringify(
+          {
+            title: `${category.charAt(0).toUpperCase() + category.slice(1)}`,
+            loading: "Loading...",
+          },
+          null,
+          2,
+        ),
+      );
+    }
+  }
+}
+
+async function createHybridConfig() {
+  const outputDir = path.join(process.cwd(), "lib", "i18n");
+  const configPath = path.join(outputDir, "config.ts");
+
+  const configContent = `// Hybrid i18n configuration - supports both static and dynamic
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
+
+// Import static files as fallbacks
+import common_en from './locales/en/common.json';
+import navigation_en from './locales/en/navigation.json';
+import dashboard_en from './locales/en/dashboard.json';
+import auth_en from './locales/en/auth.json';
+import tasks_en from './locales/en/tasks.json';
+import students_en from './locales/en/students.json';
+import groups_en from './locales/en/groups.json';
+import attendance_en from './locales/en/attendance.json';
+import assessments_en from './locales/en/assessments.json';
+import analytics_en from './locales/en/analytics.json';
+import cms_en from './locales/en/cms.json';
+import forms_en from './locales/en/forms.json';
+import settings_en from './locales/en/settings.json';
+
+import common_fr from './locales/fr/common.json';
+import navigation_fr from './locales/fr/navigation.json';
+import dashboard_fr from './locales/fr/dashboard.json';
+import auth_fr from './locales/fr/auth.json';
+import tasks_fr from './locales/fr/tasks.json';
+import students_fr from './locales/fr/students.json';
+import groups_fr from './locales/fr/groups.json';
+import attendance_fr from './locales/fr/attendance.json';
+import assessments_fr from './locales/fr/assessments.json';
+import analytics_fr from './locales/fr/analytics.json';
+import cms_fr from './locales/fr/cms.json';
+import forms_fr from './locales/fr/forms.json';
+import settings_fr from './locales/fr/settings.json';
+
+const resources = {
+  en: {
+    common: common_en,
+    navigation: navigation_en,
+    dashboard: dashboard_en,
+    auth: auth_en,
+    tasks: tasks_en,
+    students: students_en,
+    groups: groups_en,
+    attendance: attendance_en,
+    assessments: assessments_en,
+    analytics: analytics_en,
+    cms: cms_en,
+    forms: forms_en,
+    settings: settings_en,
+  },
+  fr: {
+    common: common_fr,
+    navigation: navigation_fr,
+    dashboard: dashboard_fr,
+    auth: auth_fr,
+    tasks: tasks_fr,
+    students: students_fr,
+    groups: groups_fr,
+    attendance: attendance_fr,
+    assessments: assessments_fr,
+    analytics: analytics_fr,
+    cms: cms_fr,
+    forms: forms_fr,
+    settings: settings_fr,
+  },
+} as const;
+
+i18n
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    resources,
+    fallbackLng: "en",
+    debug: process.env.NODE_ENV === "development",
+
+    interpolation: {
+      escapeValue: false,
+    },
+
+    detection: {
+      order: ["localStorage", "navigator", "htmlTag"],
+      caches: ["localStorage"],
+    },
+
+    defaultNS: "common",
+    ns: [
+      "analytics", "assessments", "attendance", "auth", "cms", "common",
+      "dashboard", "forms", "groups", "navigation", "settings", "students", "tasks"
+    ],
+  });
+
+export default i18n;
+export { resources };
+`;
+
+  await fs.writeFile(configPath, configContent);
 }
 
 async function createMinimalBuildConfig() {
@@ -463,15 +633,27 @@ export default i18n;
 }
 
 async function generateI18nFiles() {
-  console.log("🌍 Generating i18n types and files from database...");
+  console.log("🌍 Generating i18n types and files...");
 
-  // Check if we're in a build environment without database access
+  // Check if we have existing static files (from CMS publish)
+  const hasStaticFiles = await checkForExistingTranslationFiles();
+
+  if (hasStaticFiles && (process.env.VERCEL || process.env.CI)) {
+    console.log(
+      "✅ Found existing static files in build environment, using hybrid system",
+    );
+    await createHybridI18nFiles();
+    console.log("🎉 Hybrid i18n files created for build!");
+    return;
+  }
+
+  // Check if we're in a build environment without database access and no static files
   if (process.env.VERCEL || process.env.CI) {
     console.log(
-      "⚠️  Build environment detected, creating minimal TypeScript files only",
+      "⚠️  Build environment detected with no static files, creating minimal fallbacks",
     );
-    await createMinimalTypeScriptFiles();
-    console.log("🎉 Minimal TypeScript files created for build!");
+    await createHybridI18nFiles();
+    console.log("🎉 Minimal hybrid i18n files created for build!");
     return;
   }
 

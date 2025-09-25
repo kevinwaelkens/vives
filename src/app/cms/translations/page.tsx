@@ -45,6 +45,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { useTranslationInvalidation } from "@/lib/i18n/translation-provider";
+import { useSession } from "next-auth/react";
 
 interface Language {
   id: string;
@@ -75,6 +76,7 @@ interface Translation {
 export default function CMSTranslationsPage() {
   const { t } = useTranslation("cms");
   const { onTranslationKeyUpdated } = useTranslationInvalidation();
+  const { data: session, status } = useSession();
   const [languages, setLanguages] = useState<Language[]>([]);
   const [translationKeys, setTranslationKeys] = useState<TranslationKey[]>([]);
   const [loading, setLoading] = useState(true);
@@ -107,6 +109,21 @@ export default function CMSTranslationsPage() {
     isApproved: false,
   });
 
+  // Publication states
+  const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
+  const [publishNotes, setPublishNotes] = useState("");
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [publicationHistory, setPublicationHistory] = useState<
+    Array<{
+      id: string;
+      version: string;
+      publishedAt: string;
+      user: { name: string; email: string };
+      deploymentStatus: string;
+    }>
+  >([]);
+  const [unpublishedCount, setUnpublishedCount] = useState(0);
+
   const fetchLanguages = useCallback(async () => {
     try {
       const response = await fetch("/api/translations/languages");
@@ -118,6 +135,33 @@ export default function CMSTranslationsPage() {
       console.error("Failed to fetch languages:", error);
     }
   }, []);
+
+  const fetchPublicationData = useCallback(async () => {
+    // Only fetch publication data for admin users
+    if (!session || session.user.role !== "ADMIN") {
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/translations/publish");
+      if (response.ok) {
+        const data = await response.json();
+        setPublicationHistory(data.publications);
+        setUnpublishedCount(data.unpublishedCount);
+      } else if (response.status === 401) {
+        // Unauthorized - user is not admin, silently ignore
+        console.log("User is not authorized to access publication data");
+      } else {
+        console.error(
+          "Failed to fetch publication data:",
+          response.status,
+          response.statusText,
+        );
+      }
+    } catch (error) {
+      console.error("Failed to fetch publication data:", error);
+    }
+  }, [session]);
 
   const fetchTranslationKeys = useCallback(async () => {
     try {
@@ -146,6 +190,13 @@ export default function CMSTranslationsPage() {
     fetchTranslationKeys();
   }, [fetchLanguages, fetchTranslationKeys]);
 
+  // Fetch publication data separately when session is available
+  useEffect(() => {
+    if (status !== "loading") {
+      fetchPublicationData();
+    }
+  }, [fetchPublicationData, status]);
+
   // Refetch when filters change
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
@@ -157,7 +208,11 @@ export default function CMSTranslationsPage() {
 
   // Get unique categories
   const categories = Array.from(
-    new Set(translationKeys.map((key) => key.category).filter((cat): cat is string => Boolean(cat))),
+    new Set(
+      translationKeys
+        .map((key) => key.category)
+        .filter((cat): cat is string => Boolean(cat)),
+    ),
   );
 
   // Filter and sort translation keys
@@ -335,6 +390,41 @@ export default function CMSTranslationsPage() {
     setIsDeleteDialogOpen(true);
   };
 
+  const handlePublish = async () => {
+    setIsPublishing(true);
+    try {
+      const response = await fetch("/api/translations/publish", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          notes: publishNotes,
+          triggerDeployment: true,
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert(
+          `Successfully published ${result.newTranslations} new translations! Deployment triggered.`,
+        );
+        setIsPublishDialogOpen(false);
+        setPublishNotes("");
+        await fetchPublicationData();
+        await fetchTranslationKeys();
+      } else {
+        const error = await response.json();
+        alert(`Failed to publish: ${error.error}`);
+      }
+    } catch (error) {
+      console.error("Publish failed:", error);
+      alert("Failed to publish translations");
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -348,14 +438,26 @@ export default function CMSTranslationsPage() {
             Manage translation keys and translations for all supported languages
           </p>
         </div>
-        {/* Currently we don't need to allow this as dynamic content can't be used either */}
-        {/* <Button
-          onClick={() => openKeyDialog()}
-          className="flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Add Translation Key
-        </Button> */}
+        <div className="flex gap-2">
+          {session?.user.role === "ADMIN" && unpublishedCount > 0 && (
+            <Button
+              onClick={() => setIsPublishDialogOpen(true)}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+              disabled={isPublishing}
+            >
+              <Globe className="h-4 w-4" />
+              Publish ({unpublishedCount})
+            </Button>
+          )}
+          {/* Currently we don't need to allow this as dynamic content can't be used either */}
+          {/* <Button
+            onClick={() => openKeyDialog()}
+            className="flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Add Translation Key
+          </Button> */}
+        </div>
       </div>
 
       {/* Stats */}
@@ -408,28 +510,22 @@ export default function CMSTranslationsPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completion</CardTitle>
-            <Check className="h-4 w-4 text-emerald-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {translationKeys.length > 0
-                ? Math.round(
-                    (translationKeys.reduce(
-                      (sum, key) => sum + key.translations.length,
-                      0,
-                    ) /
-                      (translationKeys.length * languages.length)) *
-                      100,
-                  )
-                : 0}
-              %
-            </div>
-            <p className="text-xs text-muted-foreground">Average completion</p>
-          </CardContent>
-        </Card>
+        {session?.user.role === "ADMIN" && (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Unpublished</CardTitle>
+              <Globe className="h-4 w-4 text-orange-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{unpublishedCount}</div>
+              <p className="text-xs text-muted-foreground">
+                {publicationHistory.length > 0
+                  ? `Last published: ${new Date(publicationHistory[0]?.publishedAt).toLocaleDateString()}`
+                  : "Never published"}
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Filters */}
@@ -627,6 +723,55 @@ export default function CMSTranslationsPage() {
             ));
           })()}
         </div>
+      )}
+
+      {/* Publish Dialog - Only for Admins */}
+      {session?.user.role === "ADMIN" && (
+        <Dialog
+          open={isPublishDialogOpen}
+          onOpenChange={setIsPublishDialogOpen}
+        >
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Publish Translations</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-gray-600 mb-4">
+                  This will publish {unpublishedCount} approved translations and
+                  trigger a deployment to update the live site.
+                </p>
+                <Label htmlFor="publishNotes">Release Notes (Optional)</Label>
+                <Textarea
+                  id="publishNotes"
+                  value={publishNotes}
+                  onChange={(e) => setPublishNotes(e.target.value)}
+                  placeholder="Describe what's being published..."
+                  className="mt-1"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsPublishDialogOpen(false);
+                  setPublishNotes("");
+                }}
+                disabled={isPublishing}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handlePublish}
+                disabled={isPublishing}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                {isPublishing ? "Publishing..." : "Publish & Deploy"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
 
       {/* Key Dialog */}

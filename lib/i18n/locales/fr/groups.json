@@ -1,0 +1,75 @@
+{
+  "actions": {
+    "delete_group": "Supprimer le groupe",
+    "edit_group": "Modifier le groupe",
+    "view_details": "Voir les détails"
+  },
+  "add_group": "Ajouter un groupe",
+  "create_group": "Créer un groupe",
+  "detail": {
+    "active_tasks": "Tâches actives",
+    "add_first_student": "Ajoutez votre premier étudiant",
+    "add_student": "Ajouter un étudiant",
+    "cancel": "Annuler",
+    "create_first_task": "Créez votre première tâche",
+    "create_task": "Créer une tâche",
+    "edit_dialog": {
+      "academic_year": "Année académique",
+      "grade": "Niveau",
+      "group_code": "Code du groupe",
+      "group_name": "Nom du groupe",
+      "title": "Modifier le groupe"
+    },
+    "edit_group": "Modifier le groupe",
+    "loading": "Chargement...",
+    "move_student": "Déplacer l'étudiant",
+    "move_student_dialog": {
+      "choose_student": "Choisir un étudiant",
+      "choose_target_group": "Choisir le groupe cible",
+      "move_button": "Déplacer l'étudiant",
+      "select_student": "Sélectionner un étudiant",
+      "target_group": "Groupe cible",
+      "title": "Déplacer l'étudiant"
+    },
+    "no_students": "Aucun étudiant trouvé",
+    "no_tasks": "Aucune tâche trouvée",
+    "recent_tasks": "Tâches récentes",
+    "remove_student_dialog": {
+      "description": "Êtes-vous sûr de vouloir retirer cet étudiant du groupe ?",
+      "remove_button": "Retirer",
+      "title": "Retirer l'étudiant"
+    },
+    "save_changes": "Enregistrer les modifications",
+    "stats": {
+      "assessments": "évaluations",
+      "attendance": "présence",
+      "submissions": "soumissions"
+    },
+    "students": "Étudiants",
+    "task_info": {
+      "due_date": "Échéance"
+    },
+    "total_students": "Total des étudiants",
+    "tutors": "Tuteurs"
+  },
+  "form": {
+    "academic_year_label": "Année académique",
+    "code_label": "Code du groupe",
+    "grade_label": "Niveau",
+    "name_label": "Nom du groupe"
+  },
+  "loading": "Chargement des groupes...",
+  "no_groups": "Aucun groupe trouvé. Créez votre premier groupe pour commencer.",
+  "stats": {
+    "academic_year": "Année académique",
+    "active_groups": "Groupes actifs",
+    "active_tasks_label": "Tâches actives",
+    "grade": "Niveau",
+    "students": "Étudiants",
+    "total_groups": "Total des groupes",
+    "total_students_in_groups": "Étudiants dans les groupes",
+    "tutors_label": "Tuteurs"
+  },
+  "subtitle": "Gérer les groupes de classe et les affectations d'étudiants",
+  "title": "Groupes"
+}

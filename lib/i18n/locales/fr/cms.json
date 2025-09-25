@@ -1,0 +1,22 @@
+{
+  "analytics": {
+    "avg_session": "Session moy.",
+    "daily_active_users": "Utilisateurs actifs quotidiens",
+    "page_views": "Vues de page",
+    "subtitle": "Surveiller l'utilisation du système et les métriques de performance",
+    "system_load": "Charge système",
+    "title": "Analyses du système"
+  },
+  "settings": {
+    "database_settings": "Paramètres de base de données",
+    "email_settings": "Paramètres e-mail",
+    "general_settings": "Paramètres généraux",
+    "security_settings": "Paramètres de sécurité",
+    "subtitle": "Configurer les paramètres et préférences à l'échelle du système",
+    "title": "Paramètres système"
+  },
+  "system_settings": "Paramètres système",
+  "title": "Système de gestion de contenu",
+  "translations": "Traductions",
+  "user_management": "Gestion des utilisateurs"
+}

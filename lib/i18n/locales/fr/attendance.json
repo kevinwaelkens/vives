@@ -1,0 +1,30 @@
+{
+  "actions": {
+    "mark_all_absent": "Marquer tous absents",
+    "mark_all_present": "Marquer tous présents"
+  },
+  "export_report": "Exporter le rapport",
+  "form": {
+    "date_label": "Date",
+    "group_label": "Groupe",
+    "select_group": "Sélectionner un groupe"
+  },
+  "loading_students": "Chargement des étudiants...",
+  "messages": {
+    "attendance_failed": "Échec du marquage de présence",
+    "attendance_marked": "Présence marquée",
+    "bulk_marked": "Tous les étudiants marqués comme {{status}}"
+  },
+  "no_students": "Aucun étudiant trouvé dans ce groupe.",
+  "select_group_message": "Veuillez sélectionner un groupe pour marquer la présence",
+  "stats": {
+    "absent": "Absent",
+    "excused": "Excusé",
+    "late": "En retard",
+    "present": "Présent",
+    "total": "Total"
+  },
+  "students_title": "Étudiants",
+  "subtitle": "Suivre la présence quotidienne des étudiants",
+  "title": "Présence"
+}

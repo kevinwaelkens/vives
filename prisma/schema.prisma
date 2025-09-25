@@ -23,6 +23,7 @@ model User {
   notifications Notification[]
   userRoles     UserRole[]
   groups        Group[]        @relation("GroupTutors")
+  translationPublications TranslationPublication[]
 
   @@index([email])
   @@index([role])
@@ -360,6 +361,8 @@ model Translation {
   languageId       String
   text             String
   isApproved       Boolean        @default(false)
+  isPublished      Boolean        @default(false)
+  publishedAt      DateTime?
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
   language         Language       @relation(fields: [languageId], references: [id], onDelete: Cascade)
@@ -368,6 +371,21 @@ model Translation {
   @@unique([translationKeyId, languageId])
   @@index([translationKeyId])
   @@index([languageId])
+  @@index([isPublished])
+}
+
+model TranslationPublication {
+  id               String    @id @default(cuid())
+  version          String    @unique
+  publishedBy      String
+  publishedAt      DateTime  @default(now())
+  deploymentUrl    String?
+  deploymentStatus String    @default("pending") // pending, building, success, failed
+  notes            String?
+  user             User      @relation(fields: [publishedBy], references: [id])
+
+  @@index([publishedAt])
+  @@index([deploymentStatus])
 }
 
 enum Role {

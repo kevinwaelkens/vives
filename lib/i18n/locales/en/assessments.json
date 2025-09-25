@@ -1,0 +1,32 @@
+{
+  "actions": {
+    "grade": "Grade",
+    "view": "View"
+  },
+  "filters": {
+    "all": "All",
+    "not_submitted": "Not Submitted",
+    "to_grade": "To Grade"
+  },
+  "loading": "Loading assessments...",
+  "no_assessments": "No assessments found.",
+  "no_submission": "No submission",
+  "stats": {
+    "graded": "Graded",
+    "late": "Late",
+    "missing": "Missing",
+    "pending": "Pending",
+    "total": "Total"
+  },
+  "subtitle": "Grade student submissions and provide feedback",
+  "table": {
+    "all_assessments": "All Assessments",
+    "grade": "Grade",
+    "score": "Score",
+    "student": "Student",
+    "submitted": "Submitted",
+    "task": "Task",
+    "type": "Type"
+  },
+  "title": "Assessments"
+}

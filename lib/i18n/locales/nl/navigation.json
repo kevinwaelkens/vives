@@ -1,0 +1,13 @@
+{
+  "analytics": "Analytics",
+  "assessments": "Beoordelingen",
+  "attendance": "Aanwezigheid",
+  "auth": {
+    "logout": "Uitloggen"
+  },
+  "dashboard": "Dashboard",
+  "groups": "Groepen",
+  "settings": "Instellingen",
+  "students": "Studenten",
+  "tasks": "Taken"
+}

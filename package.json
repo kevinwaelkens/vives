@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npm run i18n:generate || echo 'i18n generation failed, continuing...' && next dev",
-    "build": "npm run i18n:generate && prisma generate && next build",
+    "build": "npm run i18n:generate && npm run i18n:build && prisma generate && next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "lint": "biome check",
@@ -14,6 +14,7 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
     "i18n:generate": "tsx scripts/generate-i18n-types.ts",
+    "i18n:build": "tsx scripts/generate-translations-from-db.ts",
     "i18n:seed": "tsx prisma/translation-seed.ts",
     "migrate": "tsx scripts/migration-system.ts",
     "test": "playwright test",
@@ -21,6 +22,7 @@
     "test:debug": "playwright test --debug",
     "test:seed": "tsx prisma/test-seed.ts",
     "deploy:setup": "tsx scripts/deploy-setup.ts",
+    "export-translations": "tsx scripts/export-translations.ts",
     "postinstall": "prisma generate"
   },
   "prisma": {

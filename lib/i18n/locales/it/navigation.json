@@ -1,0 +1,13 @@
+{
+  "analytics": "Analisi",
+  "assessments": "Valutazioni",
+  "attendance": "Presenza",
+  "auth": {
+    "logout": "Disconnetti"
+  },
+  "dashboard": "Dashboard",
+  "groups": "Gruppi",
+  "settings": "Impostazioni",
+  "students": "Studenti",
+  "tasks": "Compiti"
+}

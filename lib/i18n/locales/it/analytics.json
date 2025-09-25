@@ -1,0 +1,39 @@
+{
+  "average_score_trend": "Tendenza punteggio medio",
+  "avg_class_size": "Dimensione media classe",
+  "avg_submission_rate": "Tasso medio di invio",
+  "chart_labels": {
+    "absent": "Assente",
+    "late": "In ritardo",
+    "present": "Presente"
+  },
+  "charts": {
+    "attendance_trend": "Tendenza presenza",
+    "grade_distribution": "Distribuzione voti",
+    "performance_trend": "Tendenza prestazioni",
+    "task_completion_rate": "Tasso di completamento compiti",
+    "top_performers": "Migliori performer"
+  },
+  "detailed_statistics": "Statistiche dettagliate",
+  "error_loading": "Errore nel caricamento dei dati analitici",
+  "loading": "Caricamento analisi...",
+  "metrics": {
+    "active_students": "Studenti attivi",
+    "attendance_rate": "Tasso di presenza",
+    "average_score": "Punteggio medio",
+    "based_on_graded": "Basato su valutazioni valutate",
+    "currently_enrolled": "Attualmente iscritti",
+    "graded_assessments": "Valutazioni valutate",
+    "last_7_days": "Ultimi 7 giorni",
+    "tasks_completed": "Compiti completati"
+  },
+  "no_data_available": "Nessun dato analitico disponibile",
+  "pass_rate": "Tasso di successo",
+  "performance_insights": "Insights e tendenze delle prestazioni",
+  "student_performance": "Prestazioni degli studenti",
+  "subtitle": "Visualizza analisi e insights completi",
+  "task_completion": "Completamento compiti",
+  "title": "Analisi",
+  "total_assignments": "Totale compiti",
+  "weekly_attendance": "Presenza settimanale"
+}

@@ -1,0 +1,44 @@
+{
+  "attendance": {
+    "absent": "Absent",
+    "excused": "Excusé",
+    "late": "En retard",
+    "present": "Présent",
+    "title": "Présence d'aujourd'hui"
+  },
+  "detail": {
+    "active_tasks": "Tâches actives",
+    "add_first_student": "Ajoutez votre premier étudiant",
+    "create_first_task": "Créez votre première tâche",
+    "loading": "Chargement...",
+    "no_students": "Aucun étudiant trouvé",
+    "no_tasks": "Aucune tâche trouvée",
+    "recent_tasks": "Tâches récentes",
+    "students": "Étudiants",
+    "total_students": "Total des étudiants",
+    "tutors": "Tuteurs"
+  },
+  "due_in_days": "Échéance : Dans {{count}} jours",
+  "due_next_week": "Échéance : La semaine prochaine",
+  "due_tomorrow": "Échéance : Demain",
+  "late_submission": "En retard",
+  "loading": "Chargement du tableau de bord...",
+  "overview": "Aperçu",
+  "recent_activity": "Activité récente",
+  "recent_submissions": "Soumissions récentes",
+  "recent_tasks": "Tâches récentes",
+  "statistics": "Statistiques",
+  "stats": {
+    "active_class_groups": "Groupes de classe actifs",
+    "active_students_enrolled": "Étudiants actifs inscrits",
+    "active_tasks": "Tâches actives",
+    "awaiting_grading": "En attente de notation",
+    "pending_assessments": "Évaluations en attente",
+    "published_assignments": "Devoirs publiés",
+    "total_groups": "Total des groupes",
+    "total_students": "Total des étudiants"
+  },
+  "submitted": "Soumis",
+  "title": "Tableau de bord",
+  "welcome": "Bienvenue dans le système de gestion scolaire"
+}

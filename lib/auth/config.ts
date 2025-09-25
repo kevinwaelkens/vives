@@ -33,44 +33,14 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
   session: {
     strategy: "jwt",
-    maxAge: 7 * 24 * 60 * 60, // 7 days (1 week)
+    maxAge: 30 * 24 * 60 * 60, // 30 days (1 month)
     updateAge: 24 * 60 * 60, // 24 hours - refresh session daily
   },
   jwt: {
-    maxAge: 7 * 24 * 60 * 60, // 7 days (1 week)
+    maxAge: 30 * 24 * 60 * 60, // 30 days (1 month)
   },
-  cookies: {
-    sessionToken: {
-      name: `next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 7 * 24 * 60 * 60, // 7 days (1 week)
-      },
-    },
-    callbackUrl: {
-      name: `next-auth.callback-url`,
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 7 * 24 * 60 * 60, // 7 days (1 week)
-      },
-    },
-    csrfToken: {
-      name: `next-auth.csrf-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 7 * 24 * 60 * 60, // 7 days (1 week)
-      },
-    },
-  },
+  // Remove custom cookie config to use NextAuth defaults
+  // This should fix cookie persistence issues
   pages: {
     signIn: "/login",
     signOut: "/",
@@ -127,14 +97,46 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       // Initial sign in
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.iat = Math.floor(Date.now() / 1000);
       }
 
-      // Return previous token if the access token has not expired yet
+      // Refresh user data on update trigger or periodically
+      if (
+        trigger === "update" ||
+        (token.iat && Date.now() - token.iat * 1000 > 24 * 60 * 60 * 1000)
+      ) {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              role: true,
+              isActive: true,
+            },
+          });
+
+          if (!dbUser || !dbUser.isActive) {
+            // User was deactivated, force logout
+            return null;
+          }
+
+          // Update token with fresh user data
+          token.id = dbUser.id;
+          token.role = dbUser.role;
+          token.iat = Math.floor(Date.now() / 1000);
+        } catch (error) {
+          console.error("Error refreshing user data:", error);
+          // Return existing token on error to avoid logout
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {

@@ -14,24 +14,40 @@ export function useTranslation<T extends TranslationKey = "common">(
   options: UseTranslationOptions = {},
 ): any {
   const {
-    useDynamic = false,
+    useDynamic = true, // Default to dynamic in hybrid system
     fallbackToStatic = true,
     showLoadingFallback = true,
   } = options;
 
-  // Static translation (original behavior)
+  // Static translation (fallback behavior)
   const staticTranslation = useI18nTranslation(ns);
 
-  // Dynamic translation (new behavior)
+  // Dynamic translation (preferred behavior)
   const dynamicTranslation = useDynamicTranslation(ns as TranslationNamespace, {
     fallbackToStatic,
     enabled: useDynamic,
   });
 
-  // Return the appropriate translation system
+  // In hybrid system: use dynamic if ready, otherwise fall back to static
   if (useDynamic) {
+    // Create a hybrid translation function that falls back to static
+    const hybridT = (key: string, params?: any) => {
+      // If dynamic translations are ready and have the key, use them
+      if (
+        dynamicTranslation.ready &&
+        dynamicTranslation.translations &&
+        dynamicTranslation.translations[key]
+      ) {
+        return dynamicTranslation.t(key, params);
+      }
+
+      // Otherwise, fall back to static translations
+      return staticTranslation.t(key, params);
+    };
+
     return {
       ...dynamicTranslation,
+      t: hybridT, // Use hybrid translation function
       // Maintain compatibility with react-i18next interface
       i18n: staticTranslation.i18n,
       // Enhanced loading information

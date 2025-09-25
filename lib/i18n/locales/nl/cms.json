@@ -1,0 +1,22 @@
+{
+  "analytics": {
+    "avg_session": "Gem. sessie",
+    "daily_active_users": "Dagelijks actieve gebruikers",
+    "page_views": "Paginaweergaven",
+    "subtitle": "Monitor systeemgebruik en prestatiemetrieken",
+    "system_load": "Systeembelasting",
+    "title": "Systeemanalyse"
+  },
+  "settings": {
+    "database_settings": "Database-instellingen",
+    "email_settings": "E-mailinstellingen",
+    "general_settings": "Algemene instellingen",
+    "security_settings": "Beveiligingsinstellingen",
+    "subtitle": "Configureer systeembrede instellingen en voorkeuren",
+    "title": "Systeeminstellingen"
+  },
+  "system_settings": "Systeeminstellingen",
+  "title": "Contentmanagementsysteem",
+  "translations": "Vertalingen",
+  "user_management": "Gebruikersbeheer"
+}
